@@ -1,0 +1,96 @@
+---
+import type { APIResponse } from '../interfaces/types';
+import BaseHead from '../components/BaseHead.astro';
+
+const title = "Beer rating"
+const description = "Page about beer"
+
+const spreadsheetId = import.meta.env.SPREADSHEET_ID;
+const range = import.meta.env.RANGE;
+const apiKey = import.meta.env.GOOGLE_SHEETS_API_KEY;
+
+const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+let data: string[][] = []; // Type data as a 2D array of strings
+let error: string | null = null;
+
+try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const result: APIResponse = await response.json();    
+
+    if (!result.values || result.values.length === 0) {
+        throw new Error('Error: No data found in the Google Sheet.');
+    }
+
+    // Filter out rows where the first cell is empty
+    data = result.values.filter(row => row[0].trim() !== '');
+} catch (err) {
+    error = (err as Error).message;
+    console.error('Failed to fetch data:', err);
+}
+---
+
+<html lang="se">
+    <head>
+        <BaseHead title={title} description={description} />
+        <style>
+           a.buttonSystembolaget {
+                padding: 1px 6px;
+                border: 1px outset buttonborder;
+                border-radius: 3px;
+                color: #ffe32a;
+                background-color: #1a6a54;
+                text-decoration: none;
+            }
+            a.buttonUntappd {
+                padding: 1px 6px;
+                border: 1px outset buttonborder;
+                border-radius: 3px;
+                color: black;
+                background-color: #ffc000;
+                text-decoration: none;
+            }
+        </style>
+    </head>
+</html>
+
+<h1>Beer Ratings</h1>
+
+{error ? (
+    <p style="color: red;">{error}</p>
+) : (
+    <table border="1">
+        <thead>
+            <tr>
+                {data[0].map((header) => (
+                    <th>{header}</th>
+                ))}
+            </tr>
+        </thead>
+        <tbody>
+            {data.slice(1).map((row) => (
+                <tr>
+                    <td >
+                        <span>{row[0]}</span>
+                        <div>
+                          
+                            <a href={`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(row[0])}`}  class="buttonSystembolaget" target="_blank" 
+                                rel="noopener noreferrer">Systembolaget</a>
+                                <a href={`https://untappd.com/search?q=${encodeURIComponent(row[0])}`}   class="buttonUntappd" target="_blank" 
+                                rel="noopener noreferrer">Untappd</a>
+                       
+                        </div>
+                    </td>
+                    {row.slice(1).map((cell) => (
+                        <td>{cell || ''}</td>
+                    ))}
+                </tr>
+            ))}
+        </tbody>
+    </table>
+)}
