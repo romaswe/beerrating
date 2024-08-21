@@ -5,3 +5,9 @@ export interface APIResponse {
   majorDimension: string;
   values: string[][];
 }
+
+export interface BeerObj {
+  name: string;
+  rating: number;
+  style: string;
+}

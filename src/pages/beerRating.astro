@@ -1,14 +1,7 @@
 ---
-import type { APIResponse } from "../interfaces/types";
+import type { APIResponse, BeerObj } from "../interfaces/types";
 import BaseHead from "../components/BaseHead.astro";
-
-enum BeerStyles {
-  LagerPils = "Lager/Pils",
-  IpaApaAle = "IPA/APA/Ale",
-  PorterStout = "Porter/Stout",
-  SourOther = "Suröl/annan öl",
-  Wheat = "Veteöl",
-}
+import Header from "../components/Header.astro";
 
 const title = "Beer rating";
 const description = "Page about beer";
@@ -23,7 +16,7 @@ let data: string[][] = []; // Type data as a 2D array of strings
 let error: string | null = null;
 
 let styleMap: Map<string, number> = new Map();
-let topBeerMap: Map<string, string> = new Map();
+let topBeerMap: Map<string, BeerObj> = new Map();
 
 try {
   const response = await fetch(url);
@@ -47,22 +40,25 @@ try {
 }
 
 async function getStats(data: string[][]) {
-  // Create map of beer styles
-  Object.values(BeerStyles).forEach((style) => {
-    styleMap.set(style, 0);
-    topBeerMap.set(style, "");
-  });
-
   var dataIndex = 0;
   data.forEach((row) => {
     // We are skipping the first row becasue its the headers
     if (dataIndex >= 1) {
-      let style = row[1];
-      if (styleMap.has(style)) {
-        styleMap.set(style, (styleMap.get(style) ?? 0) + 1);
-      } else {
-        console.log(`${style} is not a key`);
-        styleMap.set(style, (styleMap.get(style) ?? 0) + 1);
+      const style = row[1];
+      // Create a map with the number of beers of each style
+      styleMap.set(style, (styleMap.get(style) ?? 0) + 1);
+
+      // get the top (average) rated beer of each style
+      const roundedRating = Math.round(Number(row[6]) * 100) / 100;
+      const beerObj: BeerObj = {
+        name: row[0],
+        rating: roundedRating,
+        style: style,
+      };
+      const compareRating =
+        Math.round((topBeerMap.get(style)?.rating ?? 0) * 100) / 100;
+      if (compareRating <= beerObj.rating) {
+        topBeerMap.set(style, beerObj);
       }
     }
     dataIndex++;
@@ -91,6 +87,7 @@ async function getStats(data: string[][]) {
         color: #ffe32a;
         background-color: #1a6a54;
         text-decoration: none;
+        margin: 1px;
       }
       a.buttonUntappd {
         padding: 1px 6px;
@@ -99,75 +96,79 @@ async function getStats(data: string[][]) {
         color: black;
         background-color: #ffc000;
         text-decoration: none;
+        margin: 1px;
       }
     </style>
   </head>
-</html>
+  <body>
+    <Header />
+    <h1>Beer Ratings</h1>
+    <div class="stats">
+      <div class="statsdata">
+        {
+          Array.from(styleMap).map((mapArray) => (
+            <p>
+              Style: "{mapArray[0]}" Count: {mapArray[1]}
+            </p>
+          ))
+        }
+      </div>
+      <div class="statsdata">
+        {
+          Array.from(topBeerMap).map((mapArray) => (
+            <p>
+              Style: "{mapArray[0]}" Name: "{mapArray[1].name}" Rating:{" "}
+              {mapArray[1].rating}
+            </p>
+          ))
+        }
+      </div>
+    </div>
 
-<h1>Beer Ratings</h1>
-<div class="stats">
-  <div class="statsdata">
     {
-      Array.from(styleMap).map((mapArray) => (
-        <p>
-          Style: "{mapArray[0]}" Count: {mapArray[1]}
-        </p>
-      ))
-    }
-  </div>
-  <div class="statsdata">
-    {
-      Array.from(styleMap).map((mapArray) => (
-        <p>
-          Style: "{mapArray[0]}" Count: {mapArray[1]}
-        </p>
-      ))
-    }
-  </div>
-</div>
-
-{
-  error ? (
-    <p style="color: red;">{error}</p>
-  ) : (
-    <table border="1">
-      <thead>
-        <tr>
-          {data[0].map((header) => (
-            <th>{header}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.slice(1).map((row) => (
-          <tr>
-            <td>
-              <span>{row[0]}</span>
-              <div>
-                <a
-                  href={`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(row[0])}`}
-                  class="buttonSystembolaget"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Systembolaget
-                </a>
-                <a
-                  href={`https://untappd.com/search?q=${encodeURIComponent(row[0])}`}
-                  class="buttonUntappd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Untappd
-                </a>
-              </div>
-            </td>
-            {row.slice(1).map((cell) => (
-              <td>{cell || ""}</td>
+      error ? (
+        <p style="color: red;">{error}</p>
+      ) : (
+        <table border="1">
+          <thead>
+            <tr>
+              {data[0].map((header) => (
+                <th>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.slice(1).map((row) => (
+              <tr>
+                <td>
+                  <span>{row[0]}</span>
+                  <div>
+                    <a
+                      href={`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(row[0])}`}
+                      class="buttonSystembolaget"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Systembolaget
+                    </a>
+                    <a
+                      href={`https://untappd.com/search?q=${encodeURIComponent(row[0])}`}
+                      class="buttonUntappd"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Untappd
+                    </a>
+                  </div>
+                </td>
+                {row.slice(1).map((cell) => (
+                  <td>{cell || ""}</td>
+                ))}
+              </tr>
             ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
-}
+          </tbody>
+        </table>
+      )
+    }
+  </body>
+</html>
