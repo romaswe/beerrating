@@ -2,6 +2,7 @@
 import type { APIResponse, BeerObj, StyleObj } from "../interfaces/types";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
 const title = "Beer rating";
 const description = "Page about beer";
@@ -49,8 +50,6 @@ try {
 async function getStats(data: string[][]) {
   var dataIndex = 0;
   data.forEach((row) => {
-    // We are skipping the first row becasue its the headers
-    if (dataIndex >= 1) {
       const name = row[0];
       const style = row[1];
       const avrageRating = row[6];
@@ -75,7 +74,6 @@ async function getStats(data: string[][]) {
       }
 
       styleMap.set(style, styleObj);
-    }
     dataIndex++;
   });
   //console.log(styleMap);
@@ -249,6 +247,7 @@ async function getStats(data: string[][]) {
   </head>
   <body>
     <Header />
+    <main>
     <h1>Beer Ratings</h1>
     <div class="stats">
       {
@@ -328,5 +327,7 @@ async function getStats(data: string[][]) {
         </table>
       )
     }
+    </main>
+    <Footer />
   </body>
 </html>
