@@ -123,6 +123,19 @@ async function getStats(data: string[][]) {
         padding: 15px;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;  /* Make the wrapper a containing block for the buttons */
+        min-height: 150px;  /* Optional: set a minimum height to ensure enough space */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;  /* Align content at the top */
+      }
+
+      .styleWrapper .button-container {
+        position: absolute;
+        bottom: 10px;
+        left: 15px;
+        display: flex;
+        gap: 10px;
       }
 
       /* Buttons */
@@ -132,8 +145,6 @@ async function getStats(data: string[][]) {
         color: white;
         border: none;
         padding: 8px 12px;
-        margin-right: 5px;
-        margin-top: 10px;
         text-decoration: none;
         border-radius: 4px;
         cursor: pointer;
@@ -142,6 +153,11 @@ async function getStats(data: string[][]) {
 
       .buttonSystembolaget:hover, .buttonUntappd:hover {
         background-color: #0056b3;
+      }
+
+      /* Ensure that h2 and h3 remain at the top */
+      .styleWrapper h2, .styleWrapper h3 {
+        margin-bottom: auto;
       }
 
       /* Table Styling */
