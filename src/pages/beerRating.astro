@@ -13,6 +13,7 @@ const apiKey = import.meta.env.GOOGLE_SHEETS_API_KEY;
 const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
 
 let data: string[][] = []; // Type data as a 2D array of strings
+let headers: string[] = [];
 let error: string | null = null;
 
 let styleMap: Map<string, StyleObj> = new Map();
@@ -30,8 +31,15 @@ try {
     throw new Error("Error: No data found in the Google Sheet.");
   }
 
-  // Filter out rows where the first cell is empty
-  data = result.values.filter((row) => row[0].trim() !== "");
+  headers = result.values[0]; // The first row is the headers
+  
+  data = result.values.slice(1).filter((row) => row[0].trim() !== "");
+  data = data.sort((a, b) => {
+    const valueA = parseFloat(a[6]) || 0; // Parse as float, use 0 if empty or NaN
+    const valueB = parseFloat(b[6]) || 0; // Parse as float, use 0 if empty or NaN
+
+    return valueB - valueA; // Sort in descending order (largest first)
+  });
   await getStats(data);
 } catch (err) {
   error = (err as Error).message;
@@ -71,7 +79,7 @@ async function getStats(data: string[][]) {
     dataIndex++;
   });
   //console.log(styleMap);
-  Array.from(styleMap).map((mapArray) => console.log(mapArray));
+  //Array.from(styleMap).map((mapArray) => console.log(mapArray));
 }
 ---
 
@@ -282,7 +290,7 @@ async function getStats(data: string[][]) {
         <table border="1">
           <thead>
             <tr>
-              {data[0].map((header) => (
+              {headers.map((header) => (
                 <th>{header}</th>
               ))}
             </tr>
