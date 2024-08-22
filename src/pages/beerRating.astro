@@ -53,10 +53,16 @@ async function getStats(data: string[][]) {
     const name = row[0];
     const style = row[1];
     const avrageRating = row[6];
-    var styleObj: StyleObj = {
+
+    const avrageStyleRating =
+      (styleMap.get(style)?.avrageStyleRating ?? 0) +
+      (isNaN(parseFloat(avrageRating)) ? 0 : parseFloat(avrageRating));
+
+    const styleObj: StyleObj = {
       style: style,
       count: (styleMap.get(style)?.count ?? 0) + 1,
       topBeer: styleMap.get(style)?.topBeer,
+      avrageStyleRating: avrageStyleRating,
     };
 
     // get the top (average) rated beer of each style
