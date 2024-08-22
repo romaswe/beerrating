@@ -2,9 +2,11 @@ services:
   frontend:
     build: .
     ports:
-      - "8080:80"
+      - "9570:80"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
+    container_name: BeerRating-astro
