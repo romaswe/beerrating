@@ -79,30 +79,126 @@ async function getStats(data: string[][]) {
   <head>
     <BaseHead title={title} description={description} />
     <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      h2, h3 {
+        margin: 5px 0;
+      }
+
+      p {
+        margin: 5px 0;
+      }
+
+      /* Header styling */
+      header {
+        background-color: #007BFF;
+        color: white;
+        padding: 10px;
+        text-align: center;
+      }
+
+      /* Stats Section */
       .stats {
         display: flex;
-        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        margin: 20px;
       }
-      .statsdata {
-        margin: auto;
+
+      .styleWrapper {
+        flex: 1 1 300px;
+        background-color: #f9f9f9;
+        margin: 10px;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
-      a.buttonSystembolaget {
-        padding: 1px 6px;
-        border: 1px outset buttonborder;
-        border-radius: 3px;
-        color: #ffe32a;
-        background-color: #1a6a54;
+
+      /* Buttons */
+      .buttonSystembolaget, .buttonUntappd {
+        display: inline-block;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        margin-right: 5px;
+        margin-top: 10px;
         text-decoration: none;
-        margin: 1px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
       }
-      a.buttonUntappd {
-        padding: 1px 6px;
-        border: 1px outset buttonborder;
-        border-radius: 3px;
-        color: black;
-        background-color: #ffc000;
-        text-decoration: none;
-        margin: 1px;
+
+      .buttonSystembolaget:hover, .buttonUntappd:hover {
+        background-color: #0056b3;
+      }
+
+      /* Table Styling */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      th, td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      /* Flexbox layout inside beer row cells */
+      .td-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .td-content > span {
+        flex: 1;
+      }
+
+      .td-content > div {
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        /* Stats Section */
+        .stats {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .styleWrapper {
+          width: 90%;
+          margin-bottom: 20px;
+        }
+
+        /* Table adjustments */
+        .td-content {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .td-content > div {
+          margin-top: 10px;
+        }
       }
     </style>
   </head>
@@ -117,7 +213,7 @@ async function getStats(data: string[][]) {
               {mapArray[0]}: {mapArray[1].count}
             </h2>
             <h3>
-              Top beer {mapArray[1].topBeer?.name} {mapArray[1].topBeer?.rating}
+              Top beer: {mapArray[1].topBeer?.name} {mapArray[1].topBeer?.rating}
             </h3>
             <p>
               {mapArray[1].topBeer?.name ? (<a
