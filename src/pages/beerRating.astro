@@ -1,5 +1,5 @@
 ---
-import type { APIResponse, BeerObj } from "../interfaces/types";
+import type { APIResponse, BeerObj, StyleObj } from "../interfaces/types";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 
@@ -15,8 +15,7 @@ const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/valu
 let data: string[][] = []; // Type data as a 2D array of strings
 let error: string | null = null;
 
-let styleMap: Map<string, number> = new Map();
-let topBeerMap: Map<string, BeerObj> = new Map();
+let styleMap: Map<string, StyleObj> = new Map();
 
 try {
   const response = await fetch(url);
@@ -44,28 +43,35 @@ async function getStats(data: string[][]) {
   data.forEach((row) => {
     // We are skipping the first row becasue its the headers
     if (dataIndex >= 1) {
+      const name = row[0];
       const style = row[1];
-      // Create a map with the number of beers of each style
-      styleMap.set(style, (styleMap.get(style) ?? 0) + 1);
+      const avrageRating = row[6];
+      var styleObj: StyleObj = {
+        style: style,
+        count: (styleMap.get(style)?.count ?? 0) + 1,
+        topBeer: styleMap.get(style)?.topBeer,
+      };
 
       // get the top (average) rated beer of each style
-      const roundedRating = Math.round(Number(row[6]) * 100) / 100;
+      const roundedRating = Math.round(Number(avrageRating) * 100) / 100;
       const beerObj: BeerObj = {
-        name: row[0],
+        name: name,
         rating: roundedRating,
         style: style,
       };
       const compareRating =
-        Math.round((topBeerMap.get(style)?.rating ?? 0) * 100) / 100;
+        Math.round((styleMap.get(style)?.topBeer?.rating ?? 0) * 100) / 100;
+
       if (compareRating <= beerObj.rating) {
-        topBeerMap.set(style, beerObj);
+        styleObj.topBeer = beerObj;
       }
+
+      styleMap.set(style, styleObj);
     }
     dataIndex++;
   });
-  styleMap = new Map([...styleMap.entries()].sort((a, b) => b[1] - a[1]));
-  console.log(styleMap);
-  console.log(topBeerMap);
+  //console.log(styleMap);
+  Array.from(styleMap).map((mapArray) => console.log(mapArray));
 }
 ---
 
@@ -104,25 +110,36 @@ async function getStats(data: string[][]) {
     <Header />
     <h1>Beer Ratings</h1>
     <div class="stats">
-      <div class="statsdata">
-        {
-          Array.from(styleMap).map((mapArray) => (
+      {
+        Array.from(styleMap).map((mapArray) => (
+          <div class="styleWrapper">
+            <h2>
+              {mapArray[0]}: {mapArray[1].count}
+            </h2>
+            <h3>
+              Top beer {mapArray[1].topBeer?.name} {mapArray[1].topBeer?.rating}
+            </h3>
             <p>
-              Style: "{mapArray[0]}" Count: {mapArray[1]}
+              {mapArray[1].topBeer?.name ? (<a
+                href={`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(mapArray[1].topBeer?.name)}`}
+                class="buttonSystembolaget"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Systembolaget
+              </a>
+              <a
+                href={`https://untappd.com/search?q=${encodeURIComponent(mapArray[1].topBeer?.name)}`}
+                class="buttonUntappd"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Untappd
+              </a>): <p>No top beer found</p>}
             </p>
-          ))
-        }
-      </div>
-      <div class="statsdata">
-        {
-          Array.from(topBeerMap).map((mapArray) => (
-            <p>
-              Style: "{mapArray[0]}" Name: "{mapArray[1].name}" Rating:{" "}
-              {mapArray[1].rating}
-            </p>
-          ))
-        }
-      </div>
+          </div>
+        ))
+      }
     </div>
 
     {

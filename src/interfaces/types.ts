@@ -11,3 +11,9 @@ export interface BeerObj {
   rating: number;
   style: string;
 }
+
+export interface StyleObj {
+  style: string;
+  count: number;
+  topBeer?: BeerObj;
+}
