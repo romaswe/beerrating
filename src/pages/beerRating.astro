@@ -130,14 +130,6 @@ async function getStats(data: string[][]) {
         justify-content: flex-start;  /* Align content at the top */
       }
 
-      .styleWrapper .button-container {
-        position: absolute;
-        bottom: 10px;
-        left: 15px;
-        display: flex;
-        gap: 10px;
-      }
-
       /* Buttons */
       .buttonSystembolaget, .buttonUntappd {
         display: inline-block;
@@ -193,6 +185,18 @@ async function getStats(data: string[][]) {
         gap: 10px;
       }
 
+      /* Hide columns 3, 4, 5 when horizontal overflow is detected */
+        body.overflow-detected table td:nth-child(3),
+        body.overflow-detected table th:nth-child(3),
+        body.overflow-detected table td:nth-child(4),
+        body.overflow-detected table th:nth-child(4),
+        body.overflow-detected table td:nth-child(5),
+        body.overflow-detected table th:nth-child(5),
+        body.overflow-detected table td:nth-child(6),
+        body.overflow-detected table th:nth-child(6) {
+          display: none;
+        }
+
       /* Responsive Design */
       @media (max-width: 768px) {
         /* Stats Section */
@@ -217,6 +221,23 @@ async function getStats(data: string[][]) {
         }
       }
     </style>
+
+    <script>
+      function checkOverflow() {
+        const body = document.body;
+        const hasOverflow = body.scrollWidth > window.innerWidth;
+
+        if (hasOverflow) {
+          body.classList.add('overflow-detected');
+        } else {
+          body.classList.remove('overflow-detected');
+        }
+      }
+
+      // Run on page load and window resize
+      window.addEventListener('load', checkOverflow);
+      window.addEventListener('resize', checkOverflow);
+    </script>
   </head>
   <body>
     <Header />
