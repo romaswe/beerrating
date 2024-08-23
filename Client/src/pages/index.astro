@@ -10,204 +10,329 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
     <style>
+      /* Global Styles */
       body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #f4f4f4;
         color: #333;
-      }
-
-      .home-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      .intro,
-      .beer-styles,
-      .glassware,
-      .about-site,
-      .taste-profiles {
-        background-color: #ffffff;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
-
-      h1,
-      h2 {
-        color: #007bff;
-        margin-top: 0;
-      }
-
-      ul {
-        padding-left: 20px;
-      }
-
-      ul li {
-        margin-bottom: 10px;
-      }
-
-      p {
         line-height: 1.6;
       }
 
-      @media (max-width: 768px) {
-        .home-container {
-          padding: 10px;
+      /* Container Styles */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+      }
+
+      /* Full Row Styles */
+      .full-row {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* Header Styles */
+      .header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 20px 0;
+        margin-bottom: 20px;
+      }
+
+      /* Section Styles */
+      .section {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .section h2 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .section p,
+      .section ul,
+      .section ol {
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Responsive Grid Layout */
+      @media (min-width: 768px) {
+        .container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
         }
 
-        ul {
-          padding-left: 15px;
+        .section {
+          padding: 30px;
+          margin-bottom: 20px;
         }
 
-        ul li {
-          font-size: 14px;
+        .full-row {
+          margin-bottom: 20px;
+          grid-column: span 2;
         }
       }
     </style>
   </head>
   <body>
     <Header />
-    <main>
-      <div class="home-container">
-        <section class="intro">
-          <h1>Welcome to Beer Ratings</h1>
-          <p>
-            Discover and compare ratings of various beers, explore different
-            styles, and find the best glassware for your favorite brews. Whether
-            you're an aficionado or just getting started, this site is your
-            guide to the world of beer.
-          </p>
-        </section>
 
-        <section class="beer-styles">
-          <h2>Beer Styles</h2>
-          <p>
-            Beer comes in a wide variety of styles, each with its own unique
-            flavors, aromas, and characteristics. Here are some popular styles:
-          </p>
-          <ul>
-            <li>
-              <strong>IPA (India Pale Ale)</strong> - Known for its hoppy bitterness
-              and fruity notes. Often served in a tulip or pint glass.
-            </li>
-            <li>
-              <strong>Lager</strong> - A crisp and refreshing style, usually light
-              in flavor. Best enjoyed in a pint glass or a mug.
-            </li>
-            <li>
-              <strong>Stout</strong> - Rich, dark, and creamy with flavors of coffee
-              or chocolate. Serve in a snifter or a tulip glass.
-            </li>
-            <li>
-              <strong>Saison</strong> - A farmhouse ale with spicy and fruity flavors.
-              Typically served in a tulip or snifter.
-            </li>
-            <li>
-              <strong>Pilsner</strong> - A light and refreshing lager with a slightly
-              bitter finish. Perfect in a pilsner glass.
-            </li>
-            <li>
-              <strong>Wheat Beer</strong> - Light and cloudy with a citrusy flavor,
-              often served in a weizen glass.
-            </li>
-          </ul>
-        </section>
+    <main class="container">
+      <!-- New Section: Welcome Message -->
+      <section class="full-row welcome-section">
+        <h2>Welcome to Beer Ratings</h2>
+        <p>
+          Discover and compare ratings of various beers, explore different
+          styles, and find the best glassware for your favorite brews. Whether
+          you're an aficionado or just getting started, this site is your guide
+          to the world of beer.
+        </p>
+      </section>
 
-        <section class="taste-profiles">
-          <h2>Taste Profiles</h2>
-          <p>
-            Each beer style has its own distinct taste profile, which can range
-            from sweet and malty to bitter and hoppy. Understanding these
-            profiles can help you better appreciate the nuances of different
-            beers:
-          </p>
-          <ul>
-            <li>
-              <strong>Hoppy</strong> - Common in IPAs and Pale Ales, with strong
-              flavors of citrus, pine, or herbal notes. Often bitter but can also
-              have fruity undertones.
-            </li>
-            <li>
-              <strong>Malty</strong> - Found in styles like Bocks and Porters, offering
-              sweet flavors reminiscent of caramel, toffee, or chocolate. Provides
-              a rich and smooth mouthfeel.
-            </li>
-            <li>
-              <strong>Fruity</strong> - Typical in Belgian Ales and certain Sours,
-              with flavors ranging from citrus and berries to tropical fruits. Can
-              be sweet or tart.
-            </li>
-            <li>
-              <strong>Spicy</strong> - Present in styles like Saisons and some Belgian
-              Ales, featuring flavors of pepper, clove, or coriander. Adds a zesty,
-              warming character.
-            </li>
-            <li>
-              <strong>Roasty</strong> - Characteristic of Stouts and Porters, offering
-              deep flavors of coffee, espresso, or dark chocolate. Often associated
-              with a dry finish.
-            </li>
-            <li>
-              <strong>Sour/Tart</strong> - Found in Sour Ales and Lambics, with a
-              sharp, tangy flavor that can range from mildly acidic to intensely
-              sour.
-            </li>
-            <li>
-              <strong>Smoky</strong> - Seen in Rauchbiers and some Scotch Ales, delivering
-              flavors reminiscent of smoked meat or wood. Adds a complex, savory
-              depth.
-            </li>
-          </ul>
-        </section>
+      <!-- Section: Beer Styles -->
+      <section class="section beer-styles">
+        <h2>Beer Styles</h2>
+        <p>
+          Beer styles range from light lagers to dark stouts, each with unique
+          characteristics. Here are some common beer styles:
+        </p>
+        <ul>
+          <li>
+            <strong>Lager:</strong> A light, crisp, and refreshing beer. Ideal for
+            hot weather.
+          </li>
+          <li>
+            <strong>Ale:</strong> Known for its fruity and spicy flavors. Ales are
+            usually fuller-bodied than lagers.
+          </li>
+          <li>
+            <strong>Stout:</strong> A dark, rich beer with flavors of coffee, chocolate,
+            and roasted malt.
+          </li>
+          <li>
+            <strong>IPA (India Pale Ale):</strong> A hoppy beer style known for its
+            strong, bitter flavor and floral aroma.
+          </li>
+          <li>
+            <strong>Wheat Beer:</strong> A light and cloudy beer with a smooth, slightly
+            sweet taste.
+          </li>
+          <li>
+            <strong>Sour Beer:</strong> A tart and tangy beer with a unique acidic
+            flavor profile.
+          </li>
+        </ul>
+      </section>
 
-        <section class="glassware">
-          <h2>Beer Glassware</h2>
-          <p>
-            Choosing the right glassware for your beer can enhance its flavors
-            and aroma. Here are some common types of beer glasses:
-          </p>
-          <ul>
-            <li>
-              <strong>Pint Glass</strong> - A versatile glass used for many styles,
-              especially IPAs and lagers.
-            </li>
-            <li>
-              <strong>Snifter</strong> - Ideal for strong ales and stouts, concentrating
-              the beer's aroma.
-            </li>
-            <li>
-              <strong>Tulip Glass</strong> - Great for Belgian ales and IPAs, with
-              a wide body and flared lip to capture aroma.
-            </li>
-            <li>
-              <strong>Weizen Glass</strong> - Tall and slender, perfect for wheat
-              beers, with a shape that supports the beer's foam.
-            </li>
-            <li>
-              <strong>Pilsner Glass</strong> - Narrow and tall, enhancing the appearance
-              of pilsners and lagers.
-            </li>
-            <li>
-              <strong>Mug</strong> - Thick-walled and sturdy, often used for lagers
-              and other session beers.
-            </li>
-          </ul>
-        </section>
+      <!-- Section: Taste Profiles -->
+      <section class="section taste-profiles">
+        <h2>Taste Profiles of Beers</h2>
+        <p>
+          Understanding the taste profile of a beer can enhance your tasting
+          experience. Here are some common taste descriptors:
+        </p>
+        <ul>
+          <li>
+            <strong>Sweet:</strong> Rich malt flavors, often found in stouts and
+            porters.
+          </li>
+          <li><strong>Bitter:</strong> Hoppy and resinous, typical of IPAs.</li>
+          <li>
+            <strong>Sour:</strong> Tart and acidic, characteristic of sour beers.
+          </li>
+          <li>
+            <strong>Fruity:</strong> Notes of citrus, berries, or tropical fruits,
+            often found in wheat beers and IPAs.
+          </li>
+          <li>
+            <strong>Spicy:</strong> Clove, pepper, and other spice notes, common
+            in Belgian ales.
+          </li>
+        </ul>
+      </section>
 
-        <section class="about-site">
-          <h2>About This Site</h2>
-          <p>
-            This website is designed to help beer enthusiasts explore and
-            compare different beers based on ratings. Whether you're looking for
-            the top-rated beers or learning more about various beer styles and
-            glassware, this site is your ultimate beer companion.
-          </p>
-        </section>
-      </div>
+      <!-- Section: Beer Glassware -->
+      <section class="section beer-glassware">
+        <h2>Beer Glassware</h2>
+        <p>
+          The right glass can enhance the aroma and flavor of your beer. Here
+          are some common types of beer glassware:
+        </p>
+        <ul>
+          <li>
+            <strong>Pint Glass:</strong> A versatile glass suitable for most beer
+            styles.
+          </li>
+          <li>
+            <strong>Snifter:</strong> Ideal for strong ales and stouts, allowing
+            you to swirl the beer and release its aromas.
+          </li>
+          <li>
+            <strong>Weizen Glass:</strong> Tall and curved, perfect for wheat beers.
+          </li>
+          <li>
+            <strong>Pilsner Glass:</strong> A tall, slender glass that showcases
+            the color and carbonation of lagers and pilsners.
+          </li>
+          <li>
+            <strong>Goblet:</strong> Wide-mouthed glass ideal for Belgian ales and
+            other rich beers.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section: Tasting and Evaluating Beer -->
+      <section class="section tasting">
+        <h2>Tasting and Evaluating Beer</h2>
+        <p>
+          Enhance your beer tasting experience with tips on how to properly
+          taste and evaluate different types of beer.
+        </p>
+        <ol>
+          <li>
+            <strong>Appearance:</strong> Observe the beer's color, clarity, and foam.
+          </li>
+          <li>
+            <strong>Aroma:</strong> Swirl the beer gently and take a deep sniff.
+          </li>
+          <li>
+            <strong>Taste:</strong> Take a small sip and consider the balance of
+            flavors.
+          </li>
+          <li>
+            <strong>Mouthfeel:</strong> Pay attention to the texture and body of
+            the beer.
+          </li>
+          <li>
+            <strong>Finish:</strong> Notice the aftertaste and how long the flavors
+            linger.
+          </li>
+        </ol>
+      </section>
+
+      <!-- Section: Homebrewing Basics -->
+      <section class="section homebrewing">
+        <h2>Homebrewing Basics</h2>
+        <p>
+          Learn the essentials of homebrewing and start brewing your own
+          delicious beer at home.
+        </p>
+        <h3>Essential Equipment</h3>
+        <ul>
+          <li>
+            <strong>Brewing Kettle:</strong> A large pot for boiling wort.
+          </li>
+          <li><strong>Fermenter:</strong> A container for fermentation.</li>
+          <li>
+            <strong>Airlock and Bung:</strong> Used to seal the fermenter.
+          </li>
+          <li>
+            <strong>Thermometer:</strong> For accurate temperature control.
+          </li>
+          <li><strong>Sanitizer:</strong> To prevent contamination.</li>
+          <li><strong>Bottling Equipment:</strong> For packaging your beer.</li>
+        </ul>
+      </section>
+
+      <!-- Section: Health and Beer -->
+      <section class="section health">
+        <h2>Health and Beer</h2>
+        <p>
+          Explore the health benefits and risks associated with beer
+          consumption. Learn how to enjoy beer responsibly as part of a balanced
+          lifestyle.
+        </p>
+        <ul>
+          <li>
+            <strong>Moderate Consumption:</strong> Benefits of drinking beer in moderation.
+          </li>
+          <li>
+            <strong>Antioxidants:</strong> The health benefits of antioxidants found
+            in beer.
+          </li>
+          <li>
+            <strong>Risks of Overconsumption:</strong> Health risks associated with
+            excessive drinking.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section: Beer Myths and Facts -->
+      <section class="section myths">
+        <h2>Beer Myths and Facts</h2>
+        <p>
+          Debunk common myths about beer and learn the real facts behind popular
+          misconceptions.
+        </p>
+        <ul>
+          <li>
+            <strong>Myth:</strong> Dark beers are stronger than light beers.
+            <br />
+            <strong>Fact:</strong> Color does not indicate strength.
+          </li>
+          <li>
+            <strong>Myth:</strong> Beer should always be served ice-cold.
+            <br />
+            <strong>Fact:</strong> Some beers are best served at warmer temperatures.
+          </li>
+          <li>
+            <strong>Myth:</strong> Beer causes "beer belly."
+            <br />
+            <strong>Fact:</strong> Weight gain is due to excess calories, not beer
+            itself.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section: Beer and the Environment -->
+      <section class="section environment">
+        <h2>Beer and the Environment</h2>
+        <p>
+          Understand the environmental impact of beer production and learn how
+          breweries are adopting sustainable practices.
+        </p>
+        <ul>
+          <li>
+            <strong>Water Usage:</strong> Beer production is water-intensive.
+          </li>
+          <li>
+            <strong>Energy Consumption:</strong> Brewing requires significant energy.
+          </li>
+          <li>
+            <strong>Recycling and Waste Management:</strong> Sustainable practices
+            in breweries.
+          </li>
+        </ul>
+      </section>
+
+      <!-- New Section: About This Site -->
+      <section class="full-row about-section">
+        <h2>About This Site</h2>
+        <p>
+          This website is designed to help beer enthusiasts explore and compare
+          different beers based on ratings. Whether you're looking for the
+          top-rated beers or learning more about various beer styles and
+          glassware, this site is your ultimate beer companion.
+        </p>
+      </section>
     </main>
     <Footer />
   </body>
