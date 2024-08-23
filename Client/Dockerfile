@@ -10,6 +10,9 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm install && npm cache clean --force
 
+# opt out from astro telemetry
+RUN npx astro telemetry disable
+
 # Copy the rest of the application files
 COPY . .
 

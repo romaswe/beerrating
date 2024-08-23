@@ -8,5 +8,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    environment:
+      - ASTRO_TELEMETRY_DISABLED=1
     restart: unless-stopped
     container_name: BeerRating-astro
