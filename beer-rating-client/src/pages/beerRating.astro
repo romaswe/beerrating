@@ -1,5 +1,5 @@
 ---
-import type { APIResponse, BeerObj, StyleObj } from "../interfaces/types";
+import type { BeerSheet, StyleArrayClass } from "../interfaces/types";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -7,17 +7,14 @@ import Footer from "../components/Footer.astro";
 const title = "Beer rating";
 const description = "Page about beer";
 
-const spreadsheetId = import.meta.env.SPREADSHEET_ID;
-const range = import.meta.env.RANGE;
-const apiKey = import.meta.env.GOOGLE_SHEETS_API_KEY;
+const backendUrl = import.meta.env.BACKEND_URL ?? "http://localhost:3000";
+const url = `${backendUrl}/api/sheets/beers-from-sheet`;
 
-const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
-
-let data: string[][] = []; // Type data as a 2D array of strings
 let headers: string[] = [];
+let data: string[][] = [];
+let styleMap: Array<Array<StyleArrayClass>> = []
 let error: string | null = null;
 
-let styleMap: Map<string, StyleObj> = new Map();
 
 try {
   const response = await fetch(url);
@@ -26,64 +23,15 @@ try {
     throw new Error(`Error: ${response.status} ${response.statusText}`);
   }
 
-  const result: APIResponse = await response.json();
+  const responseBody: BeerSheet = await response.json();
+  headers = responseBody.headers;
+  data = responseBody.data
+  styleMap = responseBody.styleArray;
 
-  if (!result.values || result.values.length === 0) {
-    throw new Error("Error: No data found in the Google Sheet.");
-  }
 
-  headers = result.values[0]; // The first row is the headers
-
-  data = result.values.slice(1).filter((row) => row[0].trim() !== "");
-  data = data.sort((a, b) => {
-    const valueA = parseFloat(a[6]) || 0; // Parse as float, use 0 if empty or NaN
-    const valueB = parseFloat(b[6]) || 0; // Parse as float, use 0 if empty or NaN
-
-    return valueB - valueA; // Sort in descending order (largest first)
-  });
-  await getStats(data);
 } catch (err) {
   error = (err as Error).message;
   console.error("Failed to fetch data:", err);
-}
-
-async function getStats(data: string[][]) {
-  var dataIndex = 0;
-  data.forEach((row) => {
-    const name = row[0];
-    const style = row[1];
-    const avrageRating = row[6];
-
-    const avrageStyleRating =
-      (styleMap.get(style)?.avrageStyleRating ?? 0) +
-      (isNaN(parseFloat(avrageRating)) ? 0 : parseFloat(avrageRating));
-
-    const styleObj: StyleObj = {
-      style: style,
-      count: (styleMap.get(style)?.count ?? 0) + 1,
-      topBeer: styleMap.get(style)?.topBeer,
-      avrageStyleRating: avrageStyleRating,
-    };
-
-    // get the top (average) rated beer of each style
-    const roundedRating = Math.round(Number(avrageRating) * 100) / 100;
-    const beerObj: BeerObj = {
-      name: name,
-      rating: roundedRating,
-      style: style,
-    };
-    const compareRating =
-      Math.round((styleMap.get(style)?.topBeer?.rating ?? 0) * 100) / 100;
-
-    if (compareRating <= beerObj.rating) {
-      styleObj.topBeer = beerObj;
-    }
-
-    styleMap.set(style, styleObj);
-    dataIndex++;
-  });
-  //console.log(styleMap);
-  //Array.from(styleMap).map((mapArray) => console.log(mapArray));
 }
 ---
 
@@ -263,7 +211,7 @@ async function getStats(data: string[][]) {
       <h1>Beer Ratings</h1>
       <div class="stats">
         {
-          Array.from(styleMap).map((mapArray) => (
+          styleMap.map((mapArray) => (
             <div class="styleWrapper">
               <h2>
                 {mapArray[0]}: {mapArray[1].count}
