@@ -7,6 +7,13 @@ const spreadsheetId = process.env.SPREADSHEET_ID;
 const range = process.env.RANGE;
 const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
 
+// Cache setup
+const cache: { data: any; timestamp: number } = {
+    data: null, // Cached data
+    timestamp: 0, // Time when data was last fetched
+};
+const CACHE_TTL = parseInt(process.env.GOOGLE_SHEETS_CACHE_TTL ?? (24 * 60 * 60 * 1000).toString()); // Default 24h
+
 interface APIResponse {
     values: string[][];
 }
@@ -26,6 +33,12 @@ interface BeerObj {
 
 export const getBeersFromSheet = async (req: Request, res: Response) => {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+    // Check cache validity
+    if ((cache.data && Date.now() - cache.timestamp < CACHE_TTL) && cache.data) {
+        console.log("Serving data from cache.");
+        return res.json(cache.data); // Return cached data
+    }
 
     try {
         const response = await fetch(url);
@@ -54,6 +67,9 @@ export const getBeersFromSheet = async (req: Request, res: Response) => {
             data,
             styleArray: Array.from(styleMap)
         }
+        // Update cache with new data and timestamp
+        cache.data = responseBody;
+        cache.timestamp = Date.now();
         res.json(responseBody);
     } catch (err) {
         const error = (err as Error).message;
