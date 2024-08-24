@@ -3,7 +3,7 @@
 @username = john_doe
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
-@beerId = {{postBeer.response.body.apptoken}}
+@beerId = {{postBeer.response.body.id}}
 
 ### Register a new user
 POST {{host}}/api/auth/register
@@ -64,3 +64,7 @@ Authorization: Bearer {{token}}
   "score": 5,
   "comment": "Absolutely loved it!"
 }
+
+
+### Fetch beers from google sheets
+GET {{host}}/api/sheets/beers-from-sheet
