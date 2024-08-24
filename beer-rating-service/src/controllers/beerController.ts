@@ -1,84 +1,47 @@
 import { Request, Response } from 'express';
 import Beer from '../models/beer';
-import { beerSchema } from '../validation/beerValidation';
+import Rating from '../models/rating';
 
+// Fetch all beers without ratings
 export const getBeers = async (req: Request, res: Response) => {
     try {
-        const beers = await Beer.find({ user: req.user?.id });
+        const beers = await Beer.find();
         res.json(beers);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
     }
 };
 
-export const createBeer = async (req: Request, res: Response) => {
+// Fetch a specific beer along with all ratings and average rating
+export const getBeerWithRatings = async (req: Request, res: Response) => {
+    const { id } = req.params;
     try {
-        const beerInput = beerSchema.parse(req.body);
+        const beer = await Beer.findById(id);
+        if (!beer) {
+            return res.status(404).json({ message: 'Beer not found' });
+        }
 
-        const beer = new Beer({
-            ...beerInput,
-            user: req.user?.id,
-        });
+        // Fetch all ratings for the beer
+        const ratings = await Rating.find({ beer: beer._id }).populate('user', 'username');
 
+        // Calculate the average rating
+        const averageRating = ratings.reduce((acc, rating) => acc + rating.score, 0) / ratings.length;
+
+        res.json({ beer, ratings, averageRating });
+    } catch (error) {
+        res.status(500).json({ message: (error as Error).message });
+    }
+};
+
+// Add a new beer
+export const createBeer = async (req: Request, res: Response) => {
+    const { name, type } = req.body;
+
+    try {
+        const beer = new Beer({ name, type });
         const savedBeer = await beer.save();
         res.status(201).json(savedBeer);
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(400).json({ message: error.message });
-        } else {
-            res.status(400).json({ message: 'Invalid data' });
-        }
-    }
-};
-
-export const updateBeer = async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-        const beerInput = beerSchema.parse(req.body);
-
-        const beer = await Beer.findById(id);
-
-        if (!beer) {
-            return res.status(404).json({ message: 'Beer not found' });
-        }
-
-        if (beer.user.toString() !== req.user?.id) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
-
-        beer.name = beerInput.name;
-        beer.type = beerInput.type;
-        beer.rating = beerInput.rating;
-
-        const updatedBeer = await beer.save();
-        res.json(updatedBeer);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(400).json({ message: error.message });
-        } else {
-            res.status(400).json({ message: 'Invalid data' });
-        }
-    }
-};
-
-export const deleteBeer = async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    try {
-        const beer = await Beer.findById(id);
-
-        if (!beer) {
-            return res.status(404).json({ message: 'Beer not found' });
-        }
-
-        if (beer.user.toString() !== req.user?.id) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
-
-        await Beer.deleteOne({ _id: id }); // Use deleteOne instead of remove
-        res.json({ message: 'Beer removed' });
-    } catch (error) {
-        res.status(500).json({ message: (error as Error).message });
+        res.status(400).json({ message: (error as Error).message });
     }
 };

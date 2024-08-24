@@ -1,0 +1,66 @@
+### Define variables
+@host = http://localhost:3000
+@username = john_doe
+@password = SecurePass123!
+@token = {{postLogin.response.body.token}}
+@beerId = {{postBeer.response.body.apptoken}}
+
+### Register a new user
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+### Login as the user
+# @name postLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+### Create a new beer
+# @name postBeer
+# This request requires a valid JWT token.
+POST {{host}}/api/beers
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Guinness",
+  "type": "Stout"
+}
+
+### Get all beers
+GET {{host}}/api/beers
+
+### Get a specific beer with ratings
+GET {{host}}/api/beers/{{beerId}}
+
+### Add a rating to a beer
+# Replace `{{beerId}}` with the actual beer ID from the response of the beer creation request.
+POST {{host}}/api/ratings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "beerId": "{{beerId}}",
+  "score": 4,
+  "comment": "A very smooth and flavorful stout."
+}
+
+### Try to add another rating to the same beer by the same user (should fail)
+POST {{host}}/api/ratings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "beerId": "{{beerId}}",
+  "score": 5,
+  "comment": "Absolutely loved it!"
+}

@@ -1,17 +1,15 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-interface IBeer extends Document {
+export interface IBeer extends Document {
     name: string;
     type: string;
-    rating: number;
-    user: mongoose.Schema.Types.ObjectId;
+    averageRating?: number; // Optional field for the beer's average rating
 }
 
 const beerSchema = new Schema<IBeer>({
     name: { type: String, required: true },
     type: { type: String, required: true },
-    rating: { type: Number, required: true, min: 0, max: 5 },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    averageRating: { type: Number, default: 0 }, // This will be computed from ratings
 }, { timestamps: true });
 
 export default mongoose.model<IBeer>('Beer', beerSchema);
