@@ -1,0 +1,27 @@
+# Node modules
+node_modules
+
+# TypeScript files
+src/**/*.ts
+
+# Log files
+logs
+*.log
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Environment files
+.env
+
+# Build artifacts
+dist
+
+# IDE files
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
