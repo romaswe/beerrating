@@ -1,11 +1,10 @@
-# Node modules
 node_modules
-
-# Log files
-logs
+dist
 *.log
-
-# IDE files
+Dockerfile
+.dockerignore
+.git
+.gitignore
 .vscode
 .idea
 *.suo

@@ -5,3 +5,9 @@ Dockerfile
 .dockerignore
 .git
 .gitignore
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
