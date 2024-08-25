@@ -1,23 +1,31 @@
-# Use the official Node.js 18 image as the base image
-FROM node:18
+FROM node:lts as builder
 
-# Set the working directory inside the container
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# Copy package.json, package-lock.json, and tsconfig.json to the working directory
-COPY package*.json tsconfig.json ./
+# Install app dependencies
+COPY package*.json ./
 
-# Install the dependencies
-RUN npm install
+RUN npm ci
 
-# Copy the rest of the application code to the working directory
 COPY . .
 
-# Build the TypeScript files
 RUN npm run build
 
-# Expose the application port (adjust this to your server port if different)
-EXPOSE 5000
+FROM node:lts-slim
 
-# Command to run the application
-CMD ["npm", "start"]
+ENV NODE_ENV production
+USER node
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm ci --production
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+EXPOSE 8080
+CMD [ "node", "dist/server.js" ]
