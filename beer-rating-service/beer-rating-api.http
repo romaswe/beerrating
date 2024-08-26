@@ -1,5 +1,5 @@
 ### Define variables
-@host = http://localhost:3000
+@host = http://localhost:{{$dotenv PORT}}
 @username = john_doe
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
@@ -43,7 +43,6 @@ GET {{host}}/api/beers
 GET {{host}}/api/beers/{{beerId}}
 
 ### Add a rating to a beer
-# Replace `{{beerId}}` with the actual beer ID from the response of the beer creation request.
 POST {{host}}/api/ratings
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -68,3 +67,11 @@ Authorization: Bearer {{token}}
 
 ### Fetch beers from google sheets
 GET {{host}}/api/sheets/beers-from-sheet
+
+### Clear sheets cache
+POST {{host}}/api/sheets/clear-cache
+Content-Type: application/json
+
+{
+  "cacheName": "beers"
+}
