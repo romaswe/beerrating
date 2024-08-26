@@ -1,5 +1,5 @@
 ---
-export const prerender = false // https://docs.astro.build/en/guides/server-side-rendering/#opting-out-of-pre-rendering-in-hybrid-mode
+export const prerender = false; // https://docs.astro.build/en/guides/server-side-rendering/#opting-out-of-pre-rendering-in-hybrid-mode
 import type { BeerSheet, StyleArrayClass } from "../interfaces/types";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
@@ -13,24 +13,21 @@ const url = `${backendUrl}/api/sheets/beers-from-sheet`;
 
 let headers: string[] = [];
 let data: string[][] = [];
-let styleMap: Array<Array<StyleArrayClass>> = []
+let styleMap: Array<Array<StyleArrayClass>> = [];
 let error: string | null = null;
-
 
 try {
   const response = await fetch(url);
 
   if (!response.ok) {
-    console.error(`Error: ${response.status} ${response.statusText}`)
+    console.error(`Error: ${response.status} ${response.statusText}`);
     throw new Error(`Error: ${response.status} ${response.statusText}`);
   }
 
   const responseBody: BeerSheet = await response.json();
   headers = responseBody.headers;
-  data = responseBody.data
+  data = responseBody.data;
   styleMap = responseBody.styleArray;
-
-
 } catch (err) {
   error = (err as Error).message;
   console.error("Failed to fetch data:", err);
