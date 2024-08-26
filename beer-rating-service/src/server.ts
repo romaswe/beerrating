@@ -27,7 +27,7 @@ app.use((req: Request, res: Response, next: NextFunction): void => {
   res.on("finish", () => {
     const [seconds, nanoseconds] = process.hrtime(start);
     const durationInMilliseconds = (seconds * 1000 + nanoseconds / 1e6).toFixed(
-      3
+      3,
     );
     console.log(`Request processed in ${durationInMilliseconds}ms`);
   });

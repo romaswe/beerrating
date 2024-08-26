@@ -11,7 +11,7 @@ const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
 const caches: Record<string, { data: any; timestamp: number }> = {};
 
 const CACHE_TTL = parseInt(
-  process.env.GOOGLE_SHEETS_CACHE_TTL ?? (24 * 60 * 60 * 1000).toString()
+  process.env.GOOGLE_SHEETS_CACHE_TTL ?? (24 * 60 * 60 * 1000).toString(),
 ); // Default 24h
 
 interface APIResponse {

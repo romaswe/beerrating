@@ -43,7 +43,7 @@ const beerSchema = new Schema<IBeer>(
     },
     averageRating: { type: Number, default: 0 }, // This will be computed from ratings
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model<IBeer>("Beer", beerSchema);

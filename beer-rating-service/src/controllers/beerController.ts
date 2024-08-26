@@ -25,7 +25,7 @@ export const getBeerWithRatings = async (req: Request, res: Response) => {
     // Fetch all ratings for the beer
     const ratings = await Rating.find({ beer: beer._id }).populate(
       "user",
-      "username"
+      "username",
     );
 
     // Calculate the average rating
@@ -67,7 +67,7 @@ export const getBeersByStyle = async (req: Request, res: Response) => {
     const validStyles = Object.values(BeerStyle); // Get all valid beer styles
     return res.status(400).json({
       message: `Invalid beer style provided. Valid styles are: ${validStyles.join(
-        ", "
+        ", ",
       )}`,
       validStyles: validStyles, // Include the list of valid styles in the response
     });
