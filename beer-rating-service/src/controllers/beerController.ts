@@ -94,3 +94,62 @@ export const getBeersByStyle = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const updateBeer = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, type, brewery, abv } = req.body;
+
+  if (type && !Object.values(BeerStyle).includes(type)) {
+    const validStyles = Object.values(BeerStyle);
+    return res.status(400).json({
+      message: `Invalid beer style provided. Valid styles are: ${validStyles.join(", ")}`,
+      validStyles: validStyles,
+    });
+  }
+
+  try {
+    const beer = await Beer.findByIdAndUpdate(
+      id,
+      { name, type, brewery, abv },
+      { new: true, runValidators: true },
+    );
+
+    if (!beer) {
+      return res.status(404).json({ message: `Beer with ID ${id} not found.` });
+    }
+
+    res.status(200).json(beer);
+  } catch (error) {
+    if (error instanceof MongoError && error.code === 11000) {
+      res.status(400).json({ message: "Beer name must be unique." });
+    } else if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Failed to update beer", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred." });
+    }
+  }
+};
+
+export const deleteBeer = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const beer = await Beer.findByIdAndDelete(id);
+
+    if (!beer) {
+      return res.status(404).json({ message: `Beer with ID ${id} not found.` });
+    }
+
+    res.status(200).json({ message: `Beer with ID ${id} has been deleted.` });
+  } catch (error) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Failed to delete beer", error: error.message });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred." });
+    }
+  }
+};
