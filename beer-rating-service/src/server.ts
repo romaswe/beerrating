@@ -45,15 +45,9 @@ mongoose
   .connect(process.env.MONGO_URI!)
   .then(() => {
     console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((error) => {
     console.error("Connection error", error.message);
   });
 
-// This should be removed when we are connectiong to DB
-try {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-} catch (error) {
-  console.error("Connection error", error);
-}
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

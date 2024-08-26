@@ -3,7 +3,7 @@
 @username = john_doe
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
-@beerId = {{postBeer.response.body.id}}
+@beerId = {{postBeer.response.body._id}}
 
 ### Register a new user
 POST {{host}}/api/auth/register
