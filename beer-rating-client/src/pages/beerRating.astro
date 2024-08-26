@@ -10,6 +10,8 @@ const description = "Page about beer";
 const backendUrl = import.meta.env.BACKEND_URL ?? "http://localhost:3000";
 const url = `${backendUrl}/api/sheets/beers-from-sheet`;
 
+console.log(`Connecting to: ${url}`);
+
 let headers: string[] = [];
 let data: string[][] = [];
 let styleMap: Array<Array<StyleArrayClass>> = []
@@ -20,6 +22,7 @@ try {
   const response = await fetch(url);
 
   if (!response.ok) {
+    console.error(`Error: ${response.status} ${response.statusText}`)
     throw new Error(`Error: ${response.status} ${response.statusText}`);
   }
 
