@@ -1,4 +1,5 @@
 ---
+export const prerender = false // https://docs.astro.build/en/guides/server-side-rendering/#opting-out-of-pre-rendering-in-hybrid-mode
 import type { BeerSheet, StyleArrayClass } from "../interfaces/types";
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
@@ -9,8 +10,6 @@ const description = "Page about beer";
 
 const backendUrl = import.meta.env.BACKEND_URL ?? "http://localhost:3000";
 const url = `${backendUrl}/api/sheets/beers-from-sheet`;
-
-console.log(`Connecting to: ${url}`);
 
 let headers: string[] = [];
 let data: string[][] = [];
