@@ -40,14 +40,18 @@ app.use("/api/ratings", ratingRoutes);
 app.use("/api/sheets", sheetRoutes);
 
 const PORT = process.env.PORT || 5000;
-
-mongoose
-  .connect(process.env.MONGO_URI!)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((error) => {
-    console.error("Connection error", error.message);
-  });
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.MONGO_URI) {
+  console.log("Found database uri, Connectiong to database");
+  mongoose
+    .connect(process.env.MONGO_URI!)
+    .then(() => {
+      console.log("MongoDB connected");
+      app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    })
+    .catch((error) => {
+      console.error("Connection error", error.message);
+    });
+} else {
+  console.log("No database uri, Starting server");
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
