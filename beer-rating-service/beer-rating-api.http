@@ -64,7 +64,6 @@ Authorization: Bearer {{token}}
   "comment": "Absolutely loved it!"
 }
 
-
 ### Fetch beers from google sheets
 GET {{host}}/api/sheets/beers-from-sheet
 
@@ -75,3 +74,6 @@ Content-Type: application/json
 {
   "cacheName": "beers"
 }
+
+### Get beer by type/style
+GET {{host}}/api/beers/type/Stout2
