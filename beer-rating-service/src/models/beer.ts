@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, PaginateModel } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 export enum BeerStyle {
   LAGER = "Lager",
@@ -25,7 +26,7 @@ export interface IBeer extends Document {
   abv?: number;
   averageRating?: number;
 }
-
+interface IBeerModel extends PaginateModel<IBeer> {}
 const beerSchema = new Schema<IBeer>(
   {
     name: { type: String, required: true, unique: true },
@@ -47,4 +48,6 @@ const beerSchema = new Schema<IBeer>(
   { timestamps: true },
 );
 
-export default mongoose.model<IBeer>("Beer", beerSchema);
+beerSchema.plugin(mongoosePaginate);
+const Beer = mongoose.model<IBeer, IBeerModel>("Beer", beerSchema);
+export default Beer;

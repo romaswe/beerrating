@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
+    "@types/mongoose-paginate-v2": "^1.6.4",
     "@types/morgan": "^1.9.9",
     "lint-staged": "^15.2.9",
     "nodemon": "^3.1.4",

@@ -6,7 +6,12 @@ import { MongoError } from "mongodb";
 // Fetch all beers without ratings
 export const getBeers = async (req: Request, res: Response) => {
   try {
-    const beers = await Beer.find();
+    const page = parseInt(req.query.page as string) || 1; // Default to page 1 if not specified
+    const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page if not specified
+
+    // Use mongoose-paginate-v2 to fetch beers with pagination
+    const beers = await Beer.paginate({}, { page, limit });
+
     res.json(beers);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
@@ -61,6 +66,8 @@ export const createBeer = async (req: Request, res: Response) => {
 
 export const getBeersByStyle = async (req: Request, res: Response) => {
   const { style } = req.params; // Extract beer style from URL parameters
+  const page = parseInt(req.query.page as string, 10) || 1; // Default to 1 if page query param is not provided
+  const limit = parseInt(req.query.limit as string, 10) || 10; // Default to 10 if limit query param is not provided
 
   // Check if the provided style is a valid BeerStyle
   if (!Object.values(BeerStyle).includes(style as BeerStyle)) {
@@ -75,7 +82,7 @@ export const getBeersByStyle = async (req: Request, res: Response) => {
 
   try {
     // Find all beers that match the specified style
-    const beers = await Beer.find({ type: style });
+    const beers = await Beer.paginate({ style }, { page, limit });
 
     if (beers.length === 0) {
       return res

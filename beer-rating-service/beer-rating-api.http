@@ -4,6 +4,8 @@
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
 @beerId = {{postBeer.response.body._id}}
+@page=1
+@limit=20
 
 ### Register a new user
 POST {{host}}/api/auth/register
@@ -36,8 +38,8 @@ Authorization: Bearer {{token}}
   "type": "Stout"
 }
 
-### Get all beers
-GET {{host}}/api/beers
+### Get all beers with pagination
+GET {{host}}/api/beers?page={{page}}&limit={{limit}}
 
 ### Get a specific beer with ratings
 GET {{host}}/api/beers/{{beerId}}
@@ -76,7 +78,7 @@ Content-Type: application/json
 }
 
 ### Get beer by type/style
-GET {{host}}/api/beers/type/Stout2
+GET {{host}}/api/beers/type/Stout2?page={{page}}&limit={{limit}}
 
 ### Update a Beer
 PUT {{host}}/api/beers/{{beerId}}
