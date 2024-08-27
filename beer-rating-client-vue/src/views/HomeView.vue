@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import Footer from '../components/Footer.vue'
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <main class="container">
@@ -170,7 +168,6 @@ import Footer from '../components/Footer.vue'
       </p>
     </section>
   </main>
-  <Footer />
 </template>
 <style scoped>
 /* General Styles */

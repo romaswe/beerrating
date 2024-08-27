@@ -1,7 +1,9 @@
 <template>
   <div class="beer-list">
     <h1>Beer List</h1>
-    <div v-if="loading">Loading...</div>
+    <div v-if="loading">
+      <LoadingComponent />
+    </div>
     <div v-else-if="error">
       <!-- Use the ErrorComponent and pass the error message -->
       <ErrorComponent :errorMessage="error" @retry="fetchBeers" />
@@ -17,12 +19,14 @@ import { defineComponent, ref, onMounted } from 'vue'
 import BeerCard from '@/components/BeerCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import type { Beer } from '@/models/Beer'
+import LoadingComponent from '@/components/LoadingComponent.vue'
 
 export default defineComponent({
   name: 'BeerView',
   components: {
     BeerCard,
-    ErrorComponent
+    ErrorComponent,
+    LoadingComponent
   },
   setup() {
     const beers = ref<Beer[]>([])

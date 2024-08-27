@@ -2,11 +2,13 @@
 import type { BeerSheet } from '@/models/Beer'
 import { defineComponent, ref, onMounted } from 'vue'
 import ErrorComponent from '@/components/ErrorComponent.vue' // Import the ErrorComponent
+import LoadingComponent from '@/components/LoadingComponent.vue'
 
 export default defineComponent({
   name: 'BeerList',
   components: {
-    ErrorComponent
+    ErrorComponent,
+    LoadingComponent
   },
   setup() {
     const beers = ref<BeerSheet>({
@@ -56,7 +58,9 @@ export default defineComponent({
   <div class="beer-sheets">
     <div class="beer-list">
       <h1>Beer List</h1>
-      <div v-if="loading">Loading...</div>
+      <div v-if="loading">
+        <LoadingComponent />
+      </div>
       <div v-else-if="error">
         <!-- Use the ErrorComponent and pass the error message -->
         <ErrorComponent :errorMessage="error" @retry="fetchBeers" />
