@@ -38,11 +38,9 @@ export const protect = async (
       }
       if (req.method !== "GET") {
         if (user.role.includes(roles.VIEWER)) {
-          return res
-            .status(401)
-            .json({
-              message: "Not authorized, viewer can only fetch information",
-            });
+          return res.status(401).json({
+            message: "Not authorized, viewer can only fetch information",
+          });
         }
       }
 
@@ -87,6 +85,12 @@ export const protectAdmin = async (
         return res
           .status(401)
           .json({ message: "Not authorized, user not found" });
+      }
+
+      if (!user.role.includes(roles.ADMIN)) {
+        return res.status(401).json({
+          message: "Not authorized, Only admins can use this",
+        });
       }
 
       // Assign the found user to the request object

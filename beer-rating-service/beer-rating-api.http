@@ -1,6 +1,8 @@
 ### Define variables
 @host = http://localhost:{{$dotenv PORT}}
-@username = john_doe
+@username = johh_viewer
+#@username = john_admin
+#@username = john_user
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
 @beerId = {{postBeer.response.body._id}}
@@ -34,7 +36,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Guinness2",
+  "name": "Guinness",
   "type": "Stout"
 }
 

@@ -33,6 +33,7 @@ export const registerUser = async (req: Request, res: Response) => {
       res.status(201).json({
         id: user.id,
         username: user.username,
+        role: user.role,
         token: generateToken(user.id.toString()), // Ensure user._id is a string
       });
     } else {
@@ -54,6 +55,7 @@ export const loginUser = async (req: Request, res: Response) => {
       res.json({
         id: user.id,
         username: user.username,
+        role: user.role,
         token: generateToken(user.id.toString()), // Ensure user.id is a string
       });
     } else {
