@@ -1,10 +1,18 @@
 import mongoose, { Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
+export const roles = {
+  VIEWER: "viewer",
+  USER: "user",
+  ADMIN: "admin",
+  DISABLED: "disabled",
+};
+
 // Define the User interface extending Mongoose's Document
 export interface IUser extends Document {
   username: string;
   password: string;
+  role: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -12,6 +20,12 @@ export interface IUser extends Document {
 const userSchema = new mongoose.Schema<IUser>({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: {
+    type: String,
+    enum: Object.values(roles),
+    default: roles.VIEWER,
+    required: true,
+  },
 });
 
 // Middleware to hash the password before saving a user

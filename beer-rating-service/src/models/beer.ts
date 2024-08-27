@@ -15,6 +15,7 @@ export enum BeerStyle {
   AMBER_ALE = "Amber Ale",
   BROWN_ALE = "Brown Ale",
   DUNKEL = "Dunkel",
+  OTHER = "Other",
 }
 
 export interface IBeer extends Document {
