@@ -32,7 +32,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Guinness",
+  "name": "Guinness2",
   "type": "Stout"
 }
 
@@ -81,6 +81,7 @@ GET {{host}}/api/beers/type/Stout2
 ### Update a Beer
 PUT {{host}}/api/beers/{{beerId}}
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "Updated Beer Name",
@@ -91,19 +92,20 @@ Content-Type: application/json
 
 ### Delete a Beer
 DELETE {{host}}/api/beers/{{beerId}}
+Authorization: Bearer {{token}}
 
 
-@ratingId = 66cc891fdd1c48e27c4bfffa
+@ratingId = 66cc89ccdd1c48e27c4c0019
 ### Update a Rating
-PUT {{host}}/api/ratings/{{beerId}}/ratings/{{ratingId}}
+PUT {{host}}/api/ratings/{{ratingId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "score": 4,
-  "comment": "Updated comment"
+  "score": 2,
+  "comment": "Updated comment2"
 }
 
 ### Delete a Rating
-DELETE {{host}}/api/ratings/{{beerId}}/ratings/{{ratingId}}
+DELETE {{host}}/api/ratings/{{ratingId}}
 Authorization: Bearer {{token}} 

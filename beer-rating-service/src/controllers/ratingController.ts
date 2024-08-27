@@ -50,39 +50,36 @@ export const addRating = async (req: Request, res: Response) => {
 };
 
 export const updateRating = async (req: Request, res: Response) => {
-  const { beerId, ratingId } = req.params;
+  const { ratingId } = req.params;
   const { score, comment } = req.body;
   const userId = req.user?.id; // Assuming user ID is stored in req.user after authentication
 
-  if (!isValidObjectId(beerId) || !isValidObjectId(ratingId)) {
-    return res.status(400).json({ message: "Invalid beer or rating ID." });
+  // Validate Object IDs
+  if (!isValidObjectId(ratingId)) {
+    return res.status(400).json({ message: "Invalid rating ID." });
   }
 
   try {
-    const beer = await Beer.findOneAndUpdate(
-      {
-        _id: beerId,
-        "ratings._id": ratingId,
-        "ratings.userId": userId, // Ensure the rating belongs to the authenticated user
-      },
-      {
-        $set: {
-          "ratings.$.score": score,
-          "ratings.$.comment": comment,
-        },
-      },
-      { new: true, runValidators: true },
-    );
+    // Find the rating by ratingId and userId
+    const rating = await Rating.findOne({
+      _id: ratingId,
+      user: userId,
+    });
 
-    if (!beer) {
-      return res
-        .status(404)
-        .json({
-          message: "Beer or rating not found or not authorized to edit.",
-        });
+    if (!rating) {
+      return res.status(404).json({
+        message: "Rating not found or not authorized to edit.",
+      });
     }
 
-    res.status(200).json(beer);
+    // Update the rating
+    rating.score = score;
+    rating.comment = comment;
+
+    // Save the updated rating
+    await rating.save();
+
+    res.status(200).json(rating);
   } catch (error) {
     if (error instanceof Error) {
       res
@@ -95,32 +92,27 @@ export const updateRating = async (req: Request, res: Response) => {
 };
 
 export const deleteRating = async (req: Request, res: Response) => {
-  const { beerId, ratingId } = req.params;
+  const { ratingId } = req.params;
   const userId = req.user?.id; // Assuming user ID is stored in req.user after authentication
 
-  if (!isValidObjectId(beerId) || !isValidObjectId(ratingId)) {
-    return res.status(400).json({ message: "Invalid beer or rating ID." });
+  console.log(ratingId);
+
+  // Validate Object IDs
+  if (!isValidObjectId(ratingId)) {
+    return res.status(400).json({ message: "Invalid rating ID." });
   }
 
   try {
-    const beer = await Beer.findOneAndUpdate(
-      {
-        _id: beerId,
-        "ratings._id": ratingId,
-        "ratings.userId": userId, // Ensure the rating belongs to the authenticated user
-      },
-      {
-        $pull: { ratings: { _id: ratingId } }, // Pull the specific rating
-      },
-      { new: true },
-    );
+    // Find and delete the rating by ratingId and userId
+    const rating = await Rating.findOneAndDelete({
+      _id: ratingId,
+      user: userId, // Ensure the rating belongs to the authenticated user
+    });
 
-    if (!beer) {
-      return res
-        .status(404)
-        .json({
-          message: "Beer or rating not found or not authorized to delete.",
-        });
+    if (!rating) {
+      return res.status(404).json({
+        message: "Rating not found or not authorized to delete.",
+      });
     }
 
     res.status(200).json({ message: "Rating deleted successfully." });
