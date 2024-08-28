@@ -1,7 +1,6 @@
 <template>
   <div class="beer-list">
     <h1>Beer List</h1>
-    <!-- Filter Bar -->
     <div class="filter-bar">
       <label v-for="style in beerStyles" :key="style">
         <input type="checkbox" :value="style" v-model="selectedStyles" />
@@ -17,7 +16,7 @@
     </div>
     <div v-else>
       <div class="beer-cards">
-        <BeerCard v-for="beer in beers" :key="beer._id" :beer="beer" />
+        <BeerCard v-for="beer in beers" :key="beer._id" :beer="beer" @open-modal="openModal(beer._id)" />
       </div>
       <!-- Pagination Controls -->
       <div class="pagination-controls">
@@ -26,23 +25,28 @@
         <button @click="nextPage" :disabled="page === totalPages">Next</button>
       </div>
     </div>
+
+    <!-- Beer Modal -->
+    <BeerModal v-if="showModal" :beer="selectedBeer" :ratings="selectedRatings" @close-modal="closeModal" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import BeerCard from '@/components/BeerCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import BeerModal from '@/components/BeerModal.vue'
 import { BeerStyle } from '@/models/Beer'
-import type { Beer } from '@/models/Beer'
+import type { Beer, Rating } from '@/models/Beer'
 
 export default defineComponent({
   name: 'BeerView',
   components: {
     BeerCard,
     ErrorComponent,
-    LoadingComponent
+    LoadingComponent,
+    BeerModal
   },
   setup() {
     const beers = ref<Beer[]>([])
@@ -50,9 +54,11 @@ export default defineComponent({
     const error = ref<string | null>(null)
     const page = ref(1)
     const totalPages = ref(1)
-    const selectedStyles = ref<BeerStyle[]>([]) // State to hold selected beer styles
+    const selectedStyles = ref<BeerStyle[]>([])
+    const showModal = ref(false)
+    const selectedBeer = ref<Beer>({} as Beer)
+    const selectedRatings = ref<Rating[]>([])
 
-    // All beer styles from the BeerStyle enum
     const beerStyles = Object.values(BeerStyle)
 
     const fetchBeers = async () => {
@@ -60,9 +66,8 @@ export default defineComponent({
       error.value = null
       try {
         const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
-        const stylesQuery = selectedStyles.value.join(',') // Create a comma-separated string of selected styles
+        const stylesQuery = selectedStyles.value.join(',')
         const url = `${backendUrl}/api/beers?styles=${stylesQuery}&page=${page.value}&limit=20`
-        console.log(`Fetching data from ${url}`)
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)
@@ -73,9 +78,24 @@ export default defineComponent({
         totalPages.value = data.totalPages
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
-        console.error('Error fetching beer data:', error.value)
       } finally {
         loading.value = false
+      }
+    }
+
+    const fetchBeerDetails = async (beerId: Number) => {
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+        const url = `${backendUrl}/api/beers/${beerId}`
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error(`Error fetching beer details: ${response.statusText}`)
+        }
+        const data = await response.json()
+        selectedBeer.value = data.beer
+        selectedRatings.value = data.ratings
+      } catch (err) {
+        console.error('Error fetching beer details:', err)
       }
     }
 
@@ -94,8 +114,19 @@ export default defineComponent({
     }
 
     const applyFilters = () => {
-      page.value = 1 // Reset to the first page when filters are applied
+      page.value = 1
       fetchBeers()
+    }
+
+    const openModal = (beerId: Number) => {
+      fetchBeerDetails(beerId)
+      showModal.value = true
+    }
+
+    const closeModal = () => {
+      showModal.value = false
+      selectedBeer.value = {} as Beer
+      selectedRatings.value = []
     }
 
     onMounted(fetchBeers)
@@ -111,7 +142,12 @@ export default defineComponent({
       prevPage,
       selectedStyles,
       beerStyles,
-      applyFilters
+      applyFilters,
+      showModal,
+      selectedBeer,
+      selectedRatings,
+      openModal,
+      closeModal
     }
   }
 })
@@ -158,20 +194,6 @@ export default defineComponent({
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
-}
-
-.beer-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  width: 200px;
-  height: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
 }
 
 .pagination-controls {

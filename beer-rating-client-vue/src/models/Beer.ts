@@ -44,3 +44,19 @@ export enum BeerStyle {
   OTHER = 'Other'
   // Add more styles as needed
 }
+
+export interface Rating {
+  _id: string
+  beer: string
+  user: User
+  score: number
+  comment: string
+  createdAt: Date
+  updatedAt: Date
+  __v: number
+}
+
+export interface User {
+  _id: string
+  username: string
+}
