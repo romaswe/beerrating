@@ -3,14 +3,28 @@ import Beer, { BeerStyle } from "../models/beer";
 import Rating from "../models/rating";
 import { MongoError } from "mongodb";
 
-// Fetch all beers without ratings
 export const getBeers = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1; // Default to page 1 if not specified
     const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page if not specified
 
-    // Use mongoose-paginate-v2 to fetch beers with pagination
-    const beers = await Beer.paginate({}, { page, limit });
+    // Get the 'styles' query parameter and convert it into an array
+    const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
+    const styles = stylesQuery ? stylesQuery.split(",") : [];
+
+    // Build the filter query
+    const filter: any = {};
+
+    if (styles.length > 0) {
+      filter.type = { $in: styles }; // Filter by beer styles if provided
+    }
+
+    // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
+    const beers = await Beer.paginate(filter, {
+      page,
+      limit,
+      sort: { averageRating: -1 }, // Sort by averageRating in descending order
+    });
 
     res.json(beers);
   } catch (error) {

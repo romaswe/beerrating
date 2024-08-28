@@ -1,25 +1,41 @@
 <template>
   <div class="beer-list">
     <h1>Beer List</h1>
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <label v-for="style in beerStyles" :key="style">
+        <input type="checkbox" :value="style" v-model="selectedStyles" />
+        {{ style }}
+      </label>
+      <button @click="applyFilters">Apply Filters</button>
+    </div>
     <div v-if="loading">
       <LoadingComponent />
     </div>
     <div v-else-if="error">
-      <!-- Use the ErrorComponent and pass the error message -->
       <ErrorComponent :errorMessage="error" @retry="fetchBeers" />
     </div>
     <div v-else>
-      <BeerCard v-for="beer in beers" :key="beer.name" :beer="beer" />
+      <div class="beer-cards">
+        <BeerCard v-for="beer in beers" :key="beer._id" :beer="beer" />
+      </div>
+      <!-- Pagination Controls -->
+      <div class="pagination-controls">
+        <button @click="prevPage" :disabled="page === 1">Previous</button>
+        <span>Page {{ page }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="page === totalPages">Next</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted, computed } from 'vue'
 import BeerCard from '@/components/BeerCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
-import type { Beer } from '@/models/Beer'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import { BeerStyle } from '@/models/Beer'
+import type { Beer } from '@/models/Beer'
 
 export default defineComponent({
   name: 'BeerView',
@@ -32,19 +48,29 @@ export default defineComponent({
     const beers = ref<Beer[]>([])
     const loading = ref(true)
     const error = ref<string | null>(null)
+    const page = ref(1)
+    const totalPages = ref(1)
+    const selectedStyles = ref<BeerStyle[]>([]) // State to hold selected beer styles
+
+    // All beer styles from the BeerStyle enum
+    const beerStyles = Object.values(BeerStyle)
 
     const fetchBeers = async () => {
       loading.value = true
       error.value = null
       try {
         const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
-        const url = `${backendUrl}/api/beers?page=1&limit=20` // TODO: Fix pagination
-        const response = await fetch(url) // Replace with your API endpoint
+        const stylesQuery = selectedStyles.value.join(',') // Create a comma-separated string of selected styles
+        const url = `${backendUrl}/api/beers?styles=${stylesQuery}&page=${page.value}&limit=20`
+        console.log(`Fetching data from ${url}`)
+        const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)
         }
         const data = await response.json()
-        beers.value = data
+
+        beers.value = data.docs
+        totalPages.value = data.totalPages
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
         console.error('Error fetching beer data:', error.value)
@@ -53,13 +79,39 @@ export default defineComponent({
       }
     }
 
+    const nextPage = () => {
+      if (page.value < totalPages.value) {
+        page.value++
+        fetchBeers()
+      }
+    }
+
+    const prevPage = () => {
+      if (page.value > 1) {
+        page.value--
+        fetchBeers()
+      }
+    }
+
+    const applyFilters = () => {
+      page.value = 1 // Reset to the first page when filters are applied
+      fetchBeers()
+    }
+
     onMounted(fetchBeers)
 
     return {
       beers,
       loading,
       error,
-      fetchBeers
+      page,
+      totalPages,
+      fetchBeers,
+      nextPage,
+      prevPage,
+      selectedStyles,
+      beerStyles,
+      applyFilters
     }
   }
 })
@@ -67,8 +119,86 @@ export default defineComponent({
 
 <style scoped>
 .beer-list {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  text-align: center;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.filter-bar label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filter-bar button {
+  padding: 5px 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.filter-bar button:hover {
+  background-color: #2980b9;
+}
+
+.beer-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.beer-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  width: 200px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.pagination-controls {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2980b9;
 }
 </style>

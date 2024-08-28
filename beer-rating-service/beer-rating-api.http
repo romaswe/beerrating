@@ -43,6 +43,10 @@ Authorization: Bearer {{token}}
 ### Get all beers with pagination
 GET {{host}}/api/beers?page={{page}}&limit={{limit}}
 
+### Get all beers of multiple styles
+GET {{host}}/api/beers?styles=Lager,IPA&limit={{limit}}&page={{page}}
+
+
 ### Get a specific beer with ratings
 GET {{host}}/api/beers/{{beerId}}
 

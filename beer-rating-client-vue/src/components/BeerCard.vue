@@ -10,15 +10,9 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
-import type { BeerStyle } from '@/models/Beer'
+import type { Beer } from '@/models/Beer'
 
-interface Beer {
-  name: string
-  type: BeerStyle
-  brewery?: string
-  abv?: number
-  averageRating?: number
-}
+
 
 export default defineComponent({
   name: 'BeerCard',
