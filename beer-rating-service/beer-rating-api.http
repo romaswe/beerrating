@@ -1,11 +1,12 @@
 ### Define variables
 @host = http://localhost:{{$dotenv PORT}}
-@username = johh_viewer
+#@username = johh_viewer
 #@username = john_admin
-#@username = john_user
+@username = john_user
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
-@beerId = {{postBeer.response.body._id}}
+#@beerId = {{postBeer.response.body._id}}
+@beerId = 66cdc28f7b8d73fb33594f0b
 @page=1
 @limit=20
 
