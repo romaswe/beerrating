@@ -1,7 +1,23 @@
 <template>
     <div class="login-container">
-        <h2>Login</h2>
-        <form @submit.prevent="handleLogin">
+        <form v-if="currentForm.toLowerCase() === 'register'" @submit.prevent="handleRegister">
+            <h2>Register</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" v-model="username" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" v-model="password" required />
+            </div>
+            <button type="submit">Register</button>
+            <p class="message">Already registered?
+                <a href="#" @click.prevent="toggleForm()">Login</a>
+            </p>
+        </form>
+        <form v-else @submit.prevent="handleLogin">
+            <h2>Login</h2>
+
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" v-model="username" required />
@@ -11,10 +27,14 @@
                 <input type="password" id="password" v-model="password" required />
             </div>
             <button type="submit">Login</button>
+            <p class="message">Not registered?
+                <a href="#" @click.prevent="toggleForm()">Create an account</a>
+            </p>
         </form>
         <!-- Use ErrorComponent if there is an error -->
         <ErrorComponent v-if="error" :errorMessage="error" :showRetry="false" @retry="handleLogin" />
     </div>
+
 </template>
 
 <script lang="ts">
@@ -31,6 +51,7 @@ export default defineComponent({
         const username = ref('')
         const password = ref('')
         const error = ref<string | null>(null)
+        const currentForm = ref('login')
 
         const handleLogin = async () => {
             error.value = null // Reset error before attempting login
@@ -42,10 +63,12 @@ export default defineComponent({
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: username.value, password: password.value })
                 })
-                if (!response.ok) {
-                    throw new Error('Failed to login')
-                }
                 const data = await response.json()
+
+                if (!response.ok) {
+                    const errorMessage = data.message ?? 'Failed to login'
+                    throw new Error(errorMessage)
+                }
 
                 // Save token and role to localStorage
                 localStorage.setItem(Myconsts.tokenName, data.token)
@@ -63,11 +86,51 @@ export default defineComponent({
             }
         }
 
+        const handleRegister = async () => {
+            error.value = null // Reset error before attempting login
+            try {
+                const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+                const url = `${backendUrl}/api/auth/register`
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username.value, password: password.value })
+                })
+                const data = await response.json()
+
+                if (!response.ok) {
+                    const errorMessage = data.message ?? 'Failed to login'
+                    throw new Error(errorMessage)
+                }
+
+                // Save token and role to localStorage
+                localStorage.setItem(Myconsts.tokenName, data.token)
+                localStorage.setItem(Myconsts.roleName, data.role)
+
+                // Refresh the page after successful login
+                window.location.reload() // Refresh the page to update the navbar
+
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    error.value = err.message // Handle error as a string
+                } else {
+                    error.value = 'An unknown error occurred.'
+                }
+            }
+        }
+
+        const toggleForm = () => {
+            currentForm.value = currentForm.value === 'login' ? 'register' : 'login';
+        }
+
         return {
             username,
             password,
             error,
-            handleLogin
+            handleLogin,
+            toggleForm,
+            currentForm,
+            handleRegister
         }
     }
 })
