@@ -35,6 +35,7 @@
 </template>
 
 <script lang="ts">
+import { Myconsts } from '@/const';
 import { defineComponent, ref, onMounted } from 'vue'
 
 export default defineComponent({
@@ -50,8 +51,8 @@ export default defineComponent({
     const userRole = ref('');
 
     const checkLoginStatus = () => {
-      const token = localStorage.getItem('token'); // TODO: Add a config file with name for token
-      const role = localStorage.getItem('role'); // TODO: Add a config file with name for role
+      const token = localStorage.getItem(Myconsts.tokenName);
+      const role = localStorage.getItem(Myconsts.roleName);
       isLoggedIn.value = !!token;
       if (role) {
         userRole.value = role;
@@ -59,8 +60,8 @@ export default defineComponent({
     };
 
     const logout = () => {
-      localStorage.removeItem('token'); // TODO: Add a config file with name for token
-      localStorage.removeItem('role'); // TODO: Add a config file with name for role
+      localStorage.removeItem(Myconsts.tokenName);
+      localStorage.removeItem(Myconsts.roleName);
       isLoggedIn.value = false;
       userRole.value = '';
       window.location.reload()

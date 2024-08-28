@@ -40,6 +40,7 @@ import LoadingComponent from '@/components/LoadingComponent.vue'
 import BeerModal from '@/components/BeerModal.vue'
 import { BeerStyle } from '@/models/Beer'
 import type { Beer, Rating } from '@/models/Beer'
+import { Myconsts } from '@/const'
 
 export default defineComponent({
   name: 'BeerView',
@@ -64,7 +65,7 @@ export default defineComponent({
 
     const beerStyles = Object.values(BeerStyle)
 
-    const token = localStorage.getItem('token'); // TODO: Add a config file with name for token
+    const token = localStorage.getItem(Myconsts.tokenName);
     isLoggedIn.value = !!token;
 
 

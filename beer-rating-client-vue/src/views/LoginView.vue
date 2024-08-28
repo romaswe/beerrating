@@ -20,6 +20,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
+import { Myconsts } from '@/const';
 
 export default defineComponent({
     name: 'LoginView',
@@ -47,8 +48,8 @@ export default defineComponent({
                 const data = await response.json()
 
                 // Save token and role to localStorage
-                localStorage.setItem('token', data.token)
-                localStorage.setItem('role', data.role)
+                localStorage.setItem(Myconsts.tokenName, data.token)
+                localStorage.setItem(Myconsts.roleName, data.role)
 
                 // Refresh the page after successful login
                 window.location.reload() // Refresh the page to update the navbar
