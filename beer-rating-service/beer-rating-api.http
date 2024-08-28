@@ -1,11 +1,12 @@
 ### Define variables
 @host = http://localhost:{{$dotenv PORT}}
-@username = johh_viewer
+#@username = johh_viewer
 #@username = john_admin
-#@username = john_user
+@username = john_user
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
-@beerId = {{postBeer.response.body._id}}
+#@beerId = {{postBeer.response.body._id}}
+@beerId = 66cdc28f7b8d73fb33594f0b
 @page=1
 @limit=20
 
@@ -42,6 +43,10 @@ Authorization: Bearer {{token}}
 
 ### Get all beers with pagination
 GET {{host}}/api/beers?page={{page}}&limit={{limit}}
+
+### Get all beers of multiple styles
+GET {{host}}/api/beers?styles=Lager,IPA&limit={{limit}}&page={{page}}
+
 
 ### Get a specific beer with ratings
 GET {{host}}/api/beers/{{beerId}}
@@ -99,15 +104,15 @@ DELETE {{host}}/api/beers/{{beerId}}
 Authorization: Bearer {{token}}
 
 
-@ratingId = 66cc89ccdd1c48e27c4c0019
+@ratingId = 66cf0dd20303f0cba812e141
 ### Update a Rating
 PUT {{host}}/api/ratings/{{ratingId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "score": 2,
-  "comment": "Updated comment2"
+  "score": 3,
+  "comment": "Updated comment1"
 }
 
 ### Delete a Rating
