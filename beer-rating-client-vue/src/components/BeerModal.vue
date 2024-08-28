@@ -23,11 +23,16 @@
 
             <h3>Ratings</h3>
             <ul v-if="ratings.length">
-                <li v-for="rating in ratings" :key="rating._id">
+                <li v-for="(rating, index) in displayedRatings" :key="rating._id">
                     <strong>{{ rating.user.username }}:</strong> {{ rating.score }} - {{ rating.comment }}
                 </li>
             </ul>
             <p v-else>No ratings</p>
+
+            <!-- Toggle button to show/hide more ratings -->
+            <button v-if="ratings.length > 5" @click="toggleShowAllRatings" class="toggle-button">
+                {{ showAllRatings ? 'Hide ratings' : 'Show All Ratings' }}
+            </button>
 
             <button @click="closeModal" class="close-button">Close</button>
         </div>
@@ -35,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue'
+import { defineComponent, type PropType, ref, computed } from 'vue'
 import type { Beer, Rating } from '@/models/Beer'
 
 export default defineComponent({
@@ -51,12 +56,26 @@ export default defineComponent({
         }
     },
     emits: ['close-modal'],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
+        const showAllRatings = ref(false)
+
+        // Computed property to determine which ratings to display
+        const displayedRatings = computed(() => {
+            return showAllRatings.value ? props.ratings : props.ratings.slice(0, 5)
+        })
+
+        const toggleShowAllRatings = () => {
+            showAllRatings.value = !showAllRatings.value
+        }
+
         const closeModal = () => {
             emit('close-modal')
         }
 
         return {
+            showAllRatings,
+            displayedRatings,
+            toggleShowAllRatings,
             closeModal
         }
     }
@@ -72,7 +91,6 @@ export default defineComponent({
     align-items: center;
     margin-top: 10px;
 }
-
 
 .button {
     display: inline-block;
@@ -98,16 +116,6 @@ export default defineComponent({
 
 .button:hover {
     opacity: 0.9;
-}
-
-.button {
-    padding: 8px 12px;
-    text-decoration: none;
-    color: white;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    font-size: 0.9em;
-    display: inline-block;
 }
 
 .modal-overlay {
@@ -137,7 +145,8 @@ h2 {
     margin-top: 0;
 }
 
-.close-button {
+.close-button,
+.toggle-button {
     margin-top: 20px;
     padding: 10px 20px;
     background-color: #3498db;
@@ -147,7 +156,8 @@ h2 {
     cursor: pointer;
 }
 
-.close-button:hover {
+.close-button:hover,
+.toggle-button:hover {
     background-color: #2980b9;
 }
 

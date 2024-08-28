@@ -36,9 +36,15 @@ export const addRating = async (req: Request, res: Response) => {
 
     // Recalculate the average rating
     const allRatings = await Rating.find({ beer: beerId });
-    const averageRating =
-      allRatings.reduce((acc, r) => acc + r.score, 0) / allRatings.length;
 
+    // Calculate the average rating rounded to two decimal places
+    const averageRating = allRatings.length
+      ? Math.round(
+          (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
+            allRatings.length) *
+            100,
+        ) / 100
+      : 0;
     // Update the beer's average rating
     beer.averageRating = averageRating;
     await beer.save();

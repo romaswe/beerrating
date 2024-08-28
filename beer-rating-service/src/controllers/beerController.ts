@@ -42,14 +42,20 @@ export const getBeerWithRatings = async (req: Request, res: Response) => {
     }
 
     // Fetch all ratings for the beer
-    const ratings = await Rating.find({ beer: beer._id }).populate(
-      "user",
-      "username",
-    );
+    const ratings = await Rating.find({
+      beer: beer._id,
+    })
+      .populate("user", "username")
+      .sort({ updatedAt: -1 });
 
-    // Calculate the average rating
-    const averageRating =
-      ratings.reduce((acc, rating) => acc + rating.score, 0) / ratings.length;
+    // Calculate the average rating rounded to two decimal places
+    const averageRating = ratings.length
+      ? Math.round(
+          (ratings.reduce((acc, rating) => acc + rating.score, 0) /
+            ratings.length) *
+            100,
+        ) / 100
+      : 0;
 
     res.json({ beer, ratings, averageRating });
   } catch (error) {
