@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'LoadingComponent',
@@ -25,15 +25,18 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100px; /* Adjust based on your layout */
+  min-height: 100px;
+  /* Adjust based on your layout */
   text-align: center;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 5px solid #f3f3f3; /* Light gray */
-  border-top: 5px solid #3498db; /* Blue */
+  border: 5px solid #f3f3f3;
+  /* Light gray */
+  border-top: 5px solid #3498db;
+  /* Blue */
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 10px;
@@ -43,6 +46,7 @@ export default defineComponent({
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
