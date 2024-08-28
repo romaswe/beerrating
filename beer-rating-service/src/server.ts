@@ -20,6 +20,13 @@ app.use(express.json());
 
 app.use(express.json());
 app.use(helmet());
+// Set up CORS options
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "*"],
+  credentials: true, // Allow cookies to be sent if needed
+};
 app.use(cors());
 
 app.use((req: Request, res: Response, next: NextFunction): void => {
@@ -38,7 +45,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/beers", beerRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/sheets", sheetRoutes);
-
+app.get('/echo', function (req, res) {
+  return res.status(200).json({ message: "hello" });
+});
 const PORT = process.env.PORT || 5000;
 if (process.env.MONGO_URI) {
   console.log("Found database uri, Connectiong to database");
