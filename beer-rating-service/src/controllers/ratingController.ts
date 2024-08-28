@@ -78,12 +78,32 @@ export const updateRating = async (req: Request, res: Response) => {
       });
     }
 
+    const beer = await Beer.findById(rating.beer);
+    if (!beer) {
+      return res.status(404).json({ message: "Beer not found" });
+    }
+
     // Update the rating
     rating.score = score;
     rating.comment = comment;
 
     // Save the updated rating
     await rating.save();
+
+    // Recalculate the average rating
+    const allRatings = await Rating.find({ beer: rating.beer });
+
+    // Calculate the average rating rounded to two decimal places
+    const averageRating = allRatings.length
+      ? Math.round(
+          (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
+            allRatings.length) *
+            100,
+        ) / 100
+      : 0;
+    // Update the beer's average rating
+    beer.averageRating = averageRating;
+    await beer.save();
 
     res.status(200).json(rating);
   } catch (error) {

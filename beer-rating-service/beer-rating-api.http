@@ -104,15 +104,15 @@ DELETE {{host}}/api/beers/{{beerId}}
 Authorization: Bearer {{token}}
 
 
-@ratingId = 66cc89ccdd1c48e27c4c0019
+@ratingId = 66cf0dd20303f0cba812e141
 ### Update a Rating
 PUT {{host}}/api/ratings/{{ratingId}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "score": 2,
-  "comment": "Updated comment2"
+  "score": 3,
+  "comment": "Updated comment1"
 }
 
 ### Delete a Rating
