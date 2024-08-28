@@ -7,6 +7,7 @@
         {{ style }}
       </label>
       <button @click="applyFilters">Apply Filters</button>
+      <button v-if="isLoggedIn">Add beer</button>
     </div>
     <div v-if="loading">
       <LoadingComponent />
@@ -58,8 +59,14 @@ export default defineComponent({
     const showModal = ref(false)
     const selectedBeer = ref<Beer>({} as Beer)
     const selectedRatings = ref<Rating[]>([])
+    const isLoggedIn = ref(false);
+
 
     const beerStyles = Object.values(BeerStyle)
+
+    const token = localStorage.getItem('token'); // TODO: Add a config file with name for token
+    isLoggedIn.value = !!token;
+
 
     const fetchBeers = async () => {
       loading.value = true
@@ -147,7 +154,8 @@ export default defineComponent({
       selectedBeer,
       selectedRatings,
       openModal,
-      closeModal
+      closeModal,
+      isLoggedIn
     }
   }
 })

@@ -50,8 +50,8 @@ export default defineComponent({
     const userRole = ref('');
 
     const checkLoginStatus = () => {
-      const token = localStorage.getItem('token');
-      const role = localStorage.getItem('role');
+      const token = localStorage.getItem('token'); // TODO: Add a config file with name for token
+      const role = localStorage.getItem('role'); // TODO: Add a config file with name for role
       isLoggedIn.value = !!token;
       if (role) {
         userRole.value = role;
@@ -59,10 +59,11 @@ export default defineComponent({
     };
 
     const logout = () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
+      localStorage.removeItem('token'); // TODO: Add a config file with name for token
+      localStorage.removeItem('role'); // TODO: Add a config file with name for role
       isLoggedIn.value = false;
       userRole.value = '';
+      window.location.reload()
     };
 
     onMounted(checkLoginStatus);

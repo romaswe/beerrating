@@ -147,7 +147,7 @@ h2 {
 
 .close-button,
 .toggle-button {
-    margin-top: 20px;
+    margin: .5rem;
     padding: 10px 20px;
     background-color: #3498db;
     color: white;

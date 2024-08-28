@@ -19,7 +19,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 
 export default defineComponent({
@@ -28,7 +27,6 @@ export default defineComponent({
         ErrorComponent
     },
     setup() {
-        const router = useRouter()
         const username = ref('')
         const password = ref('')
         const error = ref<string | null>(null)
