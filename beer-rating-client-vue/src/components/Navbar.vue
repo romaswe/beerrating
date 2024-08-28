@@ -18,7 +18,7 @@
           </template>
           <!-- Show login link if the user is not logged in -->
           <template v-else>
-            <RouterLink class="nav-link" to="/login">Login</RouterLink>
+            <RouterLink class="nav-link login-button" to="/login">Login</RouterLink>
           </template>
         </div>
         <a href="https://github.com/romaswe" target="_blank" class="navbar-github">
@@ -123,7 +123,7 @@ nav a {
   background: none;
   border: none;
   padding: 1em 0.5em;
-  color: black;
+  color: red;
   cursor: pointer;
   text-decoration: none;
   font: inherit;
@@ -131,6 +131,10 @@ nav a {
 
 .logout-button:hover {
   color: #3498db;
+}
+
+.login-button {
+  color: green;
 }
 
 @media (max-width: 720px) {
