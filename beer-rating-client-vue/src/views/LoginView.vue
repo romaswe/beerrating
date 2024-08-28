@@ -13,7 +13,7 @@
             <button type="submit">Login</button>
         </form>
         <!-- Use ErrorComponent if there is an error -->
-        <ErrorComponent v-if="error" :errorMessage="error" @retry="handleLogin" />
+        <ErrorComponent v-if="error" :errorMessage="error" :showRetry="false" @retry="handleLogin" />
     </div>
 </template>
 

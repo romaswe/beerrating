@@ -46,6 +46,7 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .beer-card:hover {

@@ -2,7 +2,7 @@
   <div class="error-container">
     <h2>Error</h2>
     <p>{{ errorMessage }}</p>
-    <button @click="retry" class="retry-button">Retry</button>
+    <button v-if="showRetry" @click="retry" class="retry-button">Retry</button>
   </div>
 </template>
 
@@ -15,6 +15,10 @@ export default defineComponent({
     errorMessage: {
       type: String,
       default: 'An error occurred while fetching data. Please try again.'
+    },
+    showRetry: {
+      type: Boolean,
+      default: true
     }
   },
   emits: ['retry'],
