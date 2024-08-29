@@ -21,6 +21,7 @@
             <RouterLink class="nav-link login-button" to="/login">Login</RouterLink>
           </template>
         </div>
+        <!-- TODO: Add a section for username and role for the one thats loggedin -->
         <a href="https://github.com/romaswe" target="_blank" class="navbar-github">
           <span class="sr-only">Go to my GitHub page</span>
           <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
