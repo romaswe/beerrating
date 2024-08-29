@@ -1,38 +1,45 @@
 <template>
     <div class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
-            <h2>{{ beer.name }}</h2>
-            <div class="button-group">
-                <a :href="`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(beer.name)}`"
-                    class="button button-systembolaget" target="_blank" rel="noopener noreferrer">
-                    Systembolaget
-                </a>
-                <a :href="`https://untappd.com/search?q=${encodeURIComponent(beer.name)}`" class="button button-untappd"
-                    target="_blank" rel="noopener noreferrer">
-                    Untappd
-                </a>
-                <a :href="`https://www.ratebeer.com/search?beername=${encodeURIComponent(beer.name)}&tab=beer`"
-                    class="button button-ratebeer" target="_blank" rel="noopener noreferrer">
-                    Ratebeer
-                </a>
-            </div>
-            <p><strong>Type:</strong> {{ beer.type }}</p>
-            <p v-if="beer.brewery"><strong>Brewery:</strong> {{ beer.brewery }}</p>
-            <p v-if="beer.abv"><strong>ABV:</strong> {{ beer.abv }}%</p>
-            <p v-if="beer.averageRating"><strong>Average Rating:</strong> {{ beer.averageRating }}</p>
+            <button @click="toggleEditMode" class="edit-button">Edit</button>
+            <template v-if="isEditing">
+                <!-- Use BeerForm for editing -->
+                <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode" />
+            </template>
+            <template v-else>
+                <h2>{{ beer.name }}</h2>
+                <div class="button-group">
+                    <a :href="`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(beer.name)}`"
+                        class="button button-systembolaget" target="_blank" rel="noopener noreferrer">
+                        Systembolaget
+                    </a>
+                    <a :href="`https://untappd.com/search?q=${encodeURIComponent(beer.name)}`"
+                        class="button button-untappd" target="_blank" rel="noopener noreferrer">
+                        Untappd
+                    </a>
+                    <a :href="`https://www.ratebeer.com/search?beername=${encodeURIComponent(beer.name)}&tab=beer`"
+                        class="button button-ratebeer" target="_blank" rel="noopener noreferrer">
+                        Ratebeer
+                    </a>
+                </div>
+                <p><strong>Type:</strong> {{ beer.type }}</p>
+                <p v-if="beer.brewery"><strong>Brewery:</strong> {{ beer.brewery }}</p>
+                <p v-if="beer.abv"><strong>ABV:</strong> {{ beer.abv }}%</p>
+                <p v-if="beer.averageRating"><strong>Average Rating:</strong> {{ beer.averageRating }}</p>
 
-            <h3>Ratings</h3>
-            <ul v-if="ratings.length">
-                <li v-for="(rating, index) in displayedRatings" :key="rating._id">
-                    <strong>{{ rating.user.username }}:</strong> {{ rating.score }} - {{ rating.comment }}
-                </li>
-            </ul>
-            <p v-else>No ratings</p>
+                <h3>Ratings</h3>
+                <ul v-if="ratings.length">
+                    <li v-for="(rating, index) in displayedRatings" :key="rating._id">
+                        <strong>{{ rating.user.username }}:</strong> {{ rating.score }} - {{ rating.comment }}
+                    </li>
+                </ul>
+                <p v-else>No ratings</p>
 
-            <!-- Toggle button to show/hide more ratings -->
-            <button v-if="ratings.length > 5" @click="toggleShowAllRatings" class="toggle-button">
-                {{ showAllRatings ? 'Hide ratings' : 'Show All Ratings' }}
-            </button>
+                <!-- Toggle button to show/hide more ratings -->
+                <button v-if="ratings.length > 5" @click="toggleShowAllRatings" class="toggle-button">
+                    {{ showAllRatings ? 'Hide ratings' : 'Show All Ratings' }}
+                </button>
+            </template>
 
             <button @click="closeModal" class="close-button">Close</button>
         </div>
@@ -42,9 +49,11 @@
 <script lang="ts">
 import { defineComponent, type PropType, ref, computed } from 'vue'
 import type { Beer, Rating } from '@/models/Beer'
+import BeerForm from '@/components/BeerForm.vue' // Import BeerForm component
 
 export default defineComponent({
     name: 'BeerModal',
+    components: { BeerForm },
     props: {
         beer: {
             type: Object as PropType<Beer>,
@@ -55,9 +64,10 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ['close-modal'],
+    emits: ['close-modal', 'update-beer'],
     setup(props, { emit }) {
         const showAllRatings = ref(false)
+        const isEditing = ref(false) // State to control edit mode
 
         // Computed property to determine which ratings to display
         const displayedRatings = computed(() => {
@@ -68,14 +78,27 @@ export default defineComponent({
             showAllRatings.value = !showAllRatings.value
         }
 
+        const toggleEditMode = () => {
+            isEditing.value = !isEditing.value
+        }
+
+        const handleFormSubmit = (updatedBeer: Partial<Beer>) => {
+            // Handle form submission for editing
+            emit('update-beer', updatedBeer)
+            toggleEditMode() // Exit edit mode after submission
+        }
+
         const closeModal = () => {
             emit('close-modal')
         }
 
         return {
             showAllRatings,
+            isEditing,
             displayedRatings,
             toggleShowAllRatings,
+            toggleEditMode,
+            handleFormSubmit,
             closeModal
         }
     }
@@ -143,6 +166,22 @@ export default defineComponent({
 
 h2 {
     margin-top: 0;
+}
+
+.edit-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background-color: #27ae60;
 }
 
 .close-button,
