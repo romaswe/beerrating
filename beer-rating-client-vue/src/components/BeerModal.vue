@@ -49,7 +49,7 @@
 <script lang="ts">
 import { defineComponent, type PropType, ref, computed } from 'vue'
 import type { Beer, Rating } from '@/models/Beer'
-import BeerForm from '@/components/BeerForm.vue' // Import BeerForm component
+import BeerForm from '@/components/BeerForm.vue'
 
 export default defineComponent({
     name: 'BeerModal',
@@ -67,9 +67,8 @@ export default defineComponent({
     emits: ['close-modal', 'update-beer'],
     setup(props, { emit }) {
         const showAllRatings = ref(false)
-        const isEditing = ref(false) // State to control edit mode
+        const isEditing = ref(false)
 
-        // Computed property to determine which ratings to display
         const displayedRatings = computed(() => {
             return showAllRatings.value ? props.ratings : props.ratings.slice(0, 5)
         })
@@ -83,9 +82,9 @@ export default defineComponent({
         }
 
         const handleFormSubmit = (updatedBeer: Partial<Beer>) => {
-            // Handle form submission for editing
+            Object.assign(props.beer, updatedBeer)
             emit('update-beer', updatedBeer)
-            toggleEditMode() // Exit edit mode after submission
+            toggleEditMode()
         }
 
         const closeModal = () => {

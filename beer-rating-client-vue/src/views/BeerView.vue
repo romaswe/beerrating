@@ -131,10 +131,11 @@ export default defineComponent({
       showModal.value = true
     }
 
-    const closeModal = () => {
+    const closeModal = async () => {
       showModal.value = false
       selectedBeer.value = {} as Beer
       selectedRatings.value = []
+      await fetchBeers()
     }
 
     onMounted(fetchBeers)
