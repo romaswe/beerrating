@@ -3,7 +3,7 @@
     <h1>Beer List</h1>
     <template v-if="addNewBeer">
       <!-- Use BeerForm for editing -->
-      <BeerForm @submit="handleFormSubmit" @cancel="toggleAddBeerMode" />
+      <BeerForm @submit="handleFormSubmit" @cancel="toggleAddBeerMode" @delete-action="handleFormSubmit" />
     </template>
     <template v-else>
       <div class="filter-bar">

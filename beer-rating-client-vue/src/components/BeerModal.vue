@@ -4,7 +4,8 @@
             <button v-if="!isEditing && isLoggedIn" @click="toggleEditMode" class="edit-button">Edit</button>
             <template v-if="isEditing">
                 <!-- Use BeerForm for editing -->
-                <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode" />
+                <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode"
+                    @delete-action="deleteAction" />
             </template>
             <template v-else>
                 <h2>{{ beer.name }}</h2>
@@ -96,6 +97,10 @@ export default defineComponent({
             emit('close-modal')
         }
 
+        const deleteAction = () => {
+            closeModal()
+        }
+
         return {
             showAllRatings,
             isEditing,
@@ -104,7 +109,8 @@ export default defineComponent({
             toggleEditMode,
             handleFormSubmit,
             closeModal,
-            isLoggedIn
+            isLoggedIn,
+            deleteAction
         }
     }
 })

@@ -19,6 +19,8 @@
             </div>
             <div class="button-group">
                 <button type="submit" class="submit-button">{{ isEdit ? 'Update Beer' : 'Add Beer' }}</button>
+                <button v-if="isEdit && isAdmin" type="button" @click="deleteAction"
+                    class="delete-button">Delete</button>
                 <button type="button" @click="cancel" class="cancel-button">Cancel</button>
             </div>
         </form>
@@ -49,8 +51,9 @@ export default defineComponent({
     components: {
         ErrorComponent
     },
-    emits: ['submit', 'cancel'],
+    emits: ['submit', 'cancel', 'deleteAction'],
     setup(props, { emit }) {
+        const isAdmin = ref(false);
         const error = ref<string | null>(null)
         const { beer, isEdit } = toRefs(props)
         const form = ref<Partial<Beer>>(isEdit.value && beer.value ? { ...beer.value } : {
@@ -60,6 +63,8 @@ export default defineComponent({
             abv: undefined,
             averageRating: undefined,
         })
+        const role = localStorage.getItem(Myconsts.roleName);
+        isAdmin.value = role == "admin";
 
         const handleSubmit = async () => {
             error.value = null
@@ -93,7 +98,7 @@ export default defineComponent({
                 if (!response.ok) {
                     const errorData = await response.json()
                     // TODO: better error handeling EG we can use errorSubMessage for more information
-                    throw new Error(`${errorData.message}\n ${errorData.error}` || 'Failed to submit form')
+                    throw new Error(`${errorData.message}\n ${errorData.error ?? ''}` || 'Failed to submit form')
                 }
 
                 const data = await response.json()
@@ -106,6 +111,37 @@ export default defineComponent({
 
         const cancel = () => {
             emit('cancel')
+        }
+
+        const deleteAction = async () => {
+            error.value = null
+            try {
+                const token = localStorage.getItem(Myconsts.tokenName)
+                if (!token) {
+                    throw new Error('User is not authenticated')
+                }
+                if (beer.value?._id) {
+                    let response = await fetch(`/api/beers/${beer.value._id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    })
+
+                    if (!response.ok) {
+                        const errorData = await response.json()
+                        // TODO: better error handeling EG we can use errorSubMessage for more information
+                        throw new Error(`${errorData.message}\n ${errorData.error ?? ''}` || 'Failed to submit form')
+                    }
+
+                    const data = await response.json()
+                    emit('deleteAction', data)
+                }
+            } catch (err) {
+                console.error('Failed to submit form:', error)
+                error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+            }
         }
 
         watch(isEdit, (newVal) => {
@@ -126,7 +162,9 @@ export default defineComponent({
             form,
             handleSubmit,
             cancel,
-            error
+            error,
+            deleteAction,
+            isAdmin
         }
     }
 })
@@ -193,6 +231,7 @@ input[type="number"]:focus {
     background-color: #2980b9;
 }
 
+.delete-button,
 .cancel-button {
     padding: 10px 20px;
     background-color: #e74c3c;
