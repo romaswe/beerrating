@@ -56,8 +56,8 @@ export default defineComponent({
         const handleLogin = async () => {
             error.value = null // Reset error before attempting login
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
-                const url = `${backendUrl}/api/auth/login`
+                //const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+                const url = `/api/auth/login`
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -89,8 +89,8 @@ export default defineComponent({
         const handleRegister = async () => {
             error.value = null // Reset error before attempting login
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
-                const url = `${backendUrl}/api/auth/register`
+                //const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+                const url = `/api/auth/register`
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

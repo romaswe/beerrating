@@ -73,9 +73,9 @@ export default defineComponent({
       loading.value = true
       error.value = null
       try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+        //const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
         const stylesQuery = selectedStyles.value.join(',')
-        const url = `${backendUrl}/api/beers?styles=${stylesQuery}&page=${page.value}&limit=20`
+        const url = `/api/beers?styles=${stylesQuery}&page=${page.value}&limit=20`
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)
@@ -93,8 +93,8 @@ export default defineComponent({
 
     const fetchBeerDetails = async (beerId: Number) => {
       try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
-        const url = `${backendUrl}/api/beers/${beerId}`
+        //const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+        const url = `/api/beers/${beerId}`
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beer details: ${response.statusText}`)
