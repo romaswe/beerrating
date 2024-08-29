@@ -1,7 +1,7 @@
 <template>
     <div class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
-            <button v-if="!isEditing" @click="toggleEditMode" class="edit-button">Edit</button>
+            <button v-if="!isEditing && isLoggedIn" @click="toggleEditMode" class="edit-button">Edit</button>
             <template v-if="isEditing">
                 <!-- Use BeerForm for editing -->
                 <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode" />
@@ -50,6 +50,7 @@
 import { defineComponent, type PropType, ref, computed } from 'vue'
 import type { Beer, Rating } from '@/models/Beer'
 import BeerForm from '@/components/BeerForm.vue'
+import { Myconsts } from '@/const';
 
 export default defineComponent({
     name: 'BeerModal',
@@ -68,6 +69,10 @@ export default defineComponent({
     setup(props, { emit }) {
         const showAllRatings = ref(false)
         const isEditing = ref(false)
+        const isLoggedIn = ref(false);
+
+        const token = localStorage.getItem(Myconsts.tokenName);
+        isLoggedIn.value = !!token;
 
         const displayedRatings = computed(() => {
             return showAllRatings.value ? props.ratings : props.ratings.slice(0, 5)
@@ -98,7 +103,8 @@ export default defineComponent({
             toggleShowAllRatings,
             toggleEditMode,
             handleFormSubmit,
-            closeModal
+            closeModal,
+            isLoggedIn
         }
     }
 })

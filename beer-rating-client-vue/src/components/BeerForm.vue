@@ -92,7 +92,8 @@ export default defineComponent({
 
                 if (!response.ok) {
                     const errorData = await response.json()
-                    throw new Error(errorData.message || 'Failed to submit form')
+                    // TODO: better error handeling EG we can use errorSubMessage for more information
+                    throw new Error(`${errorData.message}\n ${errorData.error}` || 'Failed to submit form')
                 }
 
                 const data = await response.json()

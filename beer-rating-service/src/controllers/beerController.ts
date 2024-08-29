@@ -161,7 +161,7 @@ export const updateBeer = async (req: Request, res: Response) => {
 
 export const deleteBeer = async (req: Request, res: Response) => {
   const { id } = req.params;
-
+  // TODO: Delete ratings for the beer
   try {
     const beer = await Beer.findByIdAndDelete(id);
 

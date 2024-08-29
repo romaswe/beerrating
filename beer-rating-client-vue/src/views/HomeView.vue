@@ -3,7 +3,7 @@
 <template>
   <main class="container">
     <!-- New Section: Welcome Message -->
-    <section class="full-row welcome-section card">
+    <section class="section welcome-section card">
       <h2>Welcome to Beer Ratings</h2>
       <p>
         Discover and compare ratings of various beers, explore different styles, and find the best
@@ -126,9 +126,7 @@
       <p>Debunk common myths about beer and learn the real facts behind popular misconceptions.</p>
       <ul>
         <li>
-          <strong>Myth:</strong> Dark beers are stronger than light beers.<br /><strong
-            >Fact:</strong
-          >
+          <strong>Myth:</strong> Dark beers are stronger than light beers.<br /><strong>Fact:</strong>
           Color does not indicate strength.
         </li>
         <li>
@@ -159,7 +157,7 @@
     </section>
 
     <!-- New Section: About This Site -->
-    <section class="full-row about-section card">
+    <section class="section about-section card">
       <h2>About This Site</h2>
       <p>
         This website is designed to help beer enthusiasts explore and compare different beers based
@@ -183,20 +181,11 @@ ul,
 ol {
   list-style: none;
 }
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-}
-
-/* Full-Row Sections */
-.full-row {
-  width: 100%;
-  background-color: #ffffff;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
 }
 
 /* Card Styles */
@@ -206,7 +195,8 @@ ol {
   margin: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  flex: 1 1 calc(50% - 40px); /* Make each card take half width with spacing */
+  flex: 1 1 calc(50% - 40px);
+  /* Make each card take half width with spacing */
   box-sizing: border-box;
 }
 
@@ -221,7 +211,8 @@ h2 {
   font-size: 1.5em;
   margin-bottom: 10px;
   color: #333;
-  width: 100%; /* Ensure the h2 takes the full width of its container */
+  width: 100%;
+  /* Ensure the h2 takes the full width of its container */
 }
 
 p,
@@ -229,7 +220,8 @@ ul,
 ol {
   margin-bottom: 10px;
   color: #666;
-  width: 100%; /* Ensure the paragraphs and lists take full width */
+  width: 100%;
+  /* Ensure the paragraphs and lists take full width */
 }
 
 ul,
@@ -248,7 +240,8 @@ strong {
 /* Responsive Design */
 @media (max-width: 768px) {
   .card {
-    flex: 1 1 100%; /* Full width on mobile */
+    flex: 1 1 100%;
+    /* Full width on mobile */
     margin-bottom: 20px;
   }
 

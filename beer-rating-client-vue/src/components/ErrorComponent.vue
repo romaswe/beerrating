@@ -1,7 +1,8 @@
 <template>
   <div class="error-container">
     <h2>Error</h2>
-    <p>{{ errorMessage }}</p>
+    <p v-if="errorMessage">{{ errorMessage }}</p>
+    <p v-if="errorSubMessage">{{ errorSubMessage }}</p>
     <button v-if="showRetry" @click="retry" class="retry-button">Retry</button>
   </div>
 </template>
@@ -19,6 +20,10 @@ export default defineComponent({
     showRetry: {
       type: Boolean,
       default: true
+    },
+    errorSubMessage: {
+      type: String,
+      default: undefined
     }
   },
   emits: ['retry'],
