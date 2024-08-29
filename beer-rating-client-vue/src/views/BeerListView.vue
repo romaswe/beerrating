@@ -23,7 +23,7 @@ export default defineComponent({
       loading.value = true
       error.value = null // Reset error state
       try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
+        //const backendUrl = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:3000'
         const url = `/api/sheets/beers-from-sheet`
         console.log(`Fetching data from ${url}`)
 
