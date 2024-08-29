@@ -1,38 +1,37 @@
 <template>
-    <form @submit.prevent="handleSubmit" class="beer-form">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" v-model="form.name" required />
+    <div class="form-container">
+        <form @submit.prevent="handleSubmit" class="beer-form">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" v-model="form.name" required />
+            </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <input type="text" id="type" v-model="form.type" required />
+            </div>
+            <div class="form-group">
+                <label for="brewery">Brewery</label>
+                <input type="text" id="brewery" v-model="form.brewery" />
+            </div>
+            <div class="form-group">
+                <label for="abv">ABV (%)</label>
+                <input type="number" id="abv" v-model="form.abv" step="0.1" />
+            </div>
+            <div class="button-group">
+                <button type="submit" class="submit-button">{{ isEdit ? 'Update Beer' : 'Add Beer' }}</button>
+                <button type="button" @click="cancel" class="cancel-button">Cancel</button>
+            </div>
+        </form>
+        <div v-if="error">
+            <ErrorComponent :errorMessage="error" @retry="handleSubmit" />
         </div>
-        <div class="form-group">
-            <label for="type">Type</label>
-            <input type="text" id="type" v-model="form.type" required />
-        </div>
-        <div class="form-group">
-            <label for="brewery">Brewery</label>
-            <input type="text" id="brewery" v-model="form.brewery" />
-        </div>
-        <div class="form-group">
-            <label for="abv">ABV (%)</label>
-            <input type="number" id="abv" v-model="form.abv" step="0.1" />
-        </div>
-        <div class="form-group">
-            <label for="averageRating">Average Rating</label>
-            <input type="number" id="averageRating" v-model="form.averageRating" step="0.1" />
-        </div>
-        <button type="submit" class="submit-button">{{ isEdit ? 'Update Beer' : 'Add Beer' }}</button>
-        <button type="button" @click="cancel" class="cancel-button">Cancel</button>
-    </form>
-    <div v-if="error">
-        <ErrorComponent :errorMessage="error" @retry="handleSubmit" />
     </div>
-
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, type PropType, watch, toRefs } from 'vue'
 import type { Beer, BeerStyle } from '@/models/Beer'
-import { Myconsts } from '@/const';
+import { Myconsts } from '@/const'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 
 export default defineComponent({
@@ -72,7 +71,6 @@ export default defineComponent({
 
                 let response
                 if (isEdit.value && beer.value?._id) {
-                    // Update beer
                     response = await fetch(`/api/beers/${beer.value._id}`, {
                         method: 'PUT',
                         headers: {
@@ -82,7 +80,6 @@ export default defineComponent({
                         body: JSON.stringify(form.value),
                     })
                 } else {
-                    // Add new beer
                     response = await fetch(`/api/beers`, {
                         method: 'POST',
                         headers: {
@@ -135,6 +132,15 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .beer-form {
     display: flex;
     flex-direction: column;
@@ -147,18 +153,73 @@ export default defineComponent({
     gap: 5px;
 }
 
-.submit-button,
-.cancel-button {
+label {
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="text"],
+input[type="number"] {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.submit-button {
     padding: 10px 20px;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.submit-button:hover,
-.cancel-button:hover {
+.submit-button:hover {
     background-color: #2980b9;
+}
+
+.cancel-button {
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 15px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .submit-button,
+    .cancel-button {
+        width: 100%;
+    }
 }
 </style>

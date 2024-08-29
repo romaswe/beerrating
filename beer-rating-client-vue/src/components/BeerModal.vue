@@ -1,7 +1,7 @@
 <template>
     <div class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
-            <button @click="toggleEditMode" class="edit-button">Edit</button>
+            <button v-if="!isEditing" @click="toggleEditMode" class="edit-button">Edit</button>
             <template v-if="isEditing">
                 <!-- Use BeerForm for editing -->
                 <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode" />
