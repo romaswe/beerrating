@@ -1,18 +1,20 @@
 <template>
     <form @submit.prevent="handleSubmit" class="rating-form">
         <div class="form-group">
-            <label for="score">Score: {{ form.score }}</label>
+            <label for="score" class="form-label">Score: {{ form.score }}</label>
             <!-- Slider for rating score -->
-            <input type="range" id="score" v-model="form.score" min="0" max="5" step="0.25" required />
+            <input type="range" id="score" v-model="form.score" min="0" max="5" step="0.25" required class="slider" />
         </div>
         <div class="form-group">
-            <label for="comment">Comment</label>
-            <textarea id="comment" v-model="form.comment" required></textarea>
+            <label for="comment" class="form-label">Comment</label>
+            <textarea id="comment" v-model="form.comment" required class="textarea"></textarea>
         </div>
-        <button type="submit" class="submit-button">{{ isEdit ? 'Update Rating' : 'Add Rating' }}</button>
-        <button type="button" @click="cancel" class="cancel-button">Cancel</button>
+        <div class="button-group">
+            <button type="submit" class="submit-button">{{ isEdit ? 'Update Rating' : 'Add Rating' }}</button>
+            <button type="button" @click="cancel" class="cancel-button">Cancel</button>
+        </div>
     </form>
-    <div v-if="error">
+    <div v-if="error" class="error-container">
         <ErrorComponent :errorMessage="error" @retry="handleSubmit" />
     </div>
 </template>
@@ -116,32 +118,74 @@ export default defineComponent({
 .rating-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    max-width: 400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    /* Ensures padding and borders are included in the width */
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
 }
 
-input[type="range"] {
+.form-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.slider {
     width: 100%;
-    margin-top: 5px;
+}
+
+.textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    box-sizing: border-box;
+    /* Ensures padding and borders are included in the width */
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
 }
 
 .submit-button,
 .cancel-button {
-    padding: 10px 20px;
+    flex: 1;
+    padding: 10px 15px;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.submit-button:hover,
-.cancel-button:hover {
+.submit-button:hover {
     background-color: #2980b9;
+}
+
+.cancel-button {
+    background-color: #e74c3c;
+}
+
+.cancel-button:hover {
+    background-color: #c0392b;
+}
+
+.error-container {
+    margin-top: 15px;
 }
 </style>
