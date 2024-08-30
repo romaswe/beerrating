@@ -57,10 +57,10 @@ export const getBeerWithRatings = async (req: Request, res: Response) => {
     // Calculate the average rating rounded to two decimal places
     const averageRating = ratings.length
       ? Math.round(
-          (ratings.reduce((acc, rating) => acc + rating.score, 0) /
-            ratings.length) *
-            100,
-        ) / 100
+        (ratings.reduce((acc, rating) => acc + rating.score, 0) /
+          ratings.length) *
+        100,
+      ) / 100
       : 0;
 
     res.json({ beer, ratings, averageRating });
@@ -171,20 +171,22 @@ export const updateBeer = async (req: Request, res: Response) => {
 
 export const deleteBeer = async (req: Request, res: Response) => {
   const { id } = req.params;
-  // TODO: Delete ratings for the beer
+
   try {
+    // Find and delete the beer
     const beer = await Beer.findByIdAndDelete(id);
 
     if (!beer) {
       return res.status(404).json({ message: `Beer with ID ${id} not found.` });
     }
 
-    res.status(200).json({ message: `Beer with ID ${id} has been deleted.` });
+    // Delete all ratings associated with the beer
+    await Rating.deleteMany({ beer: id });
+
+    res.status(200).json({ message: `Beer with ID ${id} and its ratings have been deleted.` });
   } catch (error) {
     if (error instanceof Error) {
-      res
-        .status(500)
-        .json({ message: "Failed to delete beer", error: error.message });
+      res.status(500).json({ message: "Failed to delete beer", error: error.message });
     } else {
       res.status(500).json({ message: "An unexpected error occurred." });
     }
