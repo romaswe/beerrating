@@ -81,9 +81,13 @@ export const createBeer = async (req: Request, res: Response) => {
     if (error instanceof MongoError && error.code === 11000) {
       res.status(400).json({ message: "Beer name must be unique." });
     } else if (error instanceof Error) {
+      const validStyles = Object.values(BeerStyle);
       res
         .status(500)
-        .json({ message: "Failed to create beer", error: error.message });
+        .json({
+          message: `Failed to create beer make sure you are using a valid style. Valid styles are: ${validStyles.join(", ")}`,
+          error: error.message,
+        });
     } else {
       res.status(500).json({ message: "An unexpected error occurred." });
     }
