@@ -2,9 +2,14 @@
   <header class="navbar">
     <div class="navbar-container">
       <nav class="navbar-content">
-        <h2>
-          <a href="/" class="navbar-title">{{ siteTitle }}</a>
-        </h2>
+        <div class="title-and-user">
+          <h2>
+            <a href="/" class="navbar-title">{{ siteTitle }}</a>
+          </h2>
+          <!-- Display the user's username and role -->
+          <span v-if="isLoggedIn" class="user-info">{{ username }} ({{ userRole }})</span>
+        </div>
+
         <div class="navbar-links">
           <RouterLink class="nav-link" to="/">Home</RouterLink>
           <RouterLink class="nav-link" to="/beer-list">Beer List</RouterLink>
@@ -21,7 +26,6 @@
             <RouterLink class="nav-link login-button" to="/login">Login</RouterLink>
           </template>
         </div>
-        <!-- TODO: Add a section for username and role for the one thats loggedin -->
         <a href="https://github.com/romaswe" target="_blank" class="navbar-github">
           <span class="sr-only">Go to my GitHub page</span>
           <svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32">
@@ -50,21 +54,28 @@ export default defineComponent({
   setup() {
     const isLoggedIn = ref(false);
     const userRole = ref('');
+    const username = ref('');
 
     const checkLoginStatus = () => {
       const token = localStorage.getItem(Myconsts.tokenName);
       const role = localStorage.getItem(Myconsts.roleName);
+      const user = localStorage.getItem(Myconsts.userName);
       isLoggedIn.value = !!token;
       if (role) {
         userRole.value = role;
+      }
+      if (user) {
+        username.value = user; // Set the username
       }
     };
 
     const logout = () => {
       localStorage.removeItem(Myconsts.tokenName);
       localStorage.removeItem(Myconsts.roleName);
+      localStorage.removeItem(Myconsts.userName);
       isLoggedIn.value = false;
       userRole.value = '';
+      username.value = '';
       window.location.reload()
     };
 
@@ -73,6 +84,7 @@ export default defineComponent({
     return {
       isLoggedIn,
       userRole,
+      username,
       logout
     };
   }
@@ -138,9 +150,47 @@ nav a {
   color: green;
 }
 
+.user-info {
+  color: #555;
+  font-weight: bold;
+  margin: 0;
+}
+
+.title-and-user {
+  display: flex;
+  /* Use flexbox to align items within the div */
+  flex-direction: column;
+  /* Stack the items vertically */
+  align-items: center;
+  /* Center the items horizontally */
+  justify-content: center;
+  /* Center the items vertically */
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 @media (max-width: 720px) {
   .social-links {
     display: none;
+  }
+
+  .navbar-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar-links {
+    margin-top: 10px;
+  }
+
+  .user-info {
+    margin-left: 0;
+    margin-top: 10px;
   }
 }
 </style>

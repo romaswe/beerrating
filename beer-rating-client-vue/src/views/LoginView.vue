@@ -73,6 +73,7 @@ export default defineComponent({
                 // Save token and role to localStorage
                 localStorage.setItem(Myconsts.tokenName, data.token)
                 localStorage.setItem(Myconsts.roleName, data.role)
+                localStorage.setItem(Myconsts.userName, data.username)
 
                 // Refresh the page after successful login
                 window.location.reload() // Refresh the page to update the navbar
@@ -106,6 +107,7 @@ export default defineComponent({
                 // Save token and role to localStorage
                 localStorage.setItem(Myconsts.tokenName, data.token)
                 localStorage.setItem(Myconsts.roleName, data.role)
+                localStorage.setItem(Myconsts.userName, data.username)
 
                 // Refresh the page after successful login
                 window.location.reload() // Refresh the page to update the navbar
