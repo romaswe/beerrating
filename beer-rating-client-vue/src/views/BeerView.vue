@@ -8,16 +8,23 @@
     <template v-else>
       <div class="filter-bar">
         <!-- Text Field for Name Query -->
-        <input type="text" v-model="nameQuery" placeholder="Search by name" class="name-input" />
+        <div class="filter-row">
+          <input type="text" v-model="nameQuery" placeholder="Search by name" class="name-input" />
+        </div>
 
-        <label v-for="style in beerStyles" :key="style">
-          <input type="checkbox" :value="style" v-model="selectedStyles" />
-          {{ style }}
-        </label>
-        <!-- Apply Filters Button -->
-        <button class="btn-secondary" @click="applyFilters">Apply Filters</button>
-        <!-- Add Beer Button -->
-        <button class="btn-primary" @click="toggleAddBeerMode" v-if="isLoggedIn">Add Beer</button>
+        <!-- Checkboxes for Styles -->
+        <div class="filter-row">
+          <label v-for="style in beerStyles" :key="style" class="checkbox-label">
+            <input type="checkbox" :value="style" v-model="selectedStyles" />
+            {{ style }}
+          </label>
+        </div>
+
+        <!-- Apply Filters and Add Beer Buttons -->
+        <div class="filter-row buttons-row">
+          <button class="btn-secondary" @click="applyFilters">Apply Filters/Search</button>
+          <button class="btn-primary" @click="toggleAddBeerMode" v-if="isLoggedIn">Add Beer</button>
+        </div>
       </div>
       <div v-if="loading">
         <LoadingComponent />
@@ -206,25 +213,33 @@ export default defineComponent({
 
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  flex-direction: column; /* Make filter-bar a column layout */
+  gap: 20px; /* Adds space between rows */
   margin-bottom: 20px;
-  align-items: center;
+  align-items: center; /* Center-aligns all items */
 }
 
-.filter-bar label {
+.filter-row {
+  width: 100%; /* Full width for each row */
   display: flex;
-  align-items: center;
-  gap: 5px;
+  justify-content: center; /* Center content within row */
+  flex-wrap: wrap; /* Wrap items if necessary */
 }
 
 .name-input {
+  width: 100%; /* Full width for search input */
+  max-width: 500px; /* Maximum width for larger screens */
   padding: 8px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  flex: 1;
-  max-width: 200px;
+  margin-bottom: 10px; /* Space below the input */
+}
+
+.checkbox-label {
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* Unified Button Styling */
@@ -235,6 +250,7 @@ button {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin: 5px;
 }
 
 button:disabled {
@@ -248,9 +264,7 @@ button:hover:not(:disabled) {
 
 /* Primary Button Styling for 'Add Beer' */
 .btn-primary {
-  background-color: #2ecc71;
-  /* Green */
-  margin-left: 10px;
+  background-color: #2ecc71; /* Green */
 }
 
 .btn-primary:hover {
@@ -259,12 +273,15 @@ button:hover:not(:disabled) {
 
 /* Secondary Button Styling for 'Apply Filters' */
 .btn-secondary {
-  background-color: #3498db;
-  /* Blue */
+  background-color: #3498db; /* Blue */
 }
 
 .btn-secondary:hover {
   background-color: #2980b9;
+}
+
+.buttons-row {
+  justify-content: center;
 }
 
 .beer-cards {
