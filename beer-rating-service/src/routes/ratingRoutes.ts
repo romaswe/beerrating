@@ -3,6 +3,7 @@ import {
   addRating,
   updateRating,
   deleteRating,
+  getUserRatingsForBeer,
 } from "../controllers/ratingController";
 import { protect } from "../middleware/authMiddleware";
 
@@ -11,7 +12,7 @@ const router = express.Router();
 router.post("/", protect, addRating);
 router.put("/:ratingId", protect, updateRating);
 router.delete("/:ratingId", protect, deleteRating);
-// TODO: Create endpoint to fetch your rating for spesific beer
+router.get("/user-ratings/:beerId?", protect, getUserRatingsForBeer);
 // TODO: Fetch all your ratings
 // TODO: Create a delete endpoint for admins that is not validated that we are the creator
 

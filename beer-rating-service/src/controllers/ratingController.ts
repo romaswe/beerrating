@@ -152,3 +152,41 @@ export const deleteRating = async (req: Request, res: Response) => {
     }
   }
 };
+
+// Fetch the user's ratings for a specific beer or all ratings if no beerId is provided
+export const getUserRatingsForBeer = async (req: Request, res: Response) => {
+  const { beerId } = req.params; // Get the beerId from request parameters
+  const userId = req.user?.id; // Assuming user ID is stored in req.user after authentication
+
+  try {
+    let ratings;
+
+    if (beerId) {
+      // Validate Object ID for beerId
+      if (!isValidObjectId(beerId)) {
+        return res.status(400).json({ message: "Invalid beer ID." });
+      }
+
+      // Find ratings for the specified beer by the logged-in user
+      ratings = await Rating.find({ beer: beerId, user: userId })
+        .populate("beer", "name")
+        .populate("user", "username");
+    } else {
+      // If no beerId is provided, find all ratings by the logged-in user
+      ratings = await Rating.find({ user: userId })
+        .populate("beer", "name")
+        .populate("user", "username");
+    }
+
+    res.status(200).json(ratings);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Failed to fetch ratings",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred." });
+    }
+  }
+};
