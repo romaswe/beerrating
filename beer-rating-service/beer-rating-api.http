@@ -121,10 +121,10 @@ Authorization: Bearer {{token}}
 
 ### Fetch user rating for specific beer
 # {beerId} is optional and if omitted you get all ratings a user have submitted
-GET http://localhost:3000/api/ratings/user-ratings/{beerId}
+GET {{host}}/api/ratings/user-ratings/{beerId}
 Authorization: Bearer {{token}}
 
 ### Fetch user rating
 # {beerId} is optional and if omitted you get all ratings a user have submitted
-GET http://localhost:3000/api/ratings/user-ratings/
+GET {{host}}/api/ratings/user-ratings/
 Authorization: Bearer {{token}}

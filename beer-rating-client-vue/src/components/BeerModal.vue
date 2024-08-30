@@ -7,6 +7,10 @@
                 <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode"
                     @delete-action="deleteAction" />
             </template>
+            <template v-if="isAddingRating">
+                <RatingForm :rating="userRating" :isEdit="!!userRating" :beerId="beer._id" @submit="handleRatingSubmit"
+                    @cancel="toggleRatingForm" />
+            </template>
             <template v-else>
                 <h2>{{ beer.name }}</h2>
                 <div class="button-group">
@@ -40,6 +44,8 @@
                 <button v-if="ratings.length > 5" @click="toggleShowAllRatings" class="toggle-button">
                     {{ showAllRatings ? 'Hide ratings' : 'Show All Ratings' }}
                 </button>
+                <button v-if="isLoggedIn && !isAddingRating" @click="toggleRatingForm" class="add-rating-button">Add
+                    Rating</button>
             </template>
 
             <button @click="closeModal" class="close-button">Close</button>
@@ -48,14 +54,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, ref, computed } from 'vue'
+import { defineComponent, type PropType, ref, computed, watch } from 'vue'
 import type { Beer, Rating } from '@/models/Beer'
 import BeerForm from '@/components/BeerForm.vue'
+import RatingForm from '@/components/RatingForm.vue'
 import { Myconsts } from '@/const';
 
 export default defineComponent({
     name: 'BeerModal',
-    components: { BeerForm },
+    components: { BeerForm, RatingForm },
     props: {
         beer: {
             type: Object as PropType<Beer>,
@@ -70,14 +77,41 @@ export default defineComponent({
     setup(props, { emit }) {
         const showAllRatings = ref(false)
         const isEditing = ref(false)
+        const isAddingRating = ref(false)
         const isLoggedIn = ref(false);
-
+        const userRating = ref<Rating | null>(null)
         const token = localStorage.getItem(Myconsts.tokenName);
+
         isLoggedIn.value = !!token;
 
         const displayedRatings = computed(() => {
             return showAllRatings.value ? props.ratings : props.ratings.slice(0, 5)
         })
+
+        const fetchUserRating = async () => {
+            if (!token || !props.beer || !props.beer._id) return;
+            try {
+                const response = await fetch(`/api/ratings/user-ratings/${props.beer._id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`Error fetching user rating: ${response.statusText}`);
+                }
+                const data = await response.json();
+                userRating.value = data; // Assuming the response is the rating object
+            } catch (err) {
+                console.error('Failed to fetch user rating:', err);
+            }
+        }
+
+        // Watch for changes in the beer prop and fetch user ratings when it updates
+        watch(() => props.beer, (newBeer) => {
+            if (newBeer && newBeer._id) {
+                fetchUserRating();
+            }
+        }, { immediate: true });
 
         const toggleShowAllRatings = () => {
             showAllRatings.value = !showAllRatings.value
@@ -87,10 +121,21 @@ export default defineComponent({
             isEditing.value = !isEditing.value
         }
 
+        const toggleRatingForm = () => {
+            isAddingRating.value = !isAddingRating.value;
+        }
+
         const handleFormSubmit = (updatedBeer: Partial<Beer>) => {
             Object.assign(props.beer, updatedBeer)
             emit('update-beer', updatedBeer)
             toggleEditMode()
+        }
+
+        const handleRatingSubmit = (newRating: Rating) => {
+            if (newRating) {
+                userRating.value = newRating; // Update the local state with the new rating
+            }
+            toggleRatingForm(); // Close the form after submission
         }
 
         const closeModal = () => {
@@ -110,12 +155,15 @@ export default defineComponent({
             handleFormSubmit,
             closeModal,
             isLoggedIn,
-            deleteAction
+            deleteAction,
+            isAddingRating,
+            toggleRatingForm,
+            handleRatingSubmit,
+            userRating
         }
     }
 })
 </script>
-
 <style scoped>
 .button-group {
     display: flex;
@@ -218,5 +266,19 @@ ul {
 
 li {
     margin-bottom: 10px;
+}
+
+.add-rating-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-rating-button:hover {
+    background-color: #27ae60;
 }
 </style>
