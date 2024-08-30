@@ -9,6 +9,8 @@
 @beerId = 66cdc28f7b8d73fb33594f0b
 @page=1
 @limit=20
+@styles=Lager,IPA,Belgian Ale
+@nameQuery=Delight
 
 ### Register a new user
 POST {{host}}/api/auth/register
@@ -45,8 +47,13 @@ Authorization: Bearer {{token}}
 GET {{host}}/api/beers?page={{page}}&limit={{limit}}
 
 ### Get all beers of multiple styles
-GET {{host}}/api/beers?styles=Lager,IPA&limit={{limit}}&page={{page}}
+GET {{host}}/api/beers?styles={{styles}}&limit={{limit}}&page={{page}}
 
+### Get all beers with pagination and query on name
+GET {{host}}/api/beers?q={{nameQuery}}&page={{page}}&limit={{limit}}
+
+### Get all beers with pagination and query  on name
+GET {{host}}/api/beers?q={{nameQuery}}&styles={{styles}}&page={{page}}&limit={{limit}}
 
 ### Get a specific beer with ratings
 GET {{host}}/api/beers/{{beerId}}

@@ -12,6 +12,8 @@ export const getBeers = async (req: Request, res: Response) => {
     const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
     const styles = stylesQuery ? stylesQuery.split(",") : [];
 
+    const nameQuery = req.query.q as string;
+
     // Build the filter query
     const filter: any = {};
 
@@ -19,6 +21,10 @@ export const getBeers = async (req: Request, res: Response) => {
       filter.type = { $in: styles }; // Filter by beer styles if provided
     }
 
+    if (nameQuery) {
+      const regex = new RegExp(nameQuery, "i"); // i for case insensitive
+      filter.name = { $regex: regex };
+    }
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
     const beers = await Beer.paginate(filter, {
       page,
