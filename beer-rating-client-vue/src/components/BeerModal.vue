@@ -1,15 +1,16 @@
 <template>
     <div class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
-            <button v-if="!isEditing && isLoggedIn" @click="toggleEditMode" class="edit-button">Edit</button>
+            <button v-if="!isEditing && !isAddingRating && isLoggedIn" @click="toggleEditMode"
+                class="edit-button">Edit</button>
             <template v-if="isEditing">
                 <!-- Use BeerForm for editing -->
                 <BeerForm :beer="beer" :isEdit="true" @submit="handleFormSubmit" @cancel="toggleEditMode"
                     @delete-action="deleteAction" />
             </template>
-            <template v-if="isAddingRating">
-                <RatingForm :rating="userRating" :isEdit="!!userRating" :beerId="beer._id" @submit="handleRatingSubmit"
-                    @cancel="toggleRatingForm" />
+            <template v-else-if="isAddingRating">
+                <RatingForm :rating="userRating[0]" :isEdit="!!userRating[0]" :beerId="beer._id"
+                    @submit="handleRatingSubmit" @cancel="toggleRatingForm" />
             </template>
             <template v-else>
                 <h2>{{ beer.name }}</h2>
@@ -100,6 +101,7 @@ export default defineComponent({
                     throw new Error(`Error fetching user rating: ${response.statusText}`);
                 }
                 const data = await response.json();
+
                 userRating.value = data; // Assuming the response is the rating object
             } catch (err) {
                 console.error('Failed to fetch user rating:', err);
