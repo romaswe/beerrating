@@ -134,10 +134,11 @@ export default defineComponent({
         }
 
         const handleRatingSubmit = (newRating: Rating) => {
-            if (newRating) {
-                userRating.value = newRating; // Update the local state with the new rating
+            /*if (newRating) {
+                userRating.value = newRating;
             }
-            toggleRatingForm(); // Close the form after submission
+            toggleRatingForm();*/
+            closeModal();
         }
 
         const closeModal = () => {
