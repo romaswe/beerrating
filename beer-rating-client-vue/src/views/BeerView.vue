@@ -2,11 +2,14 @@
   <div class="beer-list">
     <h1>Beer List</h1>
     <template v-if="addNewBeer">
-      <!-- Use BeerForm for editing -->
-      <BeerForm @submit="handleFormSubmit" @cancel="toggleAddBeerMode" @delete-action="handleFormSubmit" />
+      <!-- Use BeerForm for adding new beers -->
+      <BeerForm @submit="handleFormSubmit" @cancel="toggleAddBeerMode" />
     </template>
     <template v-else>
       <div class="filter-bar">
+        <!-- Text Field for Name Query -->
+        <input type="text" v-model="nameQuery" placeholder="Search by name" class="name-input" />
+
         <label v-for="style in beerStyles" :key="style">
           <input type="checkbox" :value="style" v-model="selectedStyles" />
           {{ style }}
@@ -24,7 +27,12 @@
       </div>
       <div v-else>
         <div class="beer-cards">
-          <BeerCard v-for="beer in beers" :key="beer._id" :beer="beer" @open-modal="openModal(beer._id)" />
+          <BeerCard
+            v-for="beer in beers"
+            :key="beer._id"
+            :beer="beer"
+            @open-modal="openModal(beer._id)"
+          />
         </div>
         <!-- Pagination Controls -->
         <div class="pagination-controls">
@@ -35,7 +43,12 @@
       </div>
     </template>
     <!-- Beer Modal -->
-    <BeerModal v-if="showModal" :beer="selectedBeer" :ratings="selectedRatings" @close-modal="closeModal" />
+    <BeerModal
+      v-if="showModal"
+      :beer="selectedBeer"
+      :ratings="selectedRatings"
+      @close-modal="closeModal"
+    />
   </div>
 </template>
 
@@ -45,10 +58,10 @@ import BeerCard from '@/components/BeerCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import BeerModal from '@/components/BeerModal.vue'
+import BeerForm from '@/components/BeerForm.vue'
 import { BeerStyle } from '@/models/Beer'
 import type { Beer, Rating } from '@/models/Beer'
 import { Myconsts } from '@/const'
-import BeerForm from '@/components/BeerForm.vue'
 
 export default defineComponent({
   name: 'BeerView',
@@ -66,23 +79,25 @@ export default defineComponent({
     const page = ref(1)
     const totalPages = ref(1)
     const selectedStyles = ref<BeerStyle[]>([])
+    const nameQuery = ref('') // New ref for name query
     const showModal = ref(false)
     const selectedBeer = ref<Beer>({} as Beer)
     const selectedRatings = ref<Rating[]>([])
-    const isLoggedIn = ref(false);
+    const isLoggedIn = ref(false)
     const addNewBeer = ref(false)
 
     const beerStyles = Object.values(BeerStyle)
 
-    const token = localStorage.getItem(Myconsts.tokenName);
-    isLoggedIn.value = !!token;
+    const token = localStorage.getItem(Myconsts.tokenName)
+    isLoggedIn.value = !!token
 
     const fetchBeers = async () => {
       loading.value = true
       error.value = null
       try {
         const stylesQuery = selectedStyles.value.join(',')
-        const url = `/api/beers?styles=${stylesQuery}&page=${page.value}&limit=20`
+        const nameQueryParam = nameQuery.value ? `&q=${encodeURIComponent(nameQuery.value)}` : ''
+        const url = `/api/beers?styles=${stylesQuery}&page=${page.value}&limit=20${nameQueryParam}`
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)
@@ -153,7 +168,6 @@ export default defineComponent({
       await fetchBeers()
     }
 
-
     onMounted(fetchBeers)
 
     return {
@@ -166,6 +180,7 @@ export default defineComponent({
       nextPage,
       prevPage,
       selectedStyles,
+      nameQuery, // Include nameQuery in the return object
       beerStyles,
       applyFilters,
       showModal,
@@ -202,6 +217,14 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.name-input {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  flex: 1;
+  max-width: 200px;
 }
 
 /* Unified Button Styling */
