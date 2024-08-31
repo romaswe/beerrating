@@ -3,6 +3,15 @@ import Beer, { BeerStyle } from "../models/beer";
 import Rating from "../models/rating";
 import { MongoError } from "mongodb";
 
+// Utility function to convert a string to a BeerStyle enum, if possible
+const convertToBeerStyleEnum = (style: string): BeerStyle | null => {
+  if (Object.values(BeerStyle).includes(style as BeerStyle)) {
+    return style as BeerStyle;
+  }
+  return null;
+};
+
+// Fetch beers with pagination, filtering, and sorting
 export const getBeers = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1; // Default to page 1 if not specified
@@ -10,7 +19,7 @@ export const getBeers = async (req: Request, res: Response) => {
 
     // Get the 'styles' query parameter and convert it into an array
     const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
-    const styles = stylesQuery ? stylesQuery.split(",") : [];
+    const styles = stylesQuery ? stylesQuery.split(",").map(style => convertToBeerStyleEnum(style)).filter(style => style !== null) as BeerStyle[] : [];
 
     const nameQuery = req.query.q as string;
 
@@ -25,6 +34,7 @@ export const getBeers = async (req: Request, res: Response) => {
       const regex = new RegExp(nameQuery, "i"); // i for case insensitive
       filter.name = { $regex: regex };
     }
+
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
     const beers = await Beer.paginate(filter, {
       page,
@@ -71,29 +81,36 @@ export const getBeerWithRatings = async (req: Request, res: Response) => {
 
 // Add a new beer
 export const createBeer = async (req: Request, res: Response) => {
-  const { name, type } = req.body;
+  const { name, type, brewery, abv } = req.body;
 
   try {
-    const beer = new Beer({ name, type });
+    // Convert all provided types to BeerStyle enums
+    const types: BeerStyle[] = type.map((style: string) => convertToBeerStyleEnum(style)).filter((style: null) => style !== null) as BeerStyle[];
+
+    // Validate if all provided types are valid BeerStyles
+    if (!types.length) {
+      const validStyles = Object.values(BeerStyle);
+      return res.status(400).json({
+        message: `Invalid beer styles provided. Valid styles are: ${validStyles.join(", ")}`,
+        validStyles: validStyles,
+      });
+    }
+
+    const beer = new Beer({ name, type: types, brewery, abv });
     const savedBeer = await beer.save();
     res.status(201).json(savedBeer);
   } catch (error) {
     if (error instanceof MongoError && error.code === 11000) {
       res.status(400).json({ message: "Beer name must be unique." });
     } else if (error instanceof Error) {
-      const validStyles = Object.values(BeerStyle);
-      res
-        .status(500)
-        .json({
-          message: `Failed to create beer make sure you are using a valid style. Valid styles are: ${validStyles.join(", ")}`,
-          error: error.message,
-        });
+      res.status(500).json({ message: `Failed to create beer`, error: error.message });
     } else {
       res.status(500).json({ message: "An unexpected error occurred." });
     }
   }
 };
 
+// Fetch beers by style with pagination
 export const getBeersByStyle = async (req: Request, res: Response) => {
   const { style } = req.params; // Extract beer style from URL parameters
   const page = parseInt(req.query.page as string, 10) || 1; // Default to 1 if page query param is not provided
@@ -103,43 +120,41 @@ export const getBeersByStyle = async (req: Request, res: Response) => {
   if (!Object.values(BeerStyle).includes(style as BeerStyle)) {
     const validStyles = Object.values(BeerStyle); // Get all valid beer styles
     return res.status(400).json({
-      message: `Invalid beer style provided. Valid styles are: ${validStyles.join(
-        ", ",
-      )}`,
+      message: `Invalid beer style provided. Valid styles are: ${validStyles.join(", ")}`,
       validStyles: validStyles, // Include the list of valid styles in the response
     });
   }
 
   try {
-    // Find all beers that match the specified style
-    const beers = await Beer.paginate({ style }, { page, limit });
+    // Find all beers that include the specified style in their 'type' array
+    const beers = await Beer.paginate({ type: style }, { page, limit });
 
-    if (beers.length === 0) {
-      return res
-        .status(404)
-        .json({ message: `No beers found for style: ${style}` });
+    if (beers.docs.length === 0) {
+      return res.status(404).json({ message: `No beers found for style: ${style}` });
     }
 
     res.status(200).json(beers);
   } catch (error) {
     if (error instanceof Error) {
-      res
-        .status(500)
-        .json({ message: "Failed to fetch beers", error: error.message });
+      res.status(500).json({ message: "Failed to fetch beers", error: error.message });
     } else {
       res.status(500).json({ message: "An unexpected error occurred." });
     }
   }
 };
-
+// Update an existing beer
 export const updateBeer = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, type, brewery, abv } = req.body;
 
-  if (type && !Object.values(BeerStyle).includes(type)) {
+  // Convert all provided types to BeerStyle enums
+  const types: BeerStyle[] = type.map((style: string) => convertToBeerStyleEnum(style)).filter((style: null) => style !== null) as BeerStyle[];
+
+  // Validate if all provided types are valid BeerStyles
+  if (!types.length) {
     const validStyles = Object.values(BeerStyle);
     return res.status(400).json({
-      message: `Invalid beer style provided. Valid styles are: ${validStyles.join(", ")}`,
+      message: `Invalid beer styles provided. Valid styles are: ${validStyles.join(", ")}`,
       validStyles: validStyles,
     });
   }
@@ -147,8 +162,8 @@ export const updateBeer = async (req: Request, res: Response) => {
   try {
     const beer = await Beer.findByIdAndUpdate(
       id,
-      { name, type, brewery, abv },
-      { new: true, runValidators: true },
+      { name, type: types, brewery, abv },
+      { new: true, runValidators: true }
     );
 
     if (!beer) {
@@ -160,15 +175,20 @@ export const updateBeer = async (req: Request, res: Response) => {
     if (error instanceof MongoError && error.code === 11000) {
       res.status(400).json({ message: "Beer name must be unique." });
     } else if (error instanceof Error) {
-      res
-        .status(500)
-        .json({ message: "Failed to update beer", error: error.message });
+      res.status(500).json({ message: "Failed to update beer", error: error.message });
     } else {
       res.status(500).json({ message: "An unexpected error occurred." });
     }
   }
 };
 
+// Utility function to ensure every string is converted to its respective BeerStyle enum if valid
+const validateAndConvertTypes = (types: string[]): BeerStyle[] => {
+  return types
+    .map((style) => (Object.values(BeerStyle).includes(style as BeerStyle) ? (style as BeerStyle) : null))
+    .filter((style): style is BeerStyle => style !== null);
+};
+// Delete a beer and its associated ratings
 export const deleteBeer = async (req: Request, res: Response) => {
   const { id } = req.params;
 

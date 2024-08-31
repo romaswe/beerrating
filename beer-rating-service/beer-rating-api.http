@@ -6,7 +6,7 @@
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
 #@beerId = {{postBeer.response.body._id}}
-@beerId = 66cdc28f7b8d73fb33594f0b
+@beerId = 66d31b77156f45c743b41787
 @page=1
 @limit=20
 @styles=Lager,IPA,Belgian Ale
@@ -39,8 +39,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Guinness",
-  "type": "Stout"
+  "name": "Guinness3",
+  "type": ["Stout","Lager"]
 }
 
 ### Get all beers with pagination

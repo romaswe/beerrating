@@ -20,7 +20,7 @@ export interface TopBeer {
 export interface Beer {
   _id: number
   name: string
-  type: BeerStyle
+  type: [BeerStyle]
   brewery?: string
   abv?: number
   averageRating?: number

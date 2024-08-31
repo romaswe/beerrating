@@ -1,7 +1,8 @@
 <template>
   <div class="beer-card" @click="openModal">
     <h2>{{ beer.name }}</h2>
-    <p><strong>Type:</strong> {{ beer.type }}</p>
+    <p><strong>Type:</strong> {{ formattedTypes }}</p>
+    <!-- Display list of types -->
     <p v-if="beer.brewery"><strong>Brewery:</strong> {{ beer.brewery }}</p>
     <p v-if="beer.abv"><strong>ABV:</strong> {{ beer.abv }}%</p>
     <p v-if="beer.averageRating"><strong>Average Rating:</strong> {{ beer.averageRating }}</p>
@@ -9,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue'
-import type { Beer } from '@/models/Beer'
+import { defineComponent, type PropType, computed } from 'vue'
+import type { Beer, BeerStyle } from '@/models/Beer'
 
 export default defineComponent({
   name: 'BeerCard',
@@ -21,13 +22,19 @@ export default defineComponent({
     }
   },
   emits: ['open-modal'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const openModal = () => {
-      emit('open-modal', _)
+      emit('open-modal', props.beer)
     }
 
+    // Computed property to format the list of beer types
+    const formattedTypes = computed(() => {
+      return props.beer.type.join(', ') // Join array of types with commas
+    })
+
     return {
-      openModal
+      openModal,
+      formattedTypes
     }
   }
 })
@@ -45,7 +52,9 @@ export default defineComponent({
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
 }
 
@@ -76,7 +85,6 @@ p {
   margin-top: 10px;
 }
 
-
 .button {
   display: inline-block;
   padding: 8px 12px;
@@ -85,32 +93,6 @@ p {
   border-radius: 4px;
   transition: background-color 0.3s ease;
   font-size: 0.9em;
-}
-
-.button-systembolaget {
-  background-color: #004b9b;
-}
-
-.button-untappd {
-  background-color: #f8a800;
-}
-
-.button-ratebeer {
-  background-color: #4e4e4e;
-}
-
-.button:hover {
-  opacity: 0.9;
-}
-
-.button {
-  padding: 8px 12px;
-  text-decoration: none;
-  color: white;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-  font-size: 0.9em;
-  display: inline-block;
 }
 
 .button-systembolaget {

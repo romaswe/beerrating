@@ -21,18 +21,20 @@ export enum BeerStyle {
 
 export interface IBeer extends Document {
   name: string;
-  type: BeerStyle;
+  type: BeerStyle[];  // Update to array of BeerStyle
   brewery?: string;
   abv?: number;
   averageRating?: number;
 }
-interface IBeerModel extends PaginateModel<IBeer> {}
+
+interface IBeerModel extends PaginateModel<IBeer> { }
+
 const beerSchema = new Schema<IBeer>(
   {
     name: { type: String, required: true, unique: true },
     type: {
-      type: String,
-      enum: Object.values(BeerStyle), // Validate against the BeerStyle enum
+      type: [String], // Change to array of strings
+      enum: Object.values(BeerStyle), // Validate each value against the BeerStyle enum
       required: true,
     },
     brewery: {
@@ -45,7 +47,7 @@ const beerSchema = new Schema<IBeer>(
     },
     averageRating: { type: Number, default: 0 }, // This will be computed from ratings
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 beerSchema.plugin(mongoosePaginate);

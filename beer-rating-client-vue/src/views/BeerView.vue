@@ -154,8 +154,8 @@ export default defineComponent({
       fetchBeers()
     }
 
-    const openModal = (beerId: Number) => {
-      fetchBeerDetails(beerId)
+    const openModal = async (beerId: Number) => {
+      await fetchBeerDetails(beerId)
       showModal.value = true
     }
 
