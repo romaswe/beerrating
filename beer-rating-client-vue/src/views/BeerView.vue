@@ -38,7 +38,7 @@
             v-for="beer in beers"
             :key="beer._id"
             :beer="beer"
-            @open-modal="openModal(beer._id)"
+            @open-modal="openModal(beer._id ?? NaN)"
           />
         </div>
         <!-- Pagination Controls -->

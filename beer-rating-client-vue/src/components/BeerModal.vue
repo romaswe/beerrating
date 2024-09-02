@@ -20,6 +20,7 @@
       </template>
       <template v-else-if="isAddingRating">
         <RatingForm
+          v-if="userRating && beer._id"
           :rating="userRating[0]"
           :isEdit="!!userRating[0]"
           :beerId="beer._id"
@@ -112,7 +113,7 @@ export default defineComponent({
     const isEditing = ref(false)
     const isAddingRating = ref(false)
     const isLoggedIn = ref(false)
-    const userRating = ref<Rating | null>(null)
+    const userRating = ref<Rating[] | null>(null)
     const token = localStorage.getItem(Myconsts.tokenName)
 
     isLoggedIn.value = !!token
