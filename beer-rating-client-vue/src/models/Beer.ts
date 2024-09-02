@@ -17,14 +17,16 @@ export interface TopBeer {
   style: string
 }
 
+// In your models/Beer.ts or similar file
 export interface Beer {
-  _id: number
-  name: string
-  type: [BeerStyle]
-  brewery?: string
-  abv?: number
-  averageRating?: number
+  _id?: number; // Assuming _id is optional and number for this example
+  name: string;
+  type: BeerStyle[];  // Ensure this is an array, not a tuple
+  brewery?: string;
+  abv?: number;
+  averageRating?: number;
 }
+
 
 export enum BeerStyle {
   LAGER = 'Lager',

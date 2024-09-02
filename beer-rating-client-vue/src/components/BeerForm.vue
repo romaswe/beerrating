@@ -10,8 +10,14 @@
         <input type="text" id="name" v-model="form.name" required />
       </div>
       <div class="form-group">
-        <label for="type">Type</label>
-        <input type="text" id="type" v-model="form.type" required />
+        <label>Type</label>
+        <!-- Checkboxes for multiple types -->
+        <div class="checkbox-group">
+          <label v-for="style in beerStyles" :key="style">
+            <input type="checkbox" :value="style" v-model="form.type" />
+            {{ style }}
+          </label>
+        </div>
       </div>
       <div class="form-group">
         <label for="brewery">Brewery</label>
@@ -41,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, type PropType, watch, toRefs } from 'vue'
-import type { Beer, BeerStyle } from '@/models/Beer'
+import { BeerStyle, type Beer } from '@/models/Beer'
 import { Myconsts } from '@/const'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
@@ -60,20 +66,20 @@ export default defineComponent({
   },
   components: {
     ErrorComponent,
-    LoadingComponent // Register the loading component
+    LoadingComponent
   },
   emits: ['submit', 'cancel', 'deleteAction'],
   setup(props, { emit }) {
     const isAdmin = ref(false)
     const error = ref<string | null>(null)
-    const isLoading = ref(false) // State for loading spinner
+    const isLoading = ref(false)
     const { beer, isEdit } = toRefs(props)
     const form = ref<Partial<Beer>>(
       isEdit.value && beer.value
         ? { ...beer.value }
         : {
             name: '',
-            type: '' as BeerStyle,
+            type: [] as BeerStyle[], // Correctly initialized as an array
             brewery: '',
             abv: undefined,
             averageRating: undefined
@@ -82,10 +88,12 @@ export default defineComponent({
     const role = localStorage.getItem(Myconsts.roleName)
     isAdmin.value = role === 'admin'
 
+    const beerStyles = Object.values(BeerStyle)
+
     const handleSubmit = async () => {
       error.value = null
       try {
-        isLoading.value = true // Start loading
+        isLoading.value = true
         const token = localStorage.getItem(Myconsts.tokenName)
         if (!token) {
           throw new Error('User is not authenticated')
@@ -125,7 +133,7 @@ export default defineComponent({
         console.error('Failed to submit form:', error)
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
       } finally {
-        isLoading.value = false // End loading
+        isLoading.value = false
       }
     }
 
@@ -136,7 +144,7 @@ export default defineComponent({
     const deleteAction = async () => {
       error.value = null
       try {
-        isLoading.value = true // Start loading
+        isLoading.value = true
         const token = localStorage.getItem(Myconsts.tokenName)
         if (!token) {
           throw new Error('User is not authenticated')
@@ -164,7 +172,7 @@ export default defineComponent({
         console.error('Failed to submit form:', error)
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
       } finally {
-        isLoading.value = false // End loading
+        isLoading.value = false
       }
     }
 
@@ -174,7 +182,7 @@ export default defineComponent({
       } else {
         form.value = {
           name: '',
-          type: '' as BeerStyle,
+          type: [] as BeerStyle[], // Ensure this is initialized as an array
           brewery: '',
           abv: undefined,
           averageRating: undefined
@@ -189,7 +197,8 @@ export default defineComponent({
       error,
       deleteAction,
       isAdmin,
-      isLoading // Return loading state to template
+      isLoading,
+      beerStyles
     }
   }
 })
@@ -271,6 +280,17 @@ input[type='number']:focus {
   background-color: #c0392b;
 }
 
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 /* Responsive Design */
 @media (max-width: 600px) {
   .form-container {
