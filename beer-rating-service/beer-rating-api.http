@@ -140,7 +140,7 @@ Authorization: Bearer {{token}}
 
 ### Fetch all users
 # Admin route
-GET {{host}}/api/admin/getUsers?page=1&limit=10
+GET {{host}}/api/admin/getUsers?page=1&limit=3
 Authorization: Bearer {{token}}
 
 ### Update users role
