@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
+import type { UserRole } from '@/models/roles';
 import { defineComponent, type PropType, ref, watch } from 'vue'
-import { UserRole } from '@/models/Roles' // Import UserRole enum
 
 interface User {
   _id: string
