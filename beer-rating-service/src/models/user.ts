@@ -1,5 +1,6 @@
 import mongoose, { Document } from "mongoose";
 import bcrypt from "bcryptjs";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 export const roles = {
   VIEWER: "viewer",
@@ -41,5 +42,6 @@ userSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+userSchema.plugin(mongoosePaginate);
 // Export the User model with the IUser interface
-export default mongoose.model<IUser>("User", userSchema);
+export default mongoose.model<IUser, mongoose.PaginateModel<IUser>>("User", userSchema);

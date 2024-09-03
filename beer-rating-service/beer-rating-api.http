@@ -1,8 +1,8 @@
 ### Define variables
 @host = http://localhost:{{$dotenv PORT}}
 #@username = johh_viewer
-#@username = john_admin
-@username = john_user
+@username = john_admin
+#@username = john_user
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
 #@beerId = {{postBeer.response.body._id}}
@@ -11,6 +11,7 @@
 @limit=20
 @styles=Lager,IPA,Belgian Ale
 @nameQuery=Delight
+@userId=66cf28e28268b8904e1b9df0
 
 ### Register a new user
 POST {{host}}/api/auth/register
@@ -135,3 +136,19 @@ Authorization: Bearer {{token}}
 # {beerId} is optional and if omitted you get all ratings a user have submitted
 GET {{host}}/api/ratings/user-ratings/
 Authorization: Bearer {{token}}
+
+
+### Fetch all users
+# Admin route
+GET {{host}}/api/admin/getUsers?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Update users role
+# Admin route
+PUT {{host}}/api/admin/{{userId}}/role
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "role": "admin"
+}

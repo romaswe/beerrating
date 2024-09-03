@@ -8,6 +8,7 @@ import ratingRoutes from "./routes/ratingRoutes";
 import sheetRoutes from "./routes/sheetRoutes";
 import helmet from "helmet";
 import cors from "cors";
+import adminRoutes from "./routes/adminRoutes";
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/beers", beerRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/sheets", sheetRoutes);
+app.use("/api/admin", adminRoutes);
 app.get('/echo', function (req, res) {
   return res.status(200).json({ message: "hello" });
 });
