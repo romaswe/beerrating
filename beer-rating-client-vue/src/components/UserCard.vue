@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType, ref, watch } from 'vue'
-import { UserRole } from '@/models/roles' // Import UserRole enum
+import { UserRole } from '@/models/Roles' // Import UserRole enum
 
 interface User {
   _id: string
