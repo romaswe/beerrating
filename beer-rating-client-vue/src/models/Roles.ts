@@ -4,3 +4,4 @@ export enum UserRole {
     ADMIN = 'admin',
     DISABLED = 'disabled'
 }
+

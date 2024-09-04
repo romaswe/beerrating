@@ -30,7 +30,7 @@ import UserCard from '@/components/UserCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import { Myconsts } from '@/const'
-import { UserRole } from '@/models/roles' // Import the UserRole enum
+import { UserRole } from '@/models/Roles' // Import the UserRole enum
 
 // Define the User interface
 interface User {

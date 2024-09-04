@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import type { UserRole } from '@/models/roles';
+import type { UserRole } from '@/models/Roles'
 import { defineComponent, type PropType, ref, watch } from 'vue'
 
 interface User {
