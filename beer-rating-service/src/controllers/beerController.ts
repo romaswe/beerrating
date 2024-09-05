@@ -1,15 +1,11 @@
 import { Request, Response } from "express";
-import Beer, { BeerStyle } from "../models/beer";
+import Beer from "../models/beer";
 import Rating from "../models/rating";
 import { MongoError } from "mongodb";
+import { BeerType } from "../models/beerType";
 
 // Utility function to convert a string to a BeerStyle enum, if possible
-const convertToBeerStyleEnum = (style: string): BeerStyle | null => {
-  if (Object.values(BeerStyle).includes(style as BeerStyle)) {
-    return style as BeerStyle;
-  }
-  return null;
-};
+
 
 // Fetch beers with pagination, filtering, and sorting
 export const getBeers = async (req: Request, res: Response) => {
@@ -19,15 +15,20 @@ export const getBeers = async (req: Request, res: Response) => {
 
     // Get the 'styles' query parameter and convert it into an array
     const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
-    const styles = stylesQuery ? stylesQuery.split(",").map(style => convertToBeerStyleEnum(style)).filter(style => style !== null) as BeerStyle[] : [];
+    const styles = stylesQuery ? stylesQuery.split(",") : [];
+    // Fetch the valid beer types from the BeerType model
+    const validBeerTypes = await BeerType.find({ name: { $in: styles } }).select('name').exec();
+
+    // Extract only the names from the validBeerTypes array
+    const validTypes = validBeerTypes.map(beerType => beerType.name);
 
     const nameQuery = req.query.q as string;
 
     // Build the filter query
     const filter: any = {};
 
-    if (styles.length > 0) {
-      filter.type = { $in: styles }; // Filter by beer styles if provided
+    if (validTypes.length > 0) {
+      filter.type = { $in: validTypes }; // Filter by beer styles if provided
     }
 
     if (nameQuery) {
@@ -36,6 +37,7 @@ export const getBeers = async (req: Request, res: Response) => {
     }
 
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
+    // TODO: Populate reviews and tasting
     const beers = await Beer.paginate(filter, {
       page,
       limit,
@@ -49,6 +51,7 @@ export const getBeers = async (req: Request, res: Response) => {
 };
 
 // Fetch a specific beer along with all ratings and average rating
+// TODO: denna borde inte behövas, då vi får allt, men om man vill hämta 1 öl så borde vi tabort averageRating för det är redan i öl objektet. samt populate rating.
 export const getBeerWithRatings = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -85,18 +88,16 @@ export const createBeer = async (req: Request, res: Response) => {
 
   try {
     // Convert all provided types to BeerStyle enums
-    const types: BeerStyle[] = type.map((style: string) => convertToBeerStyleEnum(style)).filter((style: null) => style !== null) as BeerStyle[];
+    //const types: BeerStyle[] = type.map((style: string) => convertToBeerStyleEnum(style)).filter((style: null) => style !== null) as BeerStyle[];
 
     // Validate if all provided types are valid BeerStyles
-    if (!types.length) {
-      const validStyles = Object.values(BeerStyle);
+    if (!type.length) {
       return res.status(400).json({
-        message: `Invalid beer styles provided. Valid styles are: ${validStyles.join(", ")}`,
-        validStyles: validStyles,
+        message: `Invalid beer styles provided.`
       });
     }
 
-    const beer = new Beer({ name, type: types, brewery, abv });
+    const beer = new Beer({ name, type: type, brewery, abv });
     const savedBeer = await beer.save();
     res.status(201).json(savedBeer);
   } catch (error) {
@@ -115,15 +116,6 @@ export const getBeersByStyle = async (req: Request, res: Response) => {
   const { style } = req.params; // Extract beer style from URL parameters
   const page = parseInt(req.query.page as string, 10) || 1; // Default to 1 if page query param is not provided
   const limit = parseInt(req.query.limit as string, 10) || 10; // Default to 10 if limit query param is not provided
-
-  // Check if the provided style is a valid BeerStyle
-  if (!Object.values(BeerStyle).includes(style as BeerStyle)) {
-    const validStyles = Object.values(BeerStyle); // Get all valid beer styles
-    return res.status(400).json({
-      message: `Invalid beer style provided. Valid styles are: ${validStyles.join(", ")}`,
-      validStyles: validStyles, // Include the list of valid styles in the response
-    });
-  }
 
   try {
     // Find all beers that include the specified style in their 'type' array
@@ -147,22 +139,10 @@ export const updateBeer = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, type, brewery, abv } = req.body;
 
-  // Convert all provided types to BeerStyle enums
-  const types: BeerStyle[] = type.map((style: string) => convertToBeerStyleEnum(style)).filter((style: null) => style !== null) as BeerStyle[];
-
-  // Validate if all provided types are valid BeerStyles
-  if (!types.length) {
-    const validStyles = Object.values(BeerStyle);
-    return res.status(400).json({
-      message: `Invalid beer styles provided. Valid styles are: ${validStyles.join(", ")}`,
-      validStyles: validStyles,
-    });
-  }
-
   try {
     const beer = await Beer.findByIdAndUpdate(
       id,
-      { name, type: types, brewery, abv },
+      { name, type: type, brewery, abv },
       { new: true, runValidators: true }
     );
 
@@ -182,12 +162,6 @@ export const updateBeer = async (req: Request, res: Response) => {
   }
 };
 
-// Utility function to ensure every string is converted to its respective BeerStyle enum if valid
-const validateAndConvertTypes = (types: string[]): BeerStyle[] => {
-  return types
-    .map((style) => (Object.values(BeerStyle).includes(style as BeerStyle) ? (style as BeerStyle) : null))
-    .filter((style): style is BeerStyle => style !== null);
-};
 // Delete a beer and its associated ratings
 export const deleteBeer = async (req: Request, res: Response) => {
   const { id } = req.params;

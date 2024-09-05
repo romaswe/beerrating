@@ -32,7 +32,7 @@ export const addRating = async (req: Request, res: Response) => {
       comment,
     });
 
-    await rating.save();
+    const savedRating = await rating.save();
 
     // Recalculate the average rating
     const allRatings = await Rating.find({ beer: beerId });
@@ -40,13 +40,17 @@ export const addRating = async (req: Request, res: Response) => {
     // Calculate the average rating rounded to two decimal places
     const averageRating = allRatings.length
       ? Math.round(
-          (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
-            allRatings.length) *
-            100,
-        ) / 100
+        (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
+          allRatings.length) *
+        100,
+      ) / 100
       : 0;
     // Update the beer's average rating
     beer.averageRating = averageRating;
+    if (!beer.reviews) {
+      beer.reviews = []; // Initialize the reviews array if it's undefined
+    }
+    beer.reviews.push(savedRating.id);
     await beer.save();
 
     res.status(201).json(rating);
@@ -96,10 +100,10 @@ export const updateRating = async (req: Request, res: Response) => {
     // Calculate the average rating rounded to two decimal places
     const averageRating = allRatings.length
       ? Math.round(
-          (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
-            allRatings.length) *
-            100,
-        ) / 100
+        (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
+          allRatings.length) *
+        100,
+      ) / 100
       : 0;
     // Update the beer's average rating
     beer.averageRating = averageRating;

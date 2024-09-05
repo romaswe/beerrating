@@ -9,6 +9,9 @@ import sheetRoutes from "./routes/sheetRoutes";
 import helmet from "helmet";
 import cors from "cors";
 import adminRoutes from "./routes/adminRoutes";
+import { seedBeerTypes } from "./models/beerType";
+import beerTypeRoutes from "./routes/beerTypeRoutes";
+import beerTastingRoutes from "./routes/beerTastingRoutes";
 
 dotenv.config();
 
@@ -41,9 +44,13 @@ app.use("/api/beers", beerRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/sheets", sheetRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/beer-types", beerTypeRoutes);
+app.use("/api/beer-tastings", beerTastingRoutes);
+
 app.get('/echo', function (req, res) {
   return res.status(200).json({ message: "hello" });
 });
+
 const PORT = process.env.PORT || 5000;
 const DatabaseName = process.env.BEER_DATABASE || "BeerDatabase";
 if (process.env.MONGO_URI) {
@@ -52,8 +59,9 @@ if (process.env.MONGO_URI) {
     .connect(process.env.MONGO_URI!, {
       dbName: DatabaseName,
     })
-    .then(() => {
+    .then(async () => {
       console.log("MongoDB connected");
+      await seedBeerTypes();
       app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
     .catch((error) => {
@@ -63,3 +71,4 @@ if (process.env.MONGO_URI) {
   console.log("No database uri, Starting server");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
+

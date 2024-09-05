@@ -1,17 +1,17 @@
 ### Define variables
 @host = http://localhost:{{$dotenv PORT}}
-#@username = johh_viewer
 @username = john_admin
-#@username = john_user
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
-#@beerId = {{postBeer.response.body._id}}
 @beerId = 66d31b77156f45c743b41787
 @page=1
 @limit=20
 @styles=Lager,IPA,Belgian Ale
 @nameQuery=Delight
-@userId=66cf28e28268b8904e1b9df0
+@userId = 66cf28e28268b8904e1b9df0
+@ratingId = 66d60773156f45c743b418c7
+
+### User Authentication Endpoints
 
 ### Register a new user
 POST {{host}}/api/auth/register
@@ -32,16 +32,19 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
+
+### Beer Management Endpoints
+
 ### Create a new beer
-# @name postBeer
 # This request requires a valid JWT token.
+# @name postBeer
 POST {{host}}/api/beers
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Guinness3",
-  "type": ["Stout","Lager"]
+  "name": "Guinness5",
+  "type": ["Stout2", "Lager"]
 }
 
 ### Get all beers with pagination
@@ -53,11 +56,33 @@ GET {{host}}/api/beers?styles={{styles}}&limit={{limit}}&page={{page}}
 ### Get all beers with pagination and query on name
 GET {{host}}/api/beers?q={{nameQuery}}&page={{page}}&limit={{limit}}
 
-### Get all beers with pagination and query  on name
+### Get all beers with pagination and query on name and styles
 GET {{host}}/api/beers?q={{nameQuery}}&styles={{styles}}&page={{page}}&limit={{limit}}
 
 ### Get a specific beer with ratings
 GET {{host}}/api/beers/{{beerId}}
+
+### Update a Beer
+PUT {{host}}/api/beers/{{beerId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Updated Beer Name",
+  "type": "IPA",
+  "brewery": "Updated Brewery",
+  "abv": 5.5
+}
+
+### Delete a Beer
+DELETE {{host}}/api/beers/{{beerId}}
+Authorization: Bearer {{token}}
+
+### Get beer by type/style
+GET {{host}}/api/beers/type/Stout2?page={{page}}&limit={{limit}}
+
+
+### Beer Rating Endpoints
 
 ### Add a rating to a beer
 POST {{host}}/api/ratings
@@ -81,38 +106,6 @@ Authorization: Bearer {{token}}
   "comment": "Absolutely loved it!"
 }
 
-### Fetch beers from google sheets
-GET {{host}}/api/sheets/beers-from-sheet
-
-### Clear sheets cache
-POST {{host}}/api/sheets/clear-cache
-Content-Type: application/json
-
-{
-  "cacheName": "beers"
-}
-
-### Get beer by type/style
-GET {{host}}/api/beers/type/Stout2?page={{page}}&limit={{limit}}
-
-### Update a Beer
-PUT {{host}}/api/beers/{{beerId}}
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-  "name": "Updated Beer Name",
-  "type": "IPA",
-  "brewery": "Updated Brewery",
-  "abv": 5.5
-}
-
-### Delete a Beer
-DELETE {{host}}/api/beers/{{beerId}}
-Authorization: Bearer {{token}}
-
-
-@ratingId = 66cf0dd20303f0cba812e141
 ### Update a Rating
 PUT {{host}}/api/ratings/{{ratingId}}
 Content-Type: application/json
@@ -125,30 +118,42 @@ Authorization: Bearer {{token}}
 
 ### Delete a Rating
 DELETE {{host}}/api/ratings/{{ratingId}}
-Authorization: Bearer {{token}} 
-
-### Fetch user rating for specific beer
-# {beerId} is optional and if omitted you get all ratings a user have submitted
-GET {{host}}/api/ratings/user-ratings/{beerId}
 Authorization: Bearer {{token}}
 
-### Fetch user rating
-# {beerId} is optional and if omitted you get all ratings a user have submitted
+### Fetch user rating for a specific beer
+GET {{host}}/api/ratings/user-ratings/{{beerId}}
+Authorization: Bearer {{token}}
+
+### Fetch all user ratings
 GET {{host}}/api/ratings/user-ratings/
 Authorization: Bearer {{token}}
 
 
-### Fetch all users
-# Admin route
+### Admin Endpoints
+
+### Fetch all users (Admin route)
 GET {{host}}/api/admin/getUsers?page=1&limit=3
 Authorization: Bearer {{token}}
 
-### Update users role
-# Admin route
+### Update user's role (Admin route)
 PUT {{host}}/api/admin/{{userId}}/role
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
   "role": "admin"
+}
+
+
+### External Services Integration
+
+### Fetch beers from Google Sheets
+GET {{host}}/api/sheets/beers-from-sheet
+
+### Clear Google Sheets cache
+POST {{host}}/api/sheets/clear-cache
+Content-Type: application/json
+
+{
+  "cacheName": "beers"
 }
