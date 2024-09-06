@@ -125,8 +125,6 @@ export const deleteRating = async (req: Request, res: Response) => {
   const { ratingId } = req.params;
   const userId = req.user?.id; // Assuming user ID is stored in req.user after authentication
 
-  console.log(ratingId);
-
   // Validate Object IDs
   if (!isValidObjectId(ratingId)) {
     return res.status(400).json({ message: "Invalid rating ID." });
@@ -144,6 +142,25 @@ export const deleteRating = async (req: Request, res: Response) => {
         message: "Rating not found or not authorized to delete.",
       });
     }
+
+    // Recalculate the average rating for the deleted rating's beer
+    const allRatings = await Rating.find({ beer: rating.beer });
+
+    // Calculate the average rating rounded to two decimal places
+    const averageRating = allRatings.length
+      ? Math.round(
+        (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
+          allRatings.length) *
+        100,
+      ) / 100
+      : 0;
+    // Update the beer's average rating
+    const beer = await Beer.findById(rating.beer);
+    if (!beer) {
+      return res.status(404).json({ message: "Beer not found" });
+    }
+    beer.averageRating = averageRating;
+    await beer.save();
 
     res.status(200).json({ message: "Rating deleted successfully." });
   } catch (error) {

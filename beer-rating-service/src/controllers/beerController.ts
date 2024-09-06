@@ -4,9 +4,6 @@ import Rating from "../models/rating";
 import { MongoError } from "mongodb";
 import { BeerType } from "../models/beerType";
 
-// Utility function to convert a string to a BeerStyle enum, if possible
-
-
 // Fetch beers with pagination, filtering, and sorting
 export const getBeers = async (req: Request, res: Response) => {
   try {
@@ -16,6 +13,7 @@ export const getBeers = async (req: Request, res: Response) => {
     // Get the 'styles' query parameter and convert it into an array
     const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
     const styles = stylesQuery ? stylesQuery.split(",") : [];
+
     // Fetch the valid beer types from the BeerType model
     const validBeerTypes = await BeerType.find({ name: { $in: styles } }).select('name').exec();
 
@@ -37,46 +35,58 @@ export const getBeers = async (req: Request, res: Response) => {
     }
 
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
-    // TODO: Populate reviews and tasting
     const beers = await Beer.paginate(filter, {
       page,
       limit,
       sort: { averageRating: -1 }, // Sort by averageRating in descending order
+      populate: [
+        { path: 'tasting', model: 'Tasting' },
+        {
+          path: 'reviews',
+          model: 'Rating',
+          populate: {
+            path: 'user', // Populate the user field within reviews
+            model: 'User',
+            select: 'username role', // Specify which fields to return
+          },
+        },
+      ],
     });
 
-    res.json(beers);
+    // Fetch all valid beer types to return in the response
+    const allValidBeerTypes = await BeerType.find().select('name').lean();
+    const allValidTypes = allValidBeerTypes.map(beerType => beerType.name);
+
+    res.json({ ...beers, validBeerTypes: allValidTypes });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
 };
 
+
 // Fetch a specific beer along with all ratings and average rating
-// TODO: denna borde inte behövas, då vi får allt, men om man vill hämta 1 öl så borde vi tabort averageRating för det är redan i öl objektet. samt populate rating.
-export const getBeerWithRatings = async (req: Request, res: Response) => {
+
+export const getBeerById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const beer = await Beer.findById(id);
+    // Populate rating and tasting
+    const beer = await Beer.findById(id)
+      .populate({ path: 'reviews', model: 'Rating' })
+      .populate({
+        path: 'reviews',
+        model: 'Rating',
+        populate: {
+          path: 'user', // Populate the user field within reviews
+          model: 'User',
+          select: 'username role', // Specify which fields to return
+        },
+      });
+
     if (!beer) {
       return res.status(404).json({ message: "Beer not found" });
     }
 
-    // Fetch all ratings for the beer
-    const ratings = await Rating.find({
-      beer: beer._id,
-    })
-      .populate("user", "username")
-      .sort({ updatedAt: -1 });
-
-    // Calculate the average rating rounded to two decimal places
-    const averageRating = ratings.length
-      ? Math.round(
-        (ratings.reduce((acc, rating) => acc + rating.score, 0) /
-          ratings.length) *
-        100,
-      ) / 100
-      : 0;
-
-    res.json({ beer, ratings, averageRating });
+    res.json({ beer });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -118,6 +128,16 @@ export const getBeersByStyle = async (req: Request, res: Response) => {
   const limit = parseInt(req.query.limit as string, 10) || 10; // Default to 10 if limit query param is not provided
 
   try {
+    // Get the 'styles' query parameter and convert it into an array
+    const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
+    const styles = stylesQuery ? stylesQuery.split(",") : [];
+    // Fetch the valid beer types from the BeerType model
+    const validBeerTypes = await BeerType.find({ name: { $in: styles } }).select('name').exec();
+
+    if (!validBeerTypes.length) {
+      return res.status(404).json({ message: `No valid beer types found for styles: ${styles}` });
+    }
+
     // Find all beers that include the specified style in their 'type' array
     const beers = await Beer.paginate({ type: style }, { page, limit });
 

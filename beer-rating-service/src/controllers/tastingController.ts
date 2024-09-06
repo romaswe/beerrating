@@ -9,7 +9,7 @@ export const getTastings = async (req: Request, res: Response) => {
         const options = {
             page: parseInt(page as string, 10),
             limit: parseInt(limit as string, 10),
-            populate: ['BeerV2', 'users'], // Populate related beers and users
+            populate: ['Beer', 'users'], // Populate related beers and users
             sort: { avrageRating: -1 }, // Sort by avrageRating (most recent first)
         };
 
@@ -29,7 +29,7 @@ export const getTastingById = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid Tasting ID' });
         }
 
-        const tasting = await Tasting.findById(id).populate(['BeerV2', 'users']);
+        const tasting = await Tasting.findById(id).populate(['Beer', 'users']);
         if (!tasting) {
             return res.status(404).json({ error: 'Tasting not found' });
         }
@@ -97,7 +97,7 @@ export const updateTasting = async (req: Request, res: Response) => {
         const updatedTasting = await Tasting.findByIdAndUpdate(id, req.body, {
             new: true,
             runValidators: true,
-        }).populate(['BeerV2', 'users']);
+        }).populate(['Beer', 'users']);
 
         if (!updatedTasting) {
             return res.status(404).json({ error: 'Tasting not found' });

@@ -23,7 +23,7 @@ const tastingSchema = new Schema<ITasting>(
     {
         name: { type: String, required: true },
         description: { type: String },
-        beers: [{ type: mongoose.Schema.Types.ObjectId, ref: "BeerV2" }],
+        beers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Beer" }],
         users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         reviews: [{
             score: { type: Number, required: true, min: 0, max: 5 },
