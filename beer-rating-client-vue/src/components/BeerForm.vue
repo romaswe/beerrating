@@ -47,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, type PropType, watch, toRefs } from 'vue'
-import { BeerStyle, type Beer } from '@/models/Beer'
+import { type Beer } from '@/models/Beer'
 import { Myconsts } from '@/const'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
@@ -58,6 +58,10 @@ export default defineComponent({
     beer: {
       type: Object as PropType<Beer>,
       required: false
+    },
+    beerStyles: {
+      type: Array as PropType<string[]>,
+      required: true
     },
     isEdit: {
       type: Boolean,
@@ -79,7 +83,7 @@ export default defineComponent({
         ? { ...beer.value }
         : {
             name: '',
-            type: [] as BeerStyle[], // Correctly initialized as an array
+            type: [] as string[],
             brewery: '',
             abv: undefined,
             averageRating: undefined
@@ -87,8 +91,6 @@ export default defineComponent({
     )
     const role = localStorage.getItem(Myconsts.roleName)
     isAdmin.value = role === 'admin'
-
-    const beerStyles = Object.values(BeerStyle)
 
     const handleSubmit = async () => {
       error.value = null
@@ -182,7 +184,7 @@ export default defineComponent({
       } else {
         form.value = {
           name: '',
-          type: [] as BeerStyle[], // Ensure this is initialized as an array
+          type: [] as string[],
           brewery: '',
           abv: undefined,
           averageRating: undefined
@@ -197,8 +199,7 @@ export default defineComponent({
       error,
       deleteAction,
       isAdmin,
-      isLoading,
-      beerStyles
+      isLoading
     }
   }
 })

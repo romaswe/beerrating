@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType, computed } from 'vue'
-import type { Beer, BeerStyle } from '@/models/Beer'
+import type { Beer } from '@/models/Beer'
 
 export default defineComponent({
   name: 'BeerCard',
@@ -29,7 +29,7 @@ export default defineComponent({
 
     // Computed property to format the list of beer types
     const formattedTypes = computed(() => {
-      return props.beer.type.join(', ') // Join array of types with commas
+      return props.beer.type.join(',') // Join array of types with commas
     })
 
     return {

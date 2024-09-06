@@ -17,16 +17,6 @@ export interface TopBeer {
   style: string
 }
 
-// In your models/Beer.ts or similar file
-export interface Beer {
-  _id?: number; // Assuming _id is optional and number for this example
-  name: string;
-  type: BeerStyle[];  // Ensure this is an array, not a tuple
-  brewery?: string;
-  abv?: number;
-  averageRating?: number;
-}
-
 
 export enum BeerStyle {
   LAGER = 'Lager',
@@ -56,6 +46,53 @@ export interface Rating {
   createdAt: Date
   updatedAt: Date
   __v: number
+}
+
+export interface User {
+  _id: string;
+  username: string;
+  role: string;
+}
+
+// ***********************
+
+export interface BeerModel {
+  docs: Beer[];
+  totalDocs: number;
+  limit: number;
+  totalPages: number;
+  page: number;
+  pagingCounter: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  prevPage: null;
+  nextPage: null;
+  validBeerTypes: string[];
+}
+
+export interface Beer {
+  _id?: number;
+  name: string;
+  type?: string[];
+  averageRating: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  __v?: number;
+  abv?: number;
+  reviews?: Review[];
+  tasting?: any[];
+  brewery?: string;
+}
+
+export interface Review {
+  _id: string;
+  beer: string;
+  user: User;
+  score: number;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
 }
 
 export interface User {

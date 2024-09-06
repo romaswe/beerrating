@@ -3,7 +3,7 @@
     <h1>Beer List</h1>
     <template v-if="addNewBeer">
       <!-- Use BeerForm for adding new beers -->
-      <BeerForm @submit="handleFormSubmit" @cancel="toggleAddBeerMode" />
+      <BeerForm @submit="handleFormSubmit" @cancel="toggleAddBeerMode" :beerStyles="beerStyles" />
     </template>
     <template v-else>
       <div class="filter-bar">
@@ -66,7 +66,6 @@ import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import BeerModal from '@/components/BeerModal.vue'
 import BeerForm from '@/components/BeerForm.vue'
-import { BeerStyle } from '@/models/Beer'
 import type { Beer, Rating } from '@/models/Beer'
 import { Myconsts } from '@/const'
 
@@ -85,7 +84,7 @@ export default defineComponent({
     const error = ref<string | null>(null)
     const page = ref(1)
     const totalPages = ref(1)
-    const selectedStyles = ref<BeerStyle[]>([])
+    const selectedStyles = ref([])
     const nameQuery = ref('') // New ref for name query
     const showModal = ref(false)
     const selectedBeer = ref<Beer>({} as Beer)
@@ -93,7 +92,7 @@ export default defineComponent({
     const isLoggedIn = ref(false)
     const addNewBeer = ref(false)
 
-    const beerStyles = Object.values(BeerStyle)
+    const beerStyles = ref([])
 
     const token = localStorage.getItem(Myconsts.tokenName)
     isLoggedIn.value = !!token
@@ -112,6 +111,7 @@ export default defineComponent({
         const data = await response.json()
 
         beers.value = data.docs
+        beerStyles.value = data.validBeerTypes
         totalPages.value = data.totalPages
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
