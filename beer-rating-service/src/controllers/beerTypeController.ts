@@ -3,7 +3,14 @@ import { BeerType } from "../models/beerType";
 
 export const getBeerTypes = async (req: Request, res: Response) => {
     try {
-        const beerTypes = await BeerType.find();
+        const page = parseInt(req.query.page as string) || 1; // Default to page 1 if not specified
+        const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page if not specified
+        const beerTypes = await BeerType.paginate(
+            {},
+            {
+                page,
+                limit,
+            });
         res.json(beerTypes);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });

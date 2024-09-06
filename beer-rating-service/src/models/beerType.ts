@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
+import mongoose, { Document, PaginateModel, Schema } from 'mongoose';
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const defaultBeerTypes = [
     { name: 'IPA' },
@@ -27,7 +27,7 @@ export const seedBeerTypes = async () => {
     }
 };
 
-
+interface IBeerTypeModel extends PaginateModel<IBeerType> { }
 export interface IBeerType extends Document {
     name: string;
 }
@@ -35,5 +35,5 @@ export interface IBeerType extends Document {
 const BeerTypeSchema: Schema = new Schema({
     name: { type: String, required: true, unique: true }
 });
-
-export const BeerType = mongoose.model<IBeerType>('BeerType', BeerTypeSchema);
+BeerTypeSchema.plugin(mongoosePaginate);
+export const BeerType = mongoose.model<IBeerType, IBeerTypeModel>('BeerType', BeerTypeSchema);

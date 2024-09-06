@@ -157,3 +157,7 @@ Content-Type: application/json
 {
   "cacheName": "beers"
 }
+
+### Beer type endpoints
+### Get beer types
+GET {{host}}/api/beer-types
