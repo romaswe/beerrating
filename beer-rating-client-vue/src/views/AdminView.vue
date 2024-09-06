@@ -306,12 +306,31 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Admin View Container */
 .admin-view {
   margin: 0 auto;
-  padding: 20px;
+  padding: 30px 20px;
   text-align: center;
+  background-color: #f8f9fa; /* Light background for the page */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Headings */
+h1,
+h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 40px;
+  font-size: 1.5rem;
+  color: #34495e;
+}
+
+/* User Cards and Beer Type List */
 .user-cards,
 .beer-type-list {
   display: flex;
@@ -320,37 +339,48 @@ export default defineComponent({
   justify-content: center;
 }
 
+/* Add Beer Type Form */
 .add-beer-type-form {
-  margin-top: 20px;
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
+/* Input Field Styling */
 .add-beer-type-form input {
-  padding: 10px;
+  padding: 12px;
   font-size: 1rem;
-  margin-right: 10px;
+  width: 300px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease;
 }
 
-.add-beer-type-form button {
-  padding: 10px 20px;
-  background-color: #2ecc71;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.add-beer-type-form input:focus {
+  border-color: #3498db;
+  outline: none;
 }
 
-.add-beer-type-form button:hover {
-  background-color: #27ae60;
-}
-
+/* Buttons */
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
+  font-size: 1rem;
   color: white;
   background-color: #3498db;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2980b9;
+  transform: translateY(-2px);
 }
 
 button:disabled {
@@ -358,7 +388,51 @@ button:disabled {
   cursor: not-allowed;
 }
 
-button:hover:not(:disabled) {
-  background-color: #2980b9;
+/* Green Button for Adding Beer Type */
+.add-beer-type-form button {
+  background-color: #2ecc71;
+}
+
+.add-beer-type-form button:hover:not(:disabled) {
+  background-color: #27ae60;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  margin: 30px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination-controls button {
+  padding: 10px 15px;
+}
+
+.pagination-controls span {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .add-beer-type-form input {
+    width: 100%;
+  }
+
+  .admin-view {
+    padding: 20px;
+  }
+
+  h1,
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  button {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+  }
 }
 </style>
