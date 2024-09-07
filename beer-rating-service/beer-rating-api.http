@@ -43,8 +43,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Guinness5",
-  "type": ["Stout2", "Lager"]
+  "name": "Guinness22",
+  "type": ["Stout", "Lager"]
 }
 
 ### Get all beers with pagination
@@ -92,7 +92,7 @@ Authorization: Bearer {{token}}
 {
   "beerId": "{{beerId}}",
   "score": 4,
-  "comment": "A very smooth and flavorful stout."
+  "comment": "A very smooth and flavorful stout.9"
 }
 
 ### Try to add another rating to the same beer by the same user (should fail)

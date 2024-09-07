@@ -38,7 +38,7 @@
             v-for="beer in beers"
             :key="beer._id"
             :beer="beer"
-            @open-modal="openModal(beer._id ?? NaN)"
+            @open-modal="openModal(beer)"
           />
         </div>
         <!-- Pagination Controls -->
@@ -53,8 +53,8 @@
     <BeerModal
       v-if="showModal"
       :beer="selectedBeer"
-      :ratings="selectedRatings"
       @close-modal="closeModal"
+      :beerStyles="beerStyles"
     />
   </div>
 </template>
@@ -66,7 +66,7 @@ import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import BeerModal from '@/components/BeerModal.vue'
 import BeerForm from '@/components/BeerForm.vue'
-import type { Beer, Rating } from '@/models/Beer'
+import type { Beer, Review } from '@/models/Beer'
 import { Myconsts } from '@/const'
 
 export default defineComponent({
@@ -88,7 +88,7 @@ export default defineComponent({
     const nameQuery = ref('') // New ref for name query
     const showModal = ref(false)
     const selectedBeer = ref<Beer>({} as Beer)
-    const selectedRatings = ref<Rating[]>([])
+    const selectedRatings = ref<Review[]>([])
     const isLoggedIn = ref(false)
     const addNewBeer = ref(false)
 
@@ -120,21 +120,6 @@ export default defineComponent({
       }
     }
 
-    const fetchBeerDetails = async (beerId: Number) => {
-      try {
-        const url = `/api/beers/${beerId}`
-        const response = await fetch(url)
-        if (!response.ok) {
-          throw new Error(`Error fetching beer details: ${response.statusText}`)
-        }
-        const data = await response.json()
-        selectedBeer.value = data.beer
-        selectedRatings.value = data.ratings
-      } catch (err) {
-        console.error('Error fetching beer details:', err)
-      }
-    }
-
     const nextPage = () => {
       if (page.value < totalPages.value) {
         page.value++
@@ -154,8 +139,8 @@ export default defineComponent({
       fetchBeers()
     }
 
-    const openModal = async (beerId: Number) => {
-      await fetchBeerDetails(beerId)
+    const openModal = async (beer: Beer) => {
+      selectedBeer.value = beer
       showModal.value = true
     }
 

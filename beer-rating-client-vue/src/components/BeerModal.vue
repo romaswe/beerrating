@@ -16,6 +16,7 @@
           @submit="handleFormSubmit"
           @cancel="toggleEditMode"
           @delete-action="deleteAction"
+          :beerStyles="beerStyles"
         />
       </template>
       <template v-else-if="isAddingRating">
@@ -62,7 +63,7 @@
         <p v-if="beer.averageRating"><strong>Average Rating:</strong> {{ beer.averageRating }}</p>
 
         <h3>Ratings</h3>
-        <ul v-if="ratings.length">
+        <ul v-if="beer.reviews && beer.reviews.length">
           <li v-for="rating in displayedRatings" :key="rating._id">
             <strong>{{ rating.user.username }}:</strong> {{ rating.score }} - {{ rating.comment }}
           </li>
@@ -70,7 +71,11 @@
         <p v-else>No ratings</p>
 
         <!-- Toggle button to show/hide more ratings -->
-        <button v-if="ratings.length > 5" @click="toggleShowAllRatings" class="toggle-button">
+        <button
+          v-if="beer.reviews && beer.reviews.length > 5"
+          @click="toggleShowAllRatings"
+          class="toggle-button"
+        >
           {{ showAllRatings ? 'Hide ratings' : 'Show All Ratings' }}
         </button>
         <button
@@ -88,8 +93,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, ref, computed, watch } from 'vue'
-import type { Beer, Rating } from '@/models/Beer'
+import { defineComponent, type PropType, ref, computed } from 'vue'
+import type { Beer, Review } from '@/models/Beer'
 import BeerForm from '@/components/BeerForm.vue'
 import RatingForm from '@/components/RatingForm.vue'
 import { Myconsts } from '@/const'
@@ -102,8 +107,8 @@ export default defineComponent({
       type: Object as PropType<Beer>,
       required: true
     },
-    ratings: {
-      type: Array as PropType<Rating[]>,
+    beerStyles: {
+      type: Array as PropType<string[]>,
       required: true
     }
   },
@@ -113,49 +118,23 @@ export default defineComponent({
     const isEditing = ref(false)
     const isAddingRating = ref(false)
     const isLoggedIn = ref(false)
-    const userRating = ref<Rating[] | null>(null)
+    const userRating = ref<Review[] | null>(null)
     const token = localStorage.getItem(Myconsts.tokenName)
 
     isLoggedIn.value = !!token
 
     // Computed property to format the list of beer types
     const formattedTypes = computed(() => {
-      return props.beer.type.join(', ') ?? '' // Join array of types with commas
+      return props.beer.type ? props.beer.type.join(', ') : '' // Join array of types with commas
     })
 
     const displayedRatings = computed(() => {
-      return showAllRatings.value ? props.ratings : props.ratings.slice(0, 5)
+      return showAllRatings.value && props.beer.reviews
+        ? props.beer.reviews
+        : props.beer.reviews
+          ? props.beer.reviews.slice(0, 5)
+          : []
     })
-
-    const fetchUserRating = async () => {
-      if (!token || !props.beer || !props.beer._id) return
-      try {
-        const response = await fetch(`/api/ratings/user-ratings/${props.beer._id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        if (!response.ok) {
-          throw new Error(`Error fetching user rating: ${response.statusText}`)
-        }
-        const data = await response.json()
-
-        userRating.value = data // Assuming the response is the rating object
-      } catch (err) {
-        console.error('Failed to fetch user rating:', err)
-      }
-    }
-
-    // Watch for changes in the beer prop and fetch user ratings when it updates
-    watch(
-      () => props.beer,
-      (newBeer) => {
-        if (newBeer && newBeer._id) {
-          fetchUserRating()
-        }
-      },
-      { immediate: true }
-    )
 
     const toggleShowAllRatings = () => {
       showAllRatings.value = !showAllRatings.value
@@ -175,7 +154,7 @@ export default defineComponent({
       toggleEditMode()
     }
 
-    const handleRatingSubmit = (newRating: Rating) => {
+    const handleRatingSubmit = (newRating: Review) => {
       /*if (newRating) {
               userRating.value = newRating;
           }
