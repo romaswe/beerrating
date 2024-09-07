@@ -33,7 +33,7 @@ export interface IBeerType extends Document {
 }
 
 const BeerTypeSchema: Schema = new Schema({
-    name: { type: String, required: true, unique: true }
+    name: { type: String, required: true, unique: true, index: true }
 });
 BeerTypeSchema.plugin(mongoosePaginate);
 export const BeerType = mongoose.model<IBeerType, IBeerTypeModel>('BeerType', BeerTypeSchema);

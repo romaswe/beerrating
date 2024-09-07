@@ -16,7 +16,7 @@ interface IBeerModel extends PaginateModel<IBeer> { }
 
 const beerSchema = new Schema<IBeer>(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, index: true },
     type: {
       type: [String],
       required: true,
@@ -26,7 +26,7 @@ const beerSchema = new Schema<IBeer>(
           return validTypes.length === value.length;
         },
         message: 'One or more beer types are invalid.'
-      }
+      }, index: true
     },
     brewery: {
       type: String,
@@ -35,8 +35,9 @@ const beerSchema = new Schema<IBeer>(
     abv: {
       type: Number,
       required: false,
+      min: 0, max: 100
     },
-    averageRating: { type: Number, default: 0 }, // This will be computed from ratings
+    averageRating: { type: Number, default: 0, index: true }, // This will be computed from ratings
     tasting: [{ type: Schema.Types.ObjectId, ref: 'Tasting' }],
     reviews: [{ type: Schema.Types.ObjectId, ref: 'Rating' }],
   },

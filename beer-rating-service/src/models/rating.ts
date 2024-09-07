@@ -9,7 +9,7 @@ export interface IRating extends Document {
 
 const ratingSchema = new Schema<IRating>(
   {
-    beer: { type: mongoose.Schema.Types.ObjectId, ref: "Beer", required: true },
+    beer: { type: mongoose.Schema.Types.ObjectId, ref: "Beer", required: true, index: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     score: { type: Number, required: true, min: 0, max: 5 },
     comment: { type: String },
