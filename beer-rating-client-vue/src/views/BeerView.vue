@@ -54,6 +54,7 @@
       v-if="showModal"
       :beer="selectedBeer"
       @close-modal="closeModal"
+      @updated-beerList="closeModalAndUpdate"
       :beerStyles="beerStyles"
     />
   </div>
@@ -149,14 +150,20 @@ export default defineComponent({
       showModal.value = false
       selectedBeer.value = {} as Beer
       selectedRatings.value = []
-      //await fetchBeers()
+    }
+
+    const closeModalAndUpdate = async () => {
+      showModal.value = false
+      selectedBeer.value = {} as Beer
+      selectedRatings.value = []
+      await fetchBeers()
     }
 
     const toggleAddBeerMode = () => {
       addNewBeer.value = !addNewBeer.value
     }
 
-    const handleFormSubmit = async (updatedBeer: Partial<Beer>) => {
+    const handleFormSubmit = async () => {
       toggleAddBeerMode()
       await fetchBeers()
     }
@@ -184,7 +191,8 @@ export default defineComponent({
       isLoggedIn,
       addNewBeer,
       toggleAddBeerMode,
-      handleFormSubmit
+      handleFormSubmit,
+      closeModalAndUpdate
     }
   }
 })

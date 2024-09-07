@@ -90,7 +90,9 @@
         </button>
       </template>
 
-      <button @click="closeModal" class="close-button">Close</button>
+      <button v-if="!isEditing && !isAddingRating" @click="closeModal" class="close-button">
+        Close
+      </button>
     </div>
     <div v-if="error" class="error-container">
       <ErrorComponent :errorMessage="error" @retry="fetchUserRating" />
@@ -120,7 +122,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['close-modal', 'update-beer'],
+  emits: ['close-modal', 'update-beer', 'updated-beerList'],
   setup(props, { emit }) {
     const loading = ref(false)
     const error = ref<string | null>(null)
@@ -196,12 +198,8 @@ export default defineComponent({
       toggleEditMode()
     }
 
-    const handleRatingSubmit = (newRating: Review) => {
-      /*if (newRating) {
-              userRating.value = newRating;
-          }
-          toggleRatingForm();*/
-      closeModal()
+    const handleRatingSubmit = () => {
+      emit('updated-beerList')
     }
 
     const closeModal = () => {
@@ -209,7 +207,7 @@ export default defineComponent({
     }
 
     const deleteAction = () => {
-      closeModal()
+      emit('updated-beerList')
     }
 
     return {
