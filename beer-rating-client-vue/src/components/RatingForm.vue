@@ -20,7 +20,7 @@
     </div>
     <div class="form-group">
       <label for="comment" class="form-label">Comment</label>
-      <textarea id="comment" v-model="form.comment" required class="textarea"></textarea>
+      <textarea id="comment" v-model="form.comment" class="textarea"></textarea>
     </div>
     <div class="button-group">
       <button type="submit" class="submit-button">

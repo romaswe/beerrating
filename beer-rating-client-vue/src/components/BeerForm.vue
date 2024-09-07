@@ -25,7 +25,7 @@
       </div>
       <div class="form-group">
         <label for="abv">ABV (%)</label>
-        <input type="number" id="abv" v-model="form.abv" step="0.1" />
+        <input type="number" id="abv" v-model="form.abv" required step="0.1" min="0" max="100" />
       </div>
       <div class="button-group">
         <button type="submit" class="submit-button">
@@ -103,6 +103,9 @@ export default defineComponent({
 
         let response
         if (isEdit.value && beer.value?._id) {
+          // Trim whitespaces from form values before submission
+          form.value.name = form.value.name?.trim() || ''
+          form.value.brewery = form.value.brewery?.trim() || ''
           response = await fetch(`/api/beers/${beer.value._id}`, {
             method: 'PUT',
             headers: {

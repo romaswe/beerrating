@@ -169,7 +169,7 @@ export default defineComponent({
       beerTypeError.value = null
       try {
         const token = localStorage.getItem(Myconsts.tokenName)
-        const response = await fetch(`/api/beer-types?page=${beerTypePage.value}&limit=10`, {
+        const response = await fetch(`/api/beer-types?page=${beerTypePage.value}&limit=30`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

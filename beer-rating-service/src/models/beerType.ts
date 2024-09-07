@@ -10,6 +10,11 @@ const defaultBeerTypes = [
     { name: 'Porter' },
     { name: 'Wheat' },
     { name: 'Saison' },
+    { name: 'Sour' },
+    { name: 'Hazy' },
+    { name: 'APA' },
+    { name: 'Cider' },
+    { name: 'Festbier' },
     { name: 'Other' }
 ];
 

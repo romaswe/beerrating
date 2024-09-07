@@ -54,7 +54,7 @@ export const getBeers = async (req: Request, res: Response) => {
     });
 
     // Fetch all valid beer types to return in the response
-    const allValidBeerTypes = await BeerType.find().select('name').lean();
+    const allValidBeerTypes = await BeerType.find().select('name').sort({ name: 1 }).lean();
     const allValidTypes = allValidBeerTypes.map(beerType => beerType.name);
 
     res.json({ ...beers, validBeerTypes: allValidTypes });
