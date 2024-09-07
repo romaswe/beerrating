@@ -207,7 +207,7 @@ export default defineComponent({
 
 .filter-bar {
   display: flex;
-  flex-direction: column; /* Make filter-bar a column layout */
+  flex-direction: column;
   gap: 20px; /* Adds space between rows */
   margin-bottom: 20px;
   align-items: center; /* Center-aligns all items */
@@ -247,13 +247,16 @@ button {
   margin: 5px;
 }
 
+/* Disabled Button Styling */
 button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
 
+/* Hover effect for enabled buttons */
 button:hover:not(:disabled) {
   background-color: #2980b9;
+  cursor: pointer;
 }
 
 /* Primary Button Styling for 'Add Beer' */
@@ -261,7 +264,7 @@ button:hover:not(:disabled) {
   background-color: #2ecc71; /* Green */
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #27ae60;
 }
 
@@ -270,10 +273,11 @@ button:hover:not(:disabled) {
   background-color: #3498db; /* Blue */
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background-color: #2980b9;
 }
 
+/* Button Row Alignment */
 .buttons-row {
   justify-content: center;
 }
@@ -291,5 +295,26 @@ button:hover:not(:disabled) {
   justify-content: center;
   align-items: center;
   gap: 10px;
+}
+
+.pagination-controls button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Ensure hover effect only applies to enabled buttons */
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+/* Disabled state for pagination buttons */
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>
