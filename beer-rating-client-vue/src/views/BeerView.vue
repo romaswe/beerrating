@@ -148,7 +148,7 @@ export default defineComponent({
       showModal.value = false
       selectedBeer.value = {} as Beer
       selectedRatings.value = []
-      await fetchBeers()
+      //await fetchBeers()
     }
 
     const toggleAddBeerMode = () => {
