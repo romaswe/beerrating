@@ -1,6 +1,9 @@
 <template>
   <div class="modal-overlay" @click.self="closeModal">
-    <div class="modal-content">
+    <div v-if="loading">
+      <LoadingComponent />
+    </div>
+    <div v-else class="modal-content">
       <button
         v-if="!isEditing && !isAddingRating && isLoggedIn"
         @click="toggleEditMode"
@@ -89,19 +92,24 @@
 
       <button @click="closeModal" class="close-button">Close</button>
     </div>
+    <div v-if="error" class="error-container">
+      <ErrorComponent :errorMessage="error" @retry="fetchUserRating" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, ref, computed, watch } from 'vue'
+import { defineComponent, type PropType, ref, computed } from 'vue'
 import type { Beer, Review } from '@/models/Beer'
 import BeerForm from '@/components/BeerForm.vue'
 import RatingForm from '@/components/RatingForm.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
+import LoadingComponent from '@/components/LoadingComponent.vue'
 import { Myconsts } from '@/const'
 
 export default defineComponent({
   name: 'BeerModal',
-  components: { BeerForm, RatingForm },
+  components: { BeerForm, RatingForm, ErrorComponent, LoadingComponent },
   props: {
     beer: {
       type: Object as PropType<Beer>,
@@ -114,6 +122,8 @@ export default defineComponent({
   },
   emits: ['close-modal', 'update-beer'],
   setup(props, { emit }) {
+    const loading = ref(false)
+    const error = ref<string | null>(null)
     const showAllRatings = ref(false)
     const isEditing = ref(false)
     const isAddingRating = ref(false)
@@ -137,8 +147,14 @@ export default defineComponent({
     })
 
     const fetchUserRating = async () => {
-      if (!token || !props.beer || !props.beer._id) return
       try {
+        error.value = null
+        loading.value = true
+
+        if (!token || !props.beer || !props.beer._id) {
+          throw new Error('User is not authenticated or we cant find the beer')
+        }
+
         const response = await fetch(`/api/ratings/user-ratings/${props.beer._id}`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -151,20 +167,12 @@ export default defineComponent({
 
         userRating.value = data // Assuming the response is the rating object
       } catch (err) {
+        error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
         console.error('Failed to fetch user rating:', err)
+      } finally {
+        loading.value = false
       }
     }
-
-    // Watch for changes in the beer prop and fetch user ratings when it updates
-    watch(
-      () => props.beer,
-      (newBeer) => {
-        if (newBeer && newBeer._id) {
-          fetchUserRating()
-        }
-      },
-      { immediate: true }
-    )
 
     const toggleShowAllRatings = () => {
       showAllRatings.value = !showAllRatings.value
@@ -175,6 +183,10 @@ export default defineComponent({
     }
 
     const toggleRatingForm = () => {
+      if (!isAddingRating.value) {
+        // If we change to try to add rating we fetch this users ratings for this beer
+        fetchUserRating()
+      }
       isAddingRating.value = !isAddingRating.value
     }
 
@@ -214,7 +226,10 @@ export default defineComponent({
       toggleRatingForm,
       handleRatingSubmit,
       userRating,
-      formattedTypes
+      formattedTypes,
+      loading,
+      error,
+      fetchUserRating
     }
   }
 })

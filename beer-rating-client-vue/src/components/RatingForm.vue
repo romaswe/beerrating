@@ -1,5 +1,9 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="rating-form">
+  <h2>{{ isEdit ? 'Edit Rating' : 'Add Rating' }}</h2>
+  <div v-if="loading">
+    <LoadingComponent />
+  </div>
+  <form v-else @submit.prevent="handleSubmit" class="rating-form">
     <div class="form-group">
       <label for="score" class="form-label">Score: {{ form.score }}</label>
       <!-- Slider for rating score -->
@@ -33,6 +37,7 @@
 <script lang="ts">
 import { defineComponent, ref, type PropType, watch, toRefs } from 'vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
+import LoadingComponent from '@/components/LoadingComponent.vue'
 import { Myconsts } from '@/const'
 
 export default defineComponent({
@@ -52,13 +57,15 @@ export default defineComponent({
     }
   },
   components: {
-    ErrorComponent
+    ErrorComponent,
+    LoadingComponent
   },
   emits: ['submit', 'cancel'],
   setup(props, { emit }) {
     const error = ref<string | null>(null)
     const { rating, isEdit } = toRefs(props)
     const form = ref({ ...rating.value })
+    const loading = ref(false)
 
     watch(
       isEdit,
@@ -75,6 +82,7 @@ export default defineComponent({
     const handleSubmit = async () => {
       error.value = null
       try {
+        loading.value = true
         const token = localStorage.getItem(Myconsts.tokenName)
         if (!token) {
           throw new Error('User is not authenticated')
@@ -117,6 +125,8 @@ export default defineComponent({
       } catch (err) {
         console.error('Failed to submit rating:', err)
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+      } finally {
+        loading.value = false
       }
     }
 
@@ -128,7 +138,8 @@ export default defineComponent({
       form,
       handleSubmit,
       cancel,
-      error
+      error,
+      loading
     }
   }
 })

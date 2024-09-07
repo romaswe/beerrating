@@ -115,6 +115,7 @@ export default defineComponent({
         totalPages.value = data.totalPages
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+        console.log(error.value)
       } finally {
         loading.value = false
       }

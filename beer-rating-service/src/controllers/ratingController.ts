@@ -180,24 +180,9 @@ export const getUserRatingsForBeer = async (req: Request, res: Response) => {
   const userId = req.user?.id; // Assuming user ID is stored in req.user after authentication
 
   try {
-    let ratings;
-
-    if (beerId) {
-      // Validate Object ID for beerId
-      if (!isValidObjectId(beerId)) {
-        return res.status(400).json({ message: "Invalid beer ID." });
-      }
-
-      // Find ratings for the specified beer by the logged-in user
-      ratings = await Rating.find({ beer: beerId, user: userId })
-        .populate("beer", "name")
-        .populate("user", "username");
-    } else {
-      // If no beerId is provided, find all ratings by the logged-in user
-      ratings = await Rating.find({ user: userId })
-        .populate("beer", "name")
-        .populate("user", "username");
-    }
+    const ratings = beerId
+      ? await Rating.find({ beer: beerId, user: userId }, null, { lean: true })
+      : await Rating.find({ user: userId }, null, { lean: true });
 
     res.status(200).json(ratings);
   } catch (error) {
