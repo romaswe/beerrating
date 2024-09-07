@@ -93,7 +93,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, ref, computed } from 'vue'
+import { defineComponent, type PropType, ref, computed, watch } from 'vue'
 import type { Beer, Review } from '@/models/Beer'
 import BeerForm from '@/components/BeerForm.vue'
 import RatingForm from '@/components/RatingForm.vue'
@@ -135,6 +135,36 @@ export default defineComponent({
           ? props.beer.reviews.slice(0, 5)
           : []
     })
+
+    const fetchUserRating = async () => {
+      if (!token || !props.beer || !props.beer._id) return
+      try {
+        const response = await fetch(`/api/ratings/user-ratings/${props.beer._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (!response.ok) {
+          throw new Error(`Error fetching user rating: ${response.statusText}`)
+        }
+        const data = await response.json()
+
+        userRating.value = data // Assuming the response is the rating object
+      } catch (err) {
+        console.error('Failed to fetch user rating:', err)
+      }
+    }
+
+    // Watch for changes in the beer prop and fetch user ratings when it updates
+    watch(
+      () => props.beer,
+      (newBeer) => {
+        if (newBeer && newBeer._id) {
+          fetchUserRating()
+        }
+      },
+      { immediate: true }
+    )
 
     const toggleShowAllRatings = () => {
       showAllRatings.value = !showAllRatings.value

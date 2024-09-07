@@ -47,7 +47,7 @@ export default defineComponent({
       default: false
     },
     beerId: {
-      type: Number,
+      type: String,
       required: true
     }
   },

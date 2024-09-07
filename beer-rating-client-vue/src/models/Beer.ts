@@ -36,7 +36,7 @@ export interface BeerModel {
 }
 
 export interface Beer {
-  _id?: number;
+  _id?: string;
   name: string;
   type?: string[];
   averageRating: number;
