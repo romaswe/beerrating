@@ -29,7 +29,7 @@ export default defineComponent({
 
     // Computed property to format the list of beer types
     const formattedTypes = computed(() => {
-      return props.beer.type.join(',') // Join array of types with commas
+      return props.beer.type ? props.beer.type.join(', ') : '' // Join array of types with commas
     })
 
     return {
