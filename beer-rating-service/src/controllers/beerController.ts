@@ -57,6 +57,10 @@ export const getBeers = async (req: Request, res: Response) => {
     const allValidBeerTypes = await BeerType.find().select('name').sort({ name: 1 }).lean();
     const allValidTypes = allValidBeerTypes.map(beerType => beerType.name);
 
+
+    // TODO: Find all unique breweries and return them in the response
+
+
     res.json({ ...beers, validBeerTypes: allValidTypes });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });

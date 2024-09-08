@@ -203,7 +203,7 @@ export default defineComponent({
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify({ name: newBeerTypeName.value })
+          body: JSON.stringify({ name: newBeerTypeName.value.trim() })
         })
 
         if (!response.ok) {
