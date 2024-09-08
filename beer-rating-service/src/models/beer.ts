@@ -16,7 +16,7 @@ interface IBeerModel extends PaginateModel<IBeer> { }
 
 const beerSchema = new Schema<IBeer>(
   {
-    name: { type: String, required: true, unique: true, index: true },
+    name: { type: String, required: true, index: true },
     type: {
       type: [String],
       required: true,

@@ -104,7 +104,8 @@ export default defineComponent({
       try {
         const stylesQuery = selectedStyles.value.join(',')
         const nameQueryParam = nameQuery.value ? `&q=${encodeURIComponent(nameQuery.value)}` : ''
-        const url = `/api/beers?styles=${stylesQuery}&page=${page.value}&limit=25${nameQueryParam}&cache-buster=${new Date().getTime()}`
+        const limit = 35
+        const url = `/api/beers?styles=${stylesQuery}&page=${page.value}&limit=${limit}${nameQueryParam}&cache-buster=${new Date().getTime()}`
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)

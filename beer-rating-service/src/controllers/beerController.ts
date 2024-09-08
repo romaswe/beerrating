@@ -14,11 +14,19 @@ export const getBeers = async (req: Request, res: Response) => {
     const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
     const styles = stylesQuery ? stylesQuery.split(",") : [];
 
+    // Get the 'breweries' query parameter and convert it into an array
+    const breweryQuery = req.query.breweries as string; // Expecting a comma-separated list of styles
+    const breweries = breweryQuery ? breweryQuery.split(",") : [];
+
     // Fetch the valid beer types from the BeerType model
     const validBeerTypes = await BeerType.find({ name: { $in: styles } }).select('name').exec();
 
     // Extract only the names from the validBeerTypes array
     const validTypes = validBeerTypes.map(beerType => beerType.name);
+
+    // Get the ABV range query parameters
+    const abvMin = parseFloat(req.query.abvMin as string) || 0;
+    const abvMax = parseFloat(req.query.abvMax as string) || 100;
 
     const nameQuery = req.query.q as string;
 
@@ -29,10 +37,17 @@ export const getBeers = async (req: Request, res: Response) => {
       filter.type = { $in: validTypes }; // Filter by beer styles if provided
     }
 
+    if (breweries.length > 0) {
+      filter.brewery = { $in: breweries }; // Filter by breweries if provided
+    }
+
     if (nameQuery) {
       const regex = new RegExp(nameQuery, "i"); // i for case insensitive
       filter.name = { $regex: regex };
     }
+
+    // Filter by ABV range
+    filter.abv = { $gte: abvMin, $lte: abvMax };
 
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
     const beers = await Beer.paginate(filter, {
@@ -57,15 +72,15 @@ export const getBeers = async (req: Request, res: Response) => {
     const allValidBeerTypes = await BeerType.find().select('name').sort({ name: 1 }).lean();
     const allValidTypes = allValidBeerTypes.map(beerType => beerType.name);
 
+    // Fetch all unique breweries and return them in the response
+    const allBreweries = (await Beer.distinct('brewery')).sort((a, b) => a.localeCompare(b));
 
-    // TODO: Find all unique breweries and return them in the response
-
-
-    res.json({ ...beers, validBeerTypes: allValidTypes });
+    res.json({ ...beers, validBeerTypes: allValidTypes, allBreweries });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
 
 
 // Fetch a specific beer along with all ratings and average rating
