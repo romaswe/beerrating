@@ -4,6 +4,8 @@ import {
   updateRating,
   deleteRating,
   getUserRatingsForBeer,
+  getUnratedBeers,
+  getRatedBeers,
 } from "../controllers/ratingController";
 import { protect } from "../middleware/authMiddleware";
 
@@ -13,6 +15,7 @@ router.post("/", protect, addRating);
 router.put("/:ratingId", protect, updateRating);
 router.delete("/:ratingId", protect, deleteRating);
 router.get("/user-ratings/:beerId?", protect, getUserRatingsForBeer);
-// TODO: Create a delete endpoint for admins that is not validated that we are the creator
+router.get("/user-ratings/unrated", protect, getUnratedBeers);
+router.get("/user-ratings/rated", protect, getRatedBeers);
 
 export default router;
