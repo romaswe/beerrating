@@ -196,3 +196,47 @@ export const getUserRatingsForBeer = async (req: Request, res: Response) => {
     }
   }
 };
+
+// Fetch all beers that a user has not rated
+export const getUnratedBeers = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1; // Default to page 1 if not specified
+  const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page if not specified
+  const userId = req.user?.id; // Assuming user ID is stored in req.user after authentication
+  try {
+    // Find all beers that the user has rated
+    const ratedBeerIds = await Rating.find({ user: userId }).distinct('beer');
+
+    // Build the filter query
+    const filter: any = {};
+    if (ratedBeerIds.length > 0) {
+      filter._id = { $nin: ratedBeerIds };
+    }
+
+    // Find all beers that are not rated by the user
+
+    const unratedBeers = await Beer.paginate(filter, {
+      page,
+      limit,
+      sort: { name: -1 }, // Sort by name in descending order
+      populate: [
+        { path: 'tasting', model: 'Tasting' },
+        {
+          path: 'reviews',
+          model: 'Rating',
+          populate: {
+            path: 'user', // Populate the user field within reviews
+            model: 'User',
+            select: 'username role', // Specify which fields to return
+          },
+        },
+      ],
+    });
+
+    // Return the list of unrated beers
+    return res.status(200).json(unratedBeers);
+  } catch (error) {
+    console.error('Error fetching unrated beers:', error);
+    return res.status(500).json({ message: 'Server error', error });
+  }
+
+}
