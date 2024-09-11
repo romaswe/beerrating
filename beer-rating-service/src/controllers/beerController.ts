@@ -73,13 +73,14 @@ export const getBeers = async (req: Request, res: Response) => {
     const allValidTypes = allValidBeerTypes.map(beerType => beerType.name);
 
     // Fetch all unique breweries and return them in the response
-    const allBreweries = (await Beer.distinct('brewery')).sort((a, b) => a.localeCompare(b));
+    const allBreweries = (await Beer.distinct('brewery', { brewery: { $ne: "" } })).sort((a, b) => a.localeCompare(b));
 
     res.json({ ...beers, validBeerTypes: allValidTypes, allBreweries });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
 
 
 

@@ -7,6 +7,7 @@
     </template>
     <template v-else>
       <div class="filter-bar">
+        <h2>Filters</h2>
         <!-- Text Field for Name Query -->
         <div class="filter-row">
           <input type="text" v-model="nameQuery" placeholder="Search by name" class="name-input" />
@@ -20,9 +21,29 @@
           </label>
         </div>
 
+        <div class="advanced-search" v-if="showAdvancedSearch">
+          <!-- Checkboxes for Styles -->
+          <h3>Breweries</h3>
+          <div class="filter-row">
+            <label v-for="breweri in beerBreweries" :key="breweri" class="checkbox-label">
+              <input type="checkbox" :value="breweri" v-model="selectedBreweries" />
+              {{ breweri }}
+            </label>
+          </div>
+          <!--- Text Field for ABV Range -->
+          <h3>ABV</h3>
+          <div class="filter-row">
+            <input type="number" v-model="minAbv" placeholder="Min" class="abv-input" />
+            <input type="number" v-model="maxAbv" placeholder="Max" class="abv-input" />
+          </div>
+        </div>
+
         <!-- Apply Filters and Add Beer Buttons -->
         <div class="filter-row buttons-row">
           <button class="btn-secondary" @click="applyFilters">Apply Filters/Search</button>
+          <button class="btn-secondary" @click="toggleAdvancedSearchMode" v-if="isLoggedIn">
+            Advanced search
+          </button>
           <button class="btn-primary" @click="toggleAddBeerMode" v-if="isLoggedIn">Add Beer</button>
         </div>
       </div>
@@ -85,15 +106,20 @@ export default defineComponent({
     const error = ref<string | null>(null)
     const page = ref(1)
     const totalPages = ref(1)
+    const minAbv = ref(null)
+    const maxAbv = ref(null)
     const selectedStyles = ref([])
+    const selectedBreweries = ref([])
     const nameQuery = ref('') // New ref for name query
     const showModal = ref(false)
+    const showAdvancedSearch = ref(false)
     const selectedBeer = ref<Beer>({} as Beer)
     const selectedRatings = ref<Review[]>([])
     const isLoggedIn = ref(false)
     const addNewBeer = ref(false)
 
     const beerStyles = ref([])
+    const beerBreweries = ref([])
 
     const token = localStorage.getItem(Myconsts.tokenName)
     isLoggedIn.value = !!token
@@ -102,10 +128,17 @@ export default defineComponent({
       loading.value = true
       error.value = null
       try {
-        const stylesQuery = selectedStyles.value.join(',')
-        const nameQueryParam = nameQuery.value ? `&q=${encodeURIComponent(nameQuery.value)}` : ''
+        const stylesQuery = selectedStyles.value ? `styles=${selectedStyles.value.join(',')}` : ''
+        const nameQueryParam = nameQuery.value ? `q=${encodeURIComponent(nameQuery.value)}` : ''
+        const breweriesQuery = selectedBreweries.value
+          ? `breweries=${selectedBreweries.value.join(',')}`
+          : ''
+        const minAbvParam = minAbv.value ? `abvMin=${minAbv.value}` : ''
+        const maxAbvParam = maxAbv.value ? `abvMax=${maxAbv.value}` : ''
+        // add abv filter (min and max)
+        // add brewery filter (simulary as styleQuery)
         const limit = 35
-        const url = `/api/beers?styles=${stylesQuery}&page=${page.value}&limit=${limit}${nameQueryParam}&cache-buster=${new Date().getTime()}`
+        const url = `/api/beers?${stylesQuery}&${nameQueryParam}&${breweriesQuery}&${minAbvParam}&${maxAbvParam}&page=${page.value}&limit=${limit}&cache-buster=${new Date().getTime()}`
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)
@@ -115,6 +148,7 @@ export default defineComponent({
         beers.value = data.docs
         beerStyles.value = data.validBeerTypes
         totalPages.value = data.totalPages
+        beerBreweries.value = data.allBreweries
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
         console.log(error.value)
@@ -164,6 +198,15 @@ export default defineComponent({
       addNewBeer.value = !addNewBeer.value
     }
 
+    const toggleAdvancedSearchMode = () => {
+      // when toggeling off we should clear advanced search filters
+      if (showAdvancedSearch.value) {
+        console.log('Clearing advanced search filters')
+        selectedBreweries.value = []
+      }
+      showAdvancedSearch.value = !showAdvancedSearch.value
+    }
+
     const handleFormSubmit = async () => {
       toggleAddBeerMode()
       await fetchBeers()
@@ -193,7 +236,13 @@ export default defineComponent({
       addNewBeer,
       toggleAddBeerMode,
       handleFormSubmit,
-      closeModalAndUpdate
+      closeModalAndUpdate,
+      toggleAdvancedSearchMode,
+      showAdvancedSearch,
+      beerBreweries,
+      selectedBreweries,
+      minAbv,
+      maxAbv
     }
   }
 })

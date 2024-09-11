@@ -33,6 +33,7 @@ export interface BeerModel {
   prevPage: null;
   nextPage: null;
   validBeerTypes: string[];
+  allBreweries: string[];
 }
 
 export interface Beer {
