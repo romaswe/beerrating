@@ -6,7 +6,7 @@
       v-model="minValue"
       :min="min"
       :max="max"
-      step="0.1"
+      :step="step"
       class="slider min-slider"
       @input="updateMin"
     />
@@ -17,7 +17,7 @@
       v-model="maxValue"
       :min="min"
       :max="max"
-      step="0.1"
+      :step="step"
       class="slider max-slider"
       @input="updateMax"
     />
@@ -51,6 +51,10 @@ export default defineComponent({
     initialMax: {
       type: Number,
       default: 100
+    },
+    step: {
+      type: Number,
+      default: 1
     }
   },
   data() {
@@ -87,6 +91,7 @@ export default defineComponent({
 }
 
 .slider {
+  appearance: none;
   -webkit-appearance: none;
   width: 80%; /* Adjust width to center the slider */
   height: 8px;

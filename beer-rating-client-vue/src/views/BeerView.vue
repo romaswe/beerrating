@@ -32,16 +32,18 @@
           </div>
           <!--- Text Field for ABV Range -->
           <h3>ABV</h3>
+          <p>Selected ABV range: {{ minAbv }} - {{ maxAbv }}</p>
+
           <div class="filter-row">
             <DoubleSlider
               :min="0"
               :max="100"
+              :step="0.1"
               :initialMin="4"
               :initialMax="20"
               @update-min="onMinUpdate"
               @update-max="onMaxUpdate"
             />
-            <p>Selected range: {{ minAbv }} - {{ maxAbv }}</p>
           </div>
         </div>
 
