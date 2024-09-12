@@ -39,8 +39,8 @@
               :min="0"
               :max="100"
               :step="0.1"
-              :initialMin="4"
-              :initialMax="20"
+              :initialMin="0"
+              :initialMax="100"
               @update-min="onMinUpdate"
               @update-max="onMaxUpdate"
             />
@@ -117,8 +117,8 @@ export default defineComponent({
     const error = ref<string | null>(null)
     const page = ref(1)
     const totalPages = ref(1)
-    const minAbv = ref(0)
-    const maxAbv = ref(100)
+    const minAbv = ref<number | null>(null)
+    const maxAbv = ref<number | null>(null)
     const selectedStyles = ref([])
     const selectedBreweries = ref([])
     const nameQuery = ref('') // New ref for name query
@@ -214,6 +214,8 @@ export default defineComponent({
       if (showAdvancedSearch.value) {
         console.log('Clearing advanced search filters')
         selectedBreweries.value = []
+        minAbv.value = null
+        maxAbv.value = null
       }
       showAdvancedSearch.value = !showAdvancedSearch.value
     }

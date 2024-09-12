@@ -125,12 +125,4 @@ export default defineComponent({
   width: 80%; /* Matches the slider width */
   margin-top: 10px;
 }
-
-.min-slider {
-  z-index: 2;
-}
-
-.max-slider {
-  z-index: 1;
-}
 </style>
