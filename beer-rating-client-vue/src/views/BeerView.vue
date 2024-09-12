@@ -33,8 +33,15 @@
           <!--- Text Field for ABV Range -->
           <h3>ABV</h3>
           <div class="filter-row">
-            <input type="number" v-model="minAbv" placeholder="Min" class="abv-input" />
-            <input type="number" v-model="maxAbv" placeholder="Max" class="abv-input" />
+            <DoubleSlider
+              :min="0"
+              :max="100"
+              :initialMin="4"
+              :initialMax="20"
+              @update-min="onMinUpdate"
+              @update-max="onMaxUpdate"
+            />
+            <p>Selected range: {{ minAbv }} - {{ maxAbv }}</p>
           </div>
         </div>
 
@@ -88,6 +95,7 @@ import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import BeerModal from '@/components/BeerModal.vue'
 import BeerForm from '@/components/BeerForm.vue'
+import DoubleSlider from '@/components/DoubleSlider.vue'
 import type { Beer, Review } from '@/models/Beer'
 import { Myconsts } from '@/const'
 
@@ -98,7 +106,8 @@ export default defineComponent({
     ErrorComponent,
     LoadingComponent,
     BeerModal,
-    BeerForm
+    BeerForm,
+    DoubleSlider
   },
   setup() {
     const beers = ref<Beer[]>([])
@@ -106,8 +115,8 @@ export default defineComponent({
     const error = ref<string | null>(null)
     const page = ref(1)
     const totalPages = ref(1)
-    const minAbv = ref(null)
-    const maxAbv = ref(null)
+    const minAbv = ref(0)
+    const maxAbv = ref(100)
     const selectedStyles = ref([])
     const selectedBreweries = ref([])
     const nameQuery = ref('') // New ref for name query
@@ -207,6 +216,13 @@ export default defineComponent({
       showAdvancedSearch.value = !showAdvancedSearch.value
     }
 
+    const onMinUpdate = (value: number) => {
+      minAbv.value = value
+    }
+    const onMaxUpdate = (value: number) => {
+      maxAbv.value = value
+    }
+
     const handleFormSubmit = async () => {
       toggleAddBeerMode()
       await fetchBeers()
@@ -242,7 +258,9 @@ export default defineComponent({
       beerBreweries,
       selectedBreweries,
       minAbv,
-      maxAbv
+      maxAbv,
+      onMinUpdate,
+      onMaxUpdate
     }
   }
 })
