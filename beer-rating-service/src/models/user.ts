@@ -15,6 +15,8 @@ export interface IUser extends Document {
   password: string;
   role: string;
   matchPassword(enteredPassword: string): Promise<boolean>;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // Define the schema for User
@@ -27,7 +29,7 @@ const userSchema = new mongoose.Schema<IUser>({
     default: roles.VIEWER,
     required: true,
   },
-});
+}, { timestamps: true });
 
 // Middleware to hash the password before saving a user
 userSchema.pre<IUser>("save", async function (next) {

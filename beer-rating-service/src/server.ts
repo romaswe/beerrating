@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes";
 import beerRoutes from "./routes/beerRoutes";
 import ratingRoutes from "./routes/ratingRoutes";
 import sheetRoutes from "./routes/sheetRoutes";
+import statsRoutes from "./routes/statsRoutes";
 import helmet from "helmet";
 import cors from "cors";
 import adminRoutes from "./routes/adminRoutes";
@@ -46,6 +47,7 @@ app.use("/api/sheets", sheetRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/beer-types", beerTypeRoutes);
 app.use("/api/beer-tastings", beerTastingRoutes);
+app.use("/api/stats", statsRoutes)
 
 app.get('/echo', function (req, res) {
   return res.status(200).json({ message: "hello" });
