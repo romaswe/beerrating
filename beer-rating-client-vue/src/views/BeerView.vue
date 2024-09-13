@@ -28,16 +28,16 @@
 
         <div class="advanced-search" v-if="showAdvancedSearch">
           <!-- Checkboxes for Breweries -->
-          <h3>Breweries</h3>
-          <BrewerySelect
-            :breweries="beerBreweries"
-            :selectedBreweries="selectedBreweries"
-            @update-selected-breweries="selectedBreweries = $event"
-          />
+          <div class="filter-row">
+            <h3>Breweries</h3>
+            <BrewerySelect
+              :breweries="beerBreweries"
+              :selectedBreweries="selectedBreweries"
+              @update-selected-breweries="selectedBreweries = $event"
+            />
+          </div>
           <!--- Text Field for ABV Range -->
           <h3>ABV</h3>
-          <p>Selected ABV range: {{ minAbv }} - {{ maxAbv }}</p>
-
           <div class="filter-row">
             <DoubleSlider
               :min="0"
@@ -297,7 +297,7 @@ export default defineComponent({
 
 .name-input {
   width: 100%; /* Full width for search input */
-  max-width: 500px; /* Maximum width for larger screens */
+  max-width: 800px; /* Maximum width for larger screens */
   padding: 8px;
   border-radius: 5px;
   border: 1px solid #ccc;

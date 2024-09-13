@@ -79,7 +79,6 @@ export default defineComponent({
 <style scoped>
 .brewery-select {
   width: 100%;
-  max-width: 400px;
   margin: 0 auto;
 }
 

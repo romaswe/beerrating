@@ -1,31 +1,33 @@
 <template>
-  <div class="slider-container">
-    <!-- Min Slider -->
-    <input
-      type="range"
-      v-model="minValue"
-      :min="min"
-      :max="max"
-      :step="step"
-      class="slider min-slider"
-      @input="updateMin"
-    />
+  <div class="input-container">
+    <!-- Min and Max Inputs Side by Side -->
+    <div class="input-group">
+      <label for="min-input">Min:</label>
+      <input
+        id="min-input"
+        type="number"
+        v-model="minValue"
+        :min="min"
+        :max="max"
+        :step="step"
+        @input="updateMin"
+      />
 
-    <!-- Max Slider -->
-    <input
-      type="range"
-      v-model="maxValue"
-      :min="min"
-      :max="max"
-      :step="step"
-      class="slider max-slider"
-      @input="updateMax"
-    />
+      <label for="max-input">Max:</label>
+      <input
+        id="max-input"
+        type="number"
+        v-model="maxValue"
+        :min="min"
+        :max="max"
+        :step="step"
+        @input="updateMax"
+      />
+    </div>
 
     <!-- Display Current Values -->
     <div class="range-values">
-      <span>Min: {{ minValue }}</span>
-      <span>Max: {{ maxValue }}</span>
+      <span>Selected range: {{ minValue }} - {{ maxValue }}</span>
     </div>
   </div>
 </template>
@@ -65,12 +67,14 @@ export default defineComponent({
   },
   methods: {
     updateMin() {
+      // Ensure minValue is less than maxValue
       if (this.minValue >= this.maxValue) {
         this.minValue = this.maxValue - 1
       }
       this.$emit('update-min', this.minValue)
     },
     updateMax() {
+      // Ensure maxValue is greater than minValue
       if (this.maxValue <= this.minValue) {
         this.maxValue = this.minValue + 1
       }
@@ -81,7 +85,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.slider-container {
+.input-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,39 +94,21 @@ export default defineComponent({
   box-sizing: border-box;
 }
 
-.slider {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 80%; /* Adjust width to center the slider */
-  height: 8px;
-  background: #ddd;
-  outline: none;
-  margin: 10px 0;
-  position: relative;
+.input-group {
+  display: flex;
+  gap: 20px; /* Space between Min and Max inputs */
+  align-items: center;
 }
 
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #4caf50;
-  cursor: pointer;
-  border-radius: 50%;
-}
-
-.slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #4caf50;
-  cursor: pointer;
-  border-radius: 50%;
+input[type='number'] {
+  padding: 5px;
+  width: 80px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .range-values {
-  display: flex;
-  justify-content: space-between;
-  width: 80%; /* Matches the slider width */
   margin-top: 10px;
+  text-align: center;
 }
 </style>
