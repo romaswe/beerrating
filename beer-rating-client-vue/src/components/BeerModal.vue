@@ -68,7 +68,8 @@
         <h3>Ratings</h3>
         <ul v-if="beer.reviews && beer.reviews.length">
           <li v-for="rating in displayedRatings" :key="rating._id">
-            <strong>{{ rating.user.username }}:</strong> {{ rating.score }} - {{ rating.comment }}
+            <strong>{{ rating.user ? rating.user.username : 'Unknown User' }}:</strong>
+            {{ rating.score }} - {{ rating.comment }}
           </li>
         </ul>
         <p v-else>No ratings</p>

@@ -50,6 +50,8 @@ export const getBeers = async (req: Request, res: Response) => {
     filter.abv = { $gte: abvMin, $lte: abvMax };
 
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
+
+    // Exclude deleted users from the reviews
     const beers = await Beer.paginate(filter, {
       page,
       limit,
@@ -63,6 +65,7 @@ export const getBeers = async (req: Request, res: Response) => {
             path: 'user', // Populate the user field within reviews
             model: 'User',
             select: 'username role', // Specify which fields to return
+            match: { deletedAt: null, _id: { $ne: null } }, // Exclude deleted users, and users that are removed from the database
           },
         },
       ],
