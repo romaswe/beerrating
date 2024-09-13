@@ -22,14 +22,13 @@
         </div>
 
         <div class="advanced-search" v-if="showAdvancedSearch">
-          <!-- Checkboxes for Styles -->
+          <!-- Checkboxes for Breweries -->
           <h3>Breweries</h3>
-          <div class="filter-row">
-            <label v-for="breweri in beerBreweries" :key="breweri" class="checkbox-label">
-              <input type="checkbox" :value="breweri" v-model="selectedBreweries" />
-              {{ breweri }}
-            </label>
-          </div>
+          <BrewerySelect
+            :breweries="beerBreweries"
+            :selectedBreweries="selectedBreweries"
+            @update-selected-breweries="selectedBreweries = $event"
+          />
           <!--- Text Field for ABV Range -->
           <h3>ABV</h3>
           <p>Selected ABV range: {{ minAbv }} - {{ maxAbv }}</p>
@@ -98,6 +97,7 @@ import LoadingComponent from '@/components/LoadingComponent.vue'
 import BeerModal from '@/components/BeerModal.vue'
 import BeerForm from '@/components/BeerForm.vue'
 import DoubleSlider from '@/components/DoubleSlider.vue'
+import BrewerySelect from '@/components/BrewerySelect.vue'
 import type { Beer, Review } from '@/models/Beer'
 import { Myconsts } from '@/const'
 
@@ -109,7 +109,8 @@ export default defineComponent({
     LoadingComponent,
     BeerModal,
     BeerForm,
-    DoubleSlider
+    DoubleSlider,
+    BrewerySelect
   },
   setup() {
     const beers = ref<Beer[]>([])
