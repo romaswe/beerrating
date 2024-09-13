@@ -7,7 +7,12 @@
     </template>
     <template v-else>
       <div class="filter-bar">
-        <h2>Filters</h2>
+        <h2>
+          Filters<button class="btn-secondary" @click="toggleAdvancedSearchMode" v-if="isLoggedIn">
+            {{ showAdvancedSearch ? 'Hide Advanced filters' : 'Show Advanced filters' }}
+          </button>
+        </h2>
+
         <!-- Text Field for Name Query -->
         <div class="filter-row">
           <input type="text" v-model="nameQuery" placeholder="Search by name" class="name-input" />
@@ -49,9 +54,6 @@
         <!-- Apply Filters and Add Beer Buttons -->
         <div class="filter-row buttons-row">
           <button class="btn-secondary" @click="applyFilters">Apply Filters/Search</button>
-          <button class="btn-secondary" @click="toggleAdvancedSearchMode" v-if="isLoggedIn">
-            Advanced search
-          </button>
           <button class="btn-primary" @click="toggleAddBeerMode" v-if="isLoggedIn">Add Beer</button>
         </div>
       </div>
