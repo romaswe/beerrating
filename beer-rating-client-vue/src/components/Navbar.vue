@@ -16,6 +16,7 @@
           <RouterLink class="nav-link" to="/beers">Beers</RouterLink>
           <!-- Show more links if the user is logged in -->
           <template v-if="isLoggedIn">
+            <RouterLink class="nav-link" to="/profile">Profile</RouterLink>
             <!-- Example: Show Admin only if the role is 'admin' -->
             <RouterLink class="nav-link" v-if="userRole === 'admin'" to="/admin">Admin</RouterLink>
             <!-- Add more links based on the user role here -->

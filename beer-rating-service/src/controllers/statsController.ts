@@ -11,9 +11,6 @@ export const getUserStats = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        console.log(user);
-
-
         // Calculate days since created
         const daysSinceCreated = user.createdAt
             ? Math.ceil((Date.now() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000))
