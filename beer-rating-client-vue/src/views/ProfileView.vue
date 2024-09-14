@@ -16,36 +16,93 @@
 
   <!-- Content based on the active tab -->
   <div class="profile-content">
-    <UserStatsComponent v-if="activeTab === 'stats'" />
-    <UserRatedBeersComponent v-if="activeTab === 'rated'" />
-    <UserNotRatedBeersComponent v-if="activeTab === 'unrated'" />
+    <div v-if="loading">
+      <LoadingComponent />
+    </div>
+    <div v-else-if="error">
+      <ErrorComponent :errorMessage="error" :showRetry="false" />
+    </div>
+    <div v-else>
+      <UserStatsComponent :stats="userStats" v-if="activeTab === 'stats'" />
+      <UserRatedBeersComponent v-if="activeTab === 'rated'" />
+      <UserNotRatedBeersComponent v-if="activeTab === 'unrated'" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import ErrorComponent from '@/components/ErrorComponent.vue'
+import LoadingComponent from '@/components/LoadingComponent.vue'
 import UserNotRatedBeersComponent from '@/components/UserNotRatedBeersComponent.vue'
 import UserRatedBeersComponent from '@/components/UserRatedBeersComponent.vue'
 import UserStatsComponent from '@/components/UserStatsComponent.vue'
-import { defineComponent, ref } from 'vue'
+import { Myconsts } from '@/const'
+import type { Stats } from '@/models/Stats'
+import { defineComponent, onMounted, ref } from 'vue'
 
 export default defineComponent({
   name: 'ProfileView',
   components: {
     UserStatsComponent,
     UserRatedBeersComponent,
-    UserNotRatedBeersComponent
+    UserNotRatedBeersComponent,
+    LoadingComponent,
+    ErrorComponent
   },
   setup() {
-    // Managing the active tab state
+    const loading = ref(true)
+    const error = ref<string | null>(null)
+
+    const userStats = ref<Stats>({} as Stats)
+
+    const token = localStorage.getItem(Myconsts.tokenName)
+
     const activeTab = ref('stats')
 
-    const setActiveTab = (tab: string) => {
+    const setActiveTab = async (tab: string) => {
+      if (tab === 'stats') {
+        await fetchUserStats()
+      } else if (tab === 'rated') {
+        console.log(tab)
+      } else if (tab === 'unrated') {
+        console.log(tab)
+      }
       activeTab.value = tab
+    }
+
+    onMounted(async () => {
+      await fetchUserStats()
+    })
+
+    const fetchUserStats = async () => {
+      loading.value = true
+      error.value = null
+      try {
+        const url = `/api/stats/user-stats`
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (!response.ok) {
+          throw new Error(`Error fetching beers: ${response.statusText}`)
+        }
+        const data = await response.json()
+        userStats.value = data
+      } catch (err) {
+        error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+        console.log(error.value)
+      } finally {
+        loading.value = false
+      }
     }
 
     return {
       activeTab,
-      setActiveTab
+      setActiveTab,
+      error,
+      loading,
+      userStats
     }
   }
 })
