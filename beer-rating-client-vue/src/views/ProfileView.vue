@@ -63,9 +63,9 @@ export default defineComponent({
       if (tab === 'stats') {
         await fetchUserStats()
       } else if (tab === 'rated') {
-        console.log(tab)
+        await fetchUserRatedBeers()
       } else if (tab === 'unrated') {
-        console.log(tab)
+        await fetchUserUnratedRatedBeers()
       }
       activeTab.value = tab
     }
@@ -97,6 +97,52 @@ export default defineComponent({
       }
     }
 
+    const fetchUserRatedBeers = async () => {
+      // TODO: Handle pagination
+      loading.value = true
+      error.value = null
+      try {
+        const url = `/api/ratings/rated`
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (!response.ok) {
+          throw new Error(`Error fetching beers: ${response.statusText}`)
+        }
+        const data = await response.json()
+        console.log(data)
+      } catch (err) {
+        error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+        console.log(error.value)
+      } finally {
+        loading.value = false
+      }
+    }
+    const fetchUserUnratedRatedBeers = async () => {
+      // TODO: Handle pagination
+      loading.value = true
+      error.value = null
+      try {
+        const url = `/api/ratings/unrated`
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (!response.ok) {
+          throw new Error(`Error fetching beers: ${response.statusText}`)
+        }
+        const data = await response.json()
+        console.log(data)
+      } catch (err) {
+        error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+        console.log(error.value)
+      } finally {
+        loading.value = false
+      }
+    }
     return {
       activeTab,
       setActiveTab,

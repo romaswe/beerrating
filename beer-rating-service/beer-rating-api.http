@@ -128,6 +128,13 @@ Authorization: Bearer {{token}}
 GET {{host}}/api/ratings/user-ratings/
 Authorization: Bearer {{token}}
 
+### Fetch alla beers that a user have rated
+GET {{host}}/api/ratings/rated/
+Authorization: Bearer {{token}}
+
+### Fetch alla beers that a user have not rated
+GET {{host}}/api/ratings/unrated/
+Authorization: Bearer {{token}}
 
 ### Admin Endpoints
 

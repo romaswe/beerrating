@@ -21,7 +21,27 @@ export const getUserStats = async (req: Request, res: Response) => {
             .find({ user: user._id })
             .sort({ score: -1 })
             .limit(10)
-            .populate("beer");
+            .populate([
+                {
+                    path: 'beer', // Populate beer details
+                    populate: [
+                        {
+                            path: 'tasting', // Populate the tasting field within beer
+                            model: 'Tasting',
+                        },
+                        {
+                            path: 'reviews', // Populate the reviews field within beer
+                            model: 'Rating',
+                            populate: {
+                                path: 'user', // Populate the user field within reviews
+                                model: 'User',
+                                select: 'username role', // Specify which fields to return
+                                match: { deletedAt: null, _id: { $ne: null } }, // Exclude deleted users
+                            },
+                        },
+                    ],
+                },
+            ]);
 
         // Count the number of beers this user have rated
         const totalBeersRated = await Rating.countDocuments({ user: user._id });

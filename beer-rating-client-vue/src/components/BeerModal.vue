@@ -5,13 +5,13 @@
     </div>
     <div v-else class="modal-content">
       <button
-        v-if="!isEditing && !isAddingRating && isLoggedIn"
+        v-if="!isEditing && !isAddingRating && isLoggedIn && beerStyles"
         @click="toggleEditMode"
         class="edit-button"
       >
         Edit
       </button>
-      <template v-if="isEditing">
+      <template v-if="isEditing && beerStyles">
         <!-- Use BeerForm for editing -->
         <BeerForm
           :beer="beer"
@@ -119,8 +119,7 @@ export default defineComponent({
       required: true
     },
     beerStyles: {
-      type: Array as PropType<string[]>,
-      required: true
+      type: Array as PropType<string[]>
     }
   },
   emits: ['close-modal', 'update-beer', 'updated-beerList'],
