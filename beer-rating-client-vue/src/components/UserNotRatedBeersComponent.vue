@@ -3,7 +3,9 @@
   <form @submit.prevent="submitRatings">
     <div class="beer-container">
       <div v-for="beer in beers.docs" :key="beer._id" class="beer-item">
-        <h3>{{ beer.name }}</h3>
+        <h3>{{ beer.brewery }} - {{ beer.name }}</h3>
+        <p>Style: {{ beer.type ? beer.type.join(', ') : '' }}</p>
+        <p>Average Rating: {{ beer.averageRating }}</p>
 
         <!-- Rating Input (Slider or Number Input) -->
         <label for="rating">Rating:</label>
@@ -147,23 +149,32 @@ export default defineComponent({
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .beer-item {
-  flex: 0 1 calc(33% - 20px);
+  flex: 1 1 200px;
+  max-width: 100%;
   margin-bottom: 20px;
-  padding: 10px;
+  padding: 15px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 8px;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-  min-width: 250px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.beer-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 label {
   display: inline-block;
   margin-right: 10px;
   margin-top: 10px;
+  font-weight: bold;
 }
 
 input[type='text'] {
@@ -173,6 +184,25 @@ input[type='text'] {
 input[type='range'] {
   margin-top: 5px;
   width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .beer-item {
+    flex: 1 1 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .beer-item {
+    flex: 1 1 calc(50% - 20px);
+  }
+}
+
+@media (min-width: 1201px) {
+  .beer-item {
+    flex: 1 1 calc(33% - 20px);
+  }
 }
 
 .pagination-controls {

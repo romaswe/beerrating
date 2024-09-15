@@ -109,7 +109,7 @@ export default defineComponent({
       }
     }
 
-    const fetchUserRatedBeers = async (page = 1, limit = 25) => {
+    const fetchUserRatedBeers = async (page = 1, limit = 26) => {
       // TODO: Handle pagination
       loading.value = true
       error.value = null
@@ -132,7 +132,7 @@ export default defineComponent({
         loading.value = false
       }
     }
-    const fetchUserUnratedRatedBeers = async (page = 1, limit = 25) => {
+    const fetchUserUnratedRatedBeers = async (page = 1, limit = 26) => {
       loading.value = true
       error.value = null
       try {
