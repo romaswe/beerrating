@@ -31,8 +31,9 @@
       />
       <UserNotRatedBeersComponent
         v-if="activeTab === 'unrated'"
-        :userRatedBeers="userNotRatedBeers"
+        :beers="userNotRatedBeers"
         @changePage="fetchUserUnratedRatedBeers"
+        @ratingsSubmitted="fetchUserUnratedRatedBeers"
       />
     </div>
   </div>
