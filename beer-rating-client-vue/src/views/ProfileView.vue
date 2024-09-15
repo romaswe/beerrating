@@ -24,7 +24,11 @@
     </div>
     <div v-else>
       <UserStatsComponent :stats="userStats" v-if="activeTab === 'stats'" />
-      <UserRatedBeersComponent v-if="activeTab === 'rated'" />
+      <UserRatedBeersComponent
+        v-if="activeTab === 'rated'"
+        :userRatedBeers="userRatedBeers"
+        @changePage="fetchUserRatedBeers"
+      />
       <UserNotRatedBeersComponent v-if="activeTab === 'unrated'" />
     </div>
   </div>
@@ -37,6 +41,7 @@ import UserNotRatedBeersComponent from '@/components/UserNotRatedBeersComponent.
 import UserRatedBeersComponent from '@/components/UserRatedBeersComponent.vue'
 import UserStatsComponent from '@/components/UserStatsComponent.vue'
 import { Myconsts } from '@/const'
+import type { BeerModel } from '@/models/Beer'
 import type { Stats } from '@/models/Stats'
 import { defineComponent, onMounted, ref } from 'vue'
 
@@ -54,6 +59,7 @@ export default defineComponent({
     const error = ref<string | null>(null)
 
     const userStats = ref<Stats>({} as Stats)
+    const userRatedBeers = ref<BeerModel>({} as BeerModel)
 
     const token = localStorage.getItem(Myconsts.tokenName)
 
@@ -97,12 +103,12 @@ export default defineComponent({
       }
     }
 
-    const fetchUserRatedBeers = async () => {
+    const fetchUserRatedBeers = async (page = 1, limit = 25) => {
       // TODO: Handle pagination
       loading.value = true
       error.value = null
       try {
-        const url = `/api/ratings/rated`
+        const url = `/api/ratings/rated?page=${page}&limit=${limit}`
         const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -112,7 +118,7 @@ export default defineComponent({
           throw new Error(`Error fetching beers: ${response.statusText}`)
         }
         const data = await response.json()
-        console.log(data)
+        userRatedBeers.value = data
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
         console.log(error.value)
@@ -120,12 +126,11 @@ export default defineComponent({
         loading.value = false
       }
     }
-    const fetchUserUnratedRatedBeers = async () => {
-      // TODO: Handle pagination
+    const fetchUserUnratedRatedBeers = async (page = 1, limit = 25) => {
       loading.value = true
       error.value = null
       try {
-        const url = `/api/ratings/unrated`
+        const url = `/api/ratings/unrated?page=${page}&limit=${limit}`
         const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -148,7 +153,9 @@ export default defineComponent({
       setActiveTab,
       error,
       loading,
-      userStats
+      userStats,
+      userRatedBeers,
+      fetchUserRatedBeers
     }
   }
 })
