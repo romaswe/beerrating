@@ -1,5 +1,5 @@
 <template>
-  <h1>User Not Rated beers</h1>
+  <h1>All beers you have not rated</h1>
 </template>
 
 <script lang="ts">

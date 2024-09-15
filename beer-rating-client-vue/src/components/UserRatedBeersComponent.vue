@@ -1,5 +1,5 @@
 <template>
-  <h1>User Rated beers</h1>
+  <h1>All beers you have rated</h1>
 
   <div class="beer-cards">
     <BeerCard

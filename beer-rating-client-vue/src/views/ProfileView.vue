@@ -6,10 +6,10 @@
         <a href="#">User Stats</a>
       </li>
       <li :class="{ active: activeTab === 'rated' }" @click="setActiveTab('rated')">
-        <a href="#">All Rated Beers</a>
+        <a href="#">Rated Beers</a>
       </li>
       <li :class="{ active: activeTab === 'unrated' }" @click="setActiveTab('unrated')">
-        <a href="#">All Unrated Beers</a>
+        <a href="#">Unrated Beers</a>
       </li>
     </ul>
   </nav>
