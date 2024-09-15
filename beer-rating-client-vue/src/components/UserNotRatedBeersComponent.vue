@@ -38,6 +38,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
 import type { BeerModel } from '@/models/Beer'
+import { Myconsts } from '@/const'
 
 export default defineComponent({
   name: 'BulkRateBeers',
@@ -54,6 +55,8 @@ export default defineComponent({
 
     // Reactive state for tracking changes
     const hasChanges = ref(false)
+
+    const token = localStorage.getItem(Myconsts.tokenName)
 
     // Watch for changes in ratings to enable/disable the submit button
     watch(
@@ -110,7 +113,7 @@ export default defineComponent({
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`
+              Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({ ratings: ratingsToSubmit })
           })
@@ -120,6 +123,8 @@ export default defineComponent({
             alert('Ratings submitted successfully!')
             modifiedRatings.value = {} // Reset changes
             hasChanges.value = false
+
+            emit('changePage')
           } else {
             const errorData = await response.json()
             alert(`Error submitting ratings: ${errorData.message}`)
