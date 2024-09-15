@@ -106,6 +106,18 @@ Authorization: Bearer {{token}}
   "comment": "Absolutely loved it!"
 }
 
+### Batch add rating
+
+POST {{host}}/api/ratings/batch
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "ratings": [
+    { "beerId": "66df2b2e8f0ef61efac6c187", "score": 4, "comment": "Great beer!" },
+    { "beerId": "66df2b2e8f0ef61efac6c187", "score": 5, "comment": "Excellent!" }
+  ]
+}
 ### Update a Rating
 PUT {{host}}/api/ratings/{{ratingId}}
 Content-Type: application/json

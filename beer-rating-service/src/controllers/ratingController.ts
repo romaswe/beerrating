@@ -59,6 +59,86 @@ export const addRating = async (req: Request, res: Response) => {
   }
 };
 
+export const addBatchRatings = async (req: Request, res: Response) => {
+  const ratings = req.body.ratings; // Array of { beerId, score, comment }
+
+  if (!Array.isArray(ratings) || ratings.length === 0) {
+    return res.status(400).json({ message: "Invalid request body. Please provide an array of ratings." });
+  }
+
+  try {
+    const processedRatings = [];
+    const beerUpdates: Record<string, number[]> = {}; // Object to store beerId and scores for recalculation
+
+    for (const { beerId, score, comment } of ratings) {
+      const beer = await Beer.findById(beerId);
+      if (!beer) {
+        continue; // Skip this beer if not found
+      }
+
+      // Check if the user has already rated this beer
+      const existingRating = await Rating.findOne({
+        beer: beerId,
+        user: req.user?.id,
+      });
+      if (existingRating) {
+        continue; // Skip if already rated
+      }
+
+      // Create a new rating
+      const rating = new Rating({
+        beer: beerId,
+        user: req.user?.id,
+        score,
+        comment,
+      });
+
+      const savedRating = await rating.save();
+      processedRatings.push(savedRating);
+
+      // Track the scores for the beer to recalculate its average later
+      if (!beerUpdates[beerId]) {
+        beerUpdates[beerId] = []; // Initialize the array if not already present
+      }
+      beerUpdates[beerId].push(score);
+
+      if (!beer.reviews) {
+        beer.reviews = [];
+      }
+      beer.reviews.push(savedRating.id);
+    }
+
+    // Update average ratings for all affected beers
+    for (const [beerId, newScores] of Object.entries(beerUpdates)) {
+      const beer = await Beer.findById(beerId);
+
+      // Fetch all ratings for this beer
+      const allRatings = await Rating.find({ beer: beerId });
+      const averageRating = allRatings.length
+        ? Math.round(
+          (allRatings.reduce((acc, rating) => acc + rating.score, 0) /
+            allRatings.length) *
+          100
+        ) / 100
+        : 0;
+
+      // Update beer's average rating
+      if (beer) {
+        beer.averageRating = averageRating;
+        await beer.save();
+      }
+    }
+
+    res.status(201).json({
+      message: `${processedRatings.length} ratings added successfully.`,
+      ratings: processedRatings,
+    });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+
 export const updateRating = async (req: Request, res: Response) => {
   const { ratingId } = req.params;
   const { score, comment } = req.body;
