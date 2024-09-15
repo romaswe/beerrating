@@ -1,26 +1,30 @@
 <template>
   <h1>Bulk Rate Beers</h1>
   <form @submit.prevent="submitRatings">
-    <div v-for="beer in beers.docs" :key="beer._id" class="beer-item">
-      <h3>{{ beer.name }}</h3>
+    <div class="beer-container">
+      <div v-for="beer in beers.docs" :key="beer._id" class="beer-item">
+        <h3>{{ beer.name }}</h3>
 
-      <!-- Rating Selector -->
-      <label for="rating">Rating:</label>
-      <select
-        :value="getRatingValue(beer._id!, 'score')"
-        @change="updateRating(beer._id!, 'score', $event)"
-      >
-        <option value="">Select a rating</option>
-        <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-      </select>
+        <!-- Rating Input (Slider or Number Input) -->
+        <label for="rating">Rating:</label>
+        <span>{{ getRatingValue(beer._id!, 'score') || 0 }}</span>
+        <input
+          type="range"
+          min="0"
+          max="5"
+          step="0.1"
+          :value="getRatingValue(beer._id!, 'score') || 0"
+          @input="updateRating(beer._id!, 'score', $event)"
+        />
 
-      <!-- Comment Input (Optional) -->
-      <label for="comment">Comment (optional):</label>
-      <input
-        type="text"
-        :value="getRatingValue(beer._id!, 'comment') || ''"
-        @input="updateRating(beer._id!, 'comment', $event)"
-      />
+        <!-- Comment Input (Optional) -->
+        <label for="comment">Comment (optional):</label>
+        <input
+          type="text"
+          :value="getRatingValue(beer._id!, 'comment') || ''"
+          @input="updateRating(beer._id!, 'comment', $event)"
+        />
+      </div>
     </div>
 
     <!-- Submit Button -->
@@ -50,15 +54,10 @@ export default defineComponent({
   },
   emits: ['changePage'],
   setup(props, { emit }) {
-    // Reactive object to store modified ratings
     const modifiedRatings = ref<Record<string, { score: number | null; comment?: string }>>({})
-
-    // Reactive state for tracking changes
     const hasChanges = ref(false)
-
     const token = localStorage.getItem(Myconsts.tokenName)
 
-    // Watch for changes in ratings to enable/disable the submit button
     watch(
       modifiedRatings,
       (newRatings) => {
@@ -67,12 +66,10 @@ export default defineComponent({
       { deep: true }
     )
 
-    // Retrieve the rating or comment value for a specific beer
     const getRatingValue = (beerId: string, field: 'score' | 'comment') => {
       return modifiedRatings.value[beerId]?.[field] || null
     }
 
-    // Update the rating object with changes
     const updateRating = (beerId: string, field: 'score' | 'comment', event: Event) => {
       const target = event.target as HTMLInputElement | HTMLSelectElement
       if (target) {
@@ -82,7 +79,6 @@ export default defineComponent({
           modifiedRatings.value[beerId] = { score: null }
         }
 
-        // Narrow the type of the field explicitly
         if (field === 'score') {
           modifiedRatings.value[beerId].score = value ? Number(value) : null
         } else if (field === 'comment') {
@@ -90,21 +86,20 @@ export default defineComponent({
         }
       }
     }
-    // Handle pagination
+
     const goToPage = (page: number) => {
       if (page > 0 && page <= props.beers.totalPages) {
         emit('changePage', page)
       }
     }
 
-    // Submit only the modified ratings
     const submitRatings = async () => {
       const ratingsToSubmit = Object.entries(modifiedRatings.value)
         .filter(([_, rating]) => rating.score !== null)
         .map(([beerId, { score, comment }]) => ({
           beerId,
           score,
-          comment: comment || '' // Optional comment
+          comment: comment || ''
         }))
 
       if (ratingsToSubmit.length > 0) {
@@ -119,11 +114,9 @@ export default defineComponent({
           })
 
           if (response.ok) {
-            // Success: Notify user and clear modified ratings
             alert('Ratings submitted successfully!')
-            modifiedRatings.value = {} // Reset changes
+            modifiedRatings.value = {}
             hasChanges.value = false
-
             emit('changePage')
           } else {
             const errorData = await response.json()
@@ -150,19 +143,36 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.beer-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
 .beer-item {
+  flex: 0 1 calc(33% - 20px);
   margin-bottom: 20px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 250px;
 }
 
 label {
+  display: inline-block;
   margin-right: 10px;
+  margin-top: 10px;
 }
 
 input[type='text'] {
   margin-left: 10px;
+}
+
+input[type='range'] {
+  margin-top: 5px;
+  width: 100%;
 }
 
 .pagination-controls {
