@@ -29,7 +29,11 @@
         :userRatedBeers="userRatedBeers"
         @changePage="fetchUserRatedBeers"
       />
-      <UserNotRatedBeersComponent v-if="activeTab === 'unrated'" />
+      <UserNotRatedBeersComponent
+        v-if="activeTab === 'unrated'"
+        :userRatedBeers="userNotRatedBeers"
+        @changePage="fetchUserUnratedRatedBeers"
+      />
     </div>
   </div>
 </template>
@@ -60,6 +64,7 @@ export default defineComponent({
 
     const userStats = ref<Stats>({} as Stats)
     const userRatedBeers = ref<BeerModel>({} as BeerModel)
+    const userNotRatedBeers = ref<BeerModel>({} as BeerModel)
 
     const token = localStorage.getItem(Myconsts.tokenName)
 
@@ -140,7 +145,7 @@ export default defineComponent({
           throw new Error(`Error fetching beers: ${response.statusText}`)
         }
         const data = await response.json()
-        console.log(data)
+        userNotRatedBeers.value = data
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
         console.log(error.value)
@@ -155,7 +160,9 @@ export default defineComponent({
       loading,
       userStats,
       userRatedBeers,
-      fetchUserRatedBeers
+      fetchUserRatedBeers,
+      userNotRatedBeers,
+      fetchUserUnratedRatedBeers
     }
   }
 })
