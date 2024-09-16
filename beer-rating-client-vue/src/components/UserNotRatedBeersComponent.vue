@@ -24,7 +24,7 @@
           type="range"
           min="0"
           max="5"
-          step="0.1"
+          step="0.25"
           :value="getRatingValue(beer._id!, 'score') || 0"
           @input="updateRating(beer._id!, 'score', $event)"
         />
