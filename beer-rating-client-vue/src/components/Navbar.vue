@@ -99,6 +99,7 @@ header {
   padding: 0 1em;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: 100%; /* Ensure the header takes the full screen width */
 }
 
 h2 {
@@ -115,6 +116,8 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+  width: 100%;
 }
 
 nav a {
@@ -132,6 +135,7 @@ nav a {
 .navbar-links {
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap; /* Ensure links wrap on smaller screens */
 }
 
 .logout-button {
@@ -160,27 +164,28 @@ nav a {
 
 .title-and-user {
   display: flex;
-  /* Use flexbox to align items within the div */
   flex-direction: column;
-  /* Stack the items vertically */
   align-items: center;
-  /* Center the items horizontally */
   justify-content: center;
-  /* Center the items vertically */
 }
 
 .navbar-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap; /* Allows wrapping */
   width: 100%;
+  box-sizing: border-box; /* Prevents the container from overflowing */
 }
 
-@media (max-width: 720px) {
-  .social-links {
-    display: none;
-  }
+.navbar-container {
+  width: 100%;
+  max-width: 100%; /* Ensure the navbar doesn't exceed screen width */
+  box-sizing: border-box;
+}
 
+/* Media query for smaller screens */
+@media (max-width: 720px) {
   .navbar-content {
     flex-direction: column;
     align-items: center;
@@ -188,11 +193,22 @@ nav a {
 
   .navbar-links {
     margin-top: 10px;
+    justify-content: center; /* Center the links on mobile */
+    gap: 1rem; /* Slightly reduce gap on smaller screens */
   }
 
   .user-info {
     margin-left: 0;
     margin-top: 10px;
+  }
+
+  /* Reduce padding on mobile */
+  nav a {
+    padding: 0.8em 0.5em;
+  }
+
+  h2 a {
+    font-size: 1.2em;
   }
 }
 </style>

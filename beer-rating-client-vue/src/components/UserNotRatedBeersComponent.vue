@@ -1,6 +1,16 @@
 <template>
   <h1>Bulk Rate Beers</h1>
-  <form @submit.prevent="submitRatings">
+  <p class="warning">You need to submit page by page</p>
+  <p class="warning">
+    After you submit the page will reload and refetch the beers you have not given a rating
+  </p>
+  <div v-if="loading">
+    <LoadingComponent />
+  </div>
+  <div v-else-if="error">
+    <ErrorComponent :errorMessage="error" @retry="submitRatings" />
+  </div>
+  <form v-else @submit.prevent="submitRatings">
     <div class="beer-container">
       <div v-for="beer in beers.docs" :key="beer._id" class="beer-item">
         <h3>{{ beer.brewery }} - {{ beer.name }}</h3>
@@ -45,6 +55,8 @@
 import { defineComponent, ref, watch } from 'vue'
 import type { BeerModel } from '@/models/Beer'
 import { Myconsts } from '@/const'
+import ErrorComponent from './ErrorComponent.vue'
+import LoadingComponent from './LoadingComponent.vue'
 
 export default defineComponent({
   name: 'BulkRateBeers',
@@ -54,11 +66,17 @@ export default defineComponent({
       required: true
     }
   },
+  components: {
+    ErrorComponent,
+    LoadingComponent
+  },
   emits: ['changePage'],
   setup(props, { emit }) {
     const modifiedRatings = ref<Record<string, { score: number | null; comment?: string }>>({})
     const hasChanges = ref(false)
     const token = localStorage.getItem(Myconsts.tokenName)
+    const loading = ref(false)
+    const error = ref<string | null>(null)
 
     watch(
       modifiedRatings,
@@ -105,6 +123,8 @@ export default defineComponent({
         }))
 
       if (ratingsToSubmit.length > 0) {
+        loading.value = true
+        error.value = null
         try {
           const response = await fetch('/api/ratings/batch', {
             method: 'POST',
@@ -116,19 +136,21 @@ export default defineComponent({
           })
 
           if (response.ok) {
-            alert('Ratings submitted successfully!')
             modifiedRatings.value = {}
             hasChanges.value = false
             emit('changePage')
           } else {
             const errorData = await response.json()
-            alert(`Error submitting ratings: ${errorData.message}`)
+            error.value = errorData.message
           }
         } catch (err) {
           console.error('Error submitting ratings:', err)
+          error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
+        } finally {
+          loading.value = false
         }
       } else {
-        alert('No ratings to submit!')
+        console.log('No ratings to submit')
       }
     }
 
@@ -138,7 +160,9 @@ export default defineComponent({
       getRatingValue,
       submitRatings,
       goToPage,
-      hasChanges
+      hasChanges,
+      loading,
+      error
     }
   }
 })
@@ -208,8 +232,28 @@ input[type='range'] {
 .pagination-controls {
   margin-top: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 10px;
+}
+
+.pagination-controls button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Ensure hover effect only applies to enabled buttons */
+.pagination-controls button:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+.warning {
+  color: red;
 }
 
 button {

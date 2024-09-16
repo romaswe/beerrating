@@ -33,7 +33,6 @@
         v-if="activeTab === 'unrated'"
         :beers="userNotRatedBeers"
         @changePage="fetchUserUnratedRatedBeers"
-        @ratingsSubmitted="fetchUserUnratedRatedBeers"
       />
     </div>
   </div>
