@@ -46,10 +46,17 @@ export const getUserStats = async (req: Request, res: Response) => {
         // Count the number of beers this user have rated
         const totalBeersRated = await Rating.countDocuments({ user: user._id });
 
+        // Calculate the average rating
+        const averageRating = (await Rating.aggregate([
+            { $match: { user: user._id } },
+            { $group: { _id: null, averageRating: { $avg: "$score" } } },
+        ]))?.[0]?.averageRating || 0;
+
         const stats = {
             daysMember: daysSinceCreated,
             username: user.username,
             totalBeersRated,
+            averageRating: Math.round(averageRating * 100) / 100,
             topTenBeers: topTenBeers.map(beer => beer.beer),
         };
         res.status(201).json(stats);
@@ -57,5 +64,6 @@ export const getUserStats = async (req: Request, res: Response) => {
         res.status(500).json({ message: (error as Error).message });
     }
 }
+
 
 

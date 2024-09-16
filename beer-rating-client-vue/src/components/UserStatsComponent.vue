@@ -2,6 +2,7 @@
   <h1>User stats for {{ stats.username }}</h1>
   <p>You have been a member for {{ stats.daysMember }} days</p>
   <p>You have rated a total of {{ stats.totalBeersRated }} beers</p>
+  <p>Your average rating is {{ stats.averageRating }}</p>
   <div class="beer-cards" v-if="stats.topTenBeers.length > 0">
     <h2>Your top ten rated beers</h2>
     <BeerCard
