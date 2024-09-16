@@ -68,51 +68,32 @@ export const addBatchRatings = async (req: Request, res: Response) => {
 
   try {
     const processedRatings = [];
-    const beerUpdates: Record<string, number[]> = {}; // Object to store beerId and scores for recalculation
 
     for (const { beerId, score, comment } of ratings) {
       const beer = await Beer.findById(beerId);
-      if (!beer) {
-        continue; // Skip this beer if not found
-      }
+      if (!beer) continue; // Skip this beer if not found
 
-      // Check if the user has already rated this beer
       const existingRating = await Rating.findOne({
         beer: beerId,
         user: req.user?.id,
       });
-      if (existingRating) {
-        continue; // Skip if already rated
-      }
+      if (existingRating) continue; // Skip if already rated
 
-      // Create a new rating
+      // Create and save a new rating
       const rating = new Rating({
         beer: beerId,
         user: req.user?.id,
         score,
         comment,
       });
-
       const savedRating = await rating.save();
       processedRatings.push(savedRating);
 
-      // Track the scores for the beer to recalculate its average later
-      if (!beerUpdates[beerId]) {
-        beerUpdates[beerId] = []; // Initialize the array if not already present
-      }
-      beerUpdates[beerId].push(score);
-
-      if (!beer.reviews) {
-        beer.reviews = [];
-      }
+      // Add the rating ID to the beer's reviews
+      if (!beer.reviews) beer.reviews = [];
       beer.reviews.push(savedRating.id);
-    }
 
-    // Update average ratings for all affected beers
-    for (const [beerId, newScores] of Object.entries(beerUpdates)) {
-      const beer = await Beer.findById(beerId);
-
-      // Fetch all ratings for this beer
+      // Recalculate the average rating in this same loop
       const allRatings = await Rating.find({ beer: beerId });
       const averageRating = allRatings.length
         ? Math.round(
@@ -122,11 +103,9 @@ export const addBatchRatings = async (req: Request, res: Response) => {
         ) / 100
         : 0;
 
-      // Update beer's average rating
-      if (beer) {
-        beer.averageRating = averageRating;
-        await beer.save();
-      }
+      // Update the beer's average rating
+      beer.averageRating = averageRating;
+      await beer.save();
     }
 
     res.status(201).json({
