@@ -55,12 +55,6 @@ export const getBeers = async (req: Request, res: Response) => {
     // Filter by ABV range
     filter.abv = { $gte: abvMin, $lte: abvMax };
 
-    console.log("hj");
-    console.log(sortField);
-    console.log(sortOrder);
-
-
-
     // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and dynamic sorting
     const beers = await Beer.paginate(filter, {
       page,
