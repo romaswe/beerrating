@@ -8,7 +8,8 @@
     <template v-else>
       <div class="filter-bar">
         <h2>
-          Filters<button class="btn-secondary" @click="toggleAdvancedSearchMode" v-if="isLoggedIn">
+          Filters
+          <button class="btn-secondary" @click="toggleAdvancedSearchMode" v-if="isLoggedIn">
             {{ showAdvancedSearch ? 'Hide Advanced filters' : 'Show Advanced filters' }}
           </button>
         </h2>
@@ -36,7 +37,8 @@
               @update-selected-breweries="selectedBreweries = $event"
             />
           </div>
-          <!--- Text Field for ABV Range -->
+
+          <!-- ABV Range Filter -->
           <h3>ABV</h3>
           <div class="filter-row">
             <DoubleSlider
@@ -49,6 +51,23 @@
               @update-max="onMaxUpdate"
             />
           </div>
+
+          <!-- Sort Order Dropdown -->
+          <h3>Sort By</h3>
+          <div class="filter-row sort-select-wrapper">
+            <select v-model="selectedSortField" class="sort-select">
+              <option value="averageRating">Average Rating</option>
+              <option value="name">Name</option>
+              <option value="abv">ABV</option>
+              <option value="type">Beer Style</option>
+              <option value="brewery">Brewery</option>
+            </select>
+
+            <select v-model="selectedSortOrder" class="sort-select">
+              <option value="1">Ascending</option>
+              <option value="-1">Descending</option>
+            </select>
+          </div>
         </div>
 
         <!-- Apply Filters and Add Beer Buttons -->
@@ -57,6 +76,7 @@
           <button class="btn-primary" @click="toggleAddBeerMode" v-if="isLoggedIn">Add Beer</button>
         </div>
       </div>
+
       <div v-if="loading">
         <LoadingComponent />
       </div>
@@ -80,6 +100,7 @@
         </div>
       </div>
     </template>
+
     <!-- Beer Modal -->
     <BeerModal
       v-if="showModal"
@@ -131,6 +152,8 @@ export default defineComponent({
     const selectedRatings = ref<Review[]>([])
     const isLoggedIn = ref(false)
     const addNewBeer = ref(false)
+    const selectedSortField = ref('averageRating') // Default sort field
+    const selectedSortOrder = ref('-1') // Default sort order (Descending)
 
     const beerStyles = ref([])
     const beerBreweries = ref([])
@@ -142,6 +165,10 @@ export default defineComponent({
       loading.value = true
       error.value = null
       try {
+        // TODO: add option to change sort order and sort field
+        // Sort by ABV in ascending order: ?sortField=abv&sortOrder=1
+        // Sort by beer name in descending order: ?sortField=name&sortOrder=-1
+        // posible fields name, abv, type(style), brewery, averageRating
         const stylesQuery = selectedStyles.value ? `styles=${selectedStyles.value.join(',')}` : ''
         const nameQueryParam = nameQuery.value ? `q=${encodeURIComponent(nameQuery.value)}` : ''
         const breweriesQuery = selectedBreweries.value
@@ -149,10 +176,10 @@ export default defineComponent({
           : ''
         const minAbvParam = minAbv.value ? `abvMin=${minAbv.value}` : ''
         const maxAbvParam = maxAbv.value ? `abvMax=${maxAbv.value}` : ''
-        // add abv filter (min and max)
-        // add brewery filter (simulary as styleQuery)
+        const sortFieldParam = `sortField=${selectedSortField.value}`
+        const sortOrderParam = `sortOrder=${selectedSortOrder.value}`
         const limit = 35
-        const url = `/api/beers?${stylesQuery}&${nameQueryParam}&${breweriesQuery}&${minAbvParam}&${maxAbvParam}&page=${page.value}&limit=${limit}&cache-buster=${new Date().getTime()}`
+        const url = `/api/beers?${sortFieldParam}&${sortOrderParam}&${stylesQuery}&${nameQueryParam}&${breweriesQuery}&${minAbvParam}&${maxAbvParam}&page=${page.value}&limit=${limit}&cache-buster=${new Date().getTime()}`
         const response = await fetch(url)
         if (!response.ok) {
           throw new Error(`Error fetching beers: ${response.statusText}`)
@@ -216,6 +243,8 @@ export default defineComponent({
       // when toggeling off we should clear advanced search filters
       if (showAdvancedSearch.value) {
         console.log('Clearing advanced search filters')
+        selectedSortField.value = 'averageRating' // Default sort field
+        selectedSortOrder.value = '-1' // Default sort order (Descending)
         selectedBreweries.value = []
         minAbv.value = null
         maxAbv.value = null
@@ -267,7 +296,9 @@ export default defineComponent({
       minAbv,
       maxAbv,
       onMinUpdate,
-      onMaxUpdate
+      onMaxUpdate,
+      selectedSortField,
+      selectedSortOrder
     }
   }
 })
@@ -391,5 +422,35 @@ button:hover:not(:disabled) {
 .pagination-controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.sort-select-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.sort-select {
+  padding: 8px;
+  margin-right: 10px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.sort-select:hover {
+  background-color: #e6e6e6;
+  border-color: #888;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.sort-select option {
+  padding: 8px;
+  font-size: 14px;
 }
 </style>
