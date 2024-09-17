@@ -1,39 +1,44 @@
 # beer-rating-client-vue
 
-This template should help get you started developing with Vue 3 in Vite.
+### Prerequisites
 
-## Recommended IDE Setup
+- Node.js
+- Vue.js
+- TypeScript
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### Installation
 
-## Type Support for `.vue` Imports in TS
+1. Clone the repository: `git clone https://github.com/your-username/beer-rating-client-vue.git`
+2. Install the dependencies: `npm install`
+3. Start the application: `npm run serve`
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Features
 
-## Customize configuration
+- User authentication and authorization
+- Beer rating and review system
+- Responsive design for mobile and desktop devices
+- Brewery selection component for scalable filtering
+- Beer details modal for in-depth information and editing
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+### Tech Stack
 
-## Project Setup
+- Vue.js 3
+- TypeScript
+- SCSS/CSS
+- Vue Router
 
-```sh
-npm install
-```
+### API Endpoints
 
-### Compile and Hot-Reload for Development
+- `GET /api/beers`: Fetches a list of beers with various filter and sort options
+- `POST /api/ratings/batch`: Submits multiple beer ratings in one request
+- `GET /api/stats/user-stats`: Fetches the user's profile, including rated and unrated beers
 
-```sh
-npm run dev
-```
+### Contributing
 
-### Type-Check, Compile and Minify for Production
+If you'd like to contribute to this project, please follow the standard fork, feature branch, and pull request workflow:
 
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+1. Fork the repository.
+2. Create a new feature branch: `git checkout -b feature/new-feature`
+3. Commit your changes: `git commit -m 'Add new feature'`
+4. Push the branch: `git push origin feature/new-feature`
+5. Open a pull request.
