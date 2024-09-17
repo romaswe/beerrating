@@ -6,5 +6,12 @@ export interface Stats {
     totalBeersRated: number;
     averageRating: number;
     topTenBeers: Beer[];
+    topBeerTypes: TopBeerType[];
+}
+
+export interface TopBeerType {
+    beerType: string;
+    count: number;
+    averageRating: number;
 }
 
