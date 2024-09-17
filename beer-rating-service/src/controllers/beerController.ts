@@ -15,7 +15,7 @@ export const getBeers = async (req: Request, res: Response) => {
     const styles = stylesQuery ? stylesQuery.split(",") : [];
 
     // Get the 'breweries' query parameter and convert it into an array
-    const breweryQuery = req.query.breweries as string; // Expecting a comma-separated list of styles
+    const breweryQuery = req.query.breweries as string; // Expecting a comma-separated list of breweries
     const breweries = breweryQuery ? breweryQuery.split(",") : [];
 
     // Fetch the valid beer types from the BeerType model
@@ -29,6 +29,12 @@ export const getBeers = async (req: Request, res: Response) => {
     const abvMax = parseFloat(req.query.abvMax as string) || 100;
 
     const nameQuery = req.query.q as string;
+
+    // Get the 'sortOrder' query parameter, or default to sorting by average rating in descending order
+    // Sort by ABV in ascending order: ?sortField=abv&sortOrder=1
+    // Sort by beer name in descending order: ?sortField=name&sortOrder=-1
+    const sortField = req.query.sortField as string || 'averageRating';
+    const sortOrder = parseInt(req.query.sortOrder as string) || -1;
 
     // Build the filter query
     const filter: any = {};
@@ -49,13 +55,11 @@ export const getBeers = async (req: Request, res: Response) => {
     // Filter by ABV range
     filter.abv = { $gte: abvMin, $lte: abvMax };
 
-    // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and sorting by average rating
-
-    // Exclude deleted users from the reviews
+    // Use mongoose-paginate-v2 to fetch beers with pagination, filtering, and dynamic sorting
     const beers = await Beer.paginate(filter, {
       page,
       limit,
-      sort: { averageRating: -1 }, // Sort by averageRating in descending order
+      sort: { [sortField]: sortOrder }, // Dynamic sorting based on the provided field and order
       populate: [
         { path: 'tasting', model: 'Tasting' },
         {
@@ -65,7 +69,7 @@ export const getBeers = async (req: Request, res: Response) => {
             path: 'user', // Populate the user field within reviews
             model: 'User',
             select: 'username role', // Specify which fields to return
-            match: { deletedAt: null, _id: { $ne: null } }, // Exclude deleted users, and users that are removed from the database
+            match: { deletedAt: null, _id: { $ne: null } }, // Exclude deleted users
           },
         },
       ],
@@ -83,6 +87,7 @@ export const getBeers = async (req: Request, res: Response) => {
     res.status(500).json({ message: (error as Error).message });
   }
 };
+
 
 
 
