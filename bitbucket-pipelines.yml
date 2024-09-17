@@ -6,6 +6,6 @@ pipelines:
               clone:
                   enabled: false
               script:
-                  - git clone --bare git@bitbucket.org:RepoOrg/beerrating.git
+                  - git clone --bare git@bitbucket.org:romaswe/beerrating.git
                   - cd beerrating.git
-                  - git push --mirror git@github.com:RepoOrg/beerrating.git
+                  - git push --mirror git@github.com:romaswe/beerrating.git
