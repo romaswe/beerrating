@@ -31,6 +31,7 @@ const tastingSchema = new Schema<ITasting>(
             score: { type: Number, required: true, min: 0, max: 5 },
             comment: { type: String },
         }],
+        avrageRating: { type: Number, default: 0, index: true }
     },
     { timestamps: true }
 );
