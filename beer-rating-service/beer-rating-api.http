@@ -10,6 +10,7 @@
 @nameQuery=Delight
 @userId = 66cf28e28268b8904e1b9df0
 @ratingId = 66d60773156f45c743b418c7
+@tastingId = 66eb20009e2255f17c502a0a
 
 ### User Authentication Endpoints
 
@@ -147,6 +148,43 @@ Authorization: Bearer {{token}}
 ### Fetch alla beers that a user have not rated
 GET {{host}}/api/ratings/unrated/
 Authorization: Bearer {{token}}
+
+
+### Tasting Endpoints
+
+### Create a new tasting
+POST {{host}}/api/beer-tastings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Autumn IPA Tasting",
+  "description": "A tasting event for IPA lovers",
+  "beers": ["{{beerId}}"]
+}
+
+### Fetch tastings with pagination
+GET {{host}}/api/beer-tastings?page={{page}}&limit={{limit}}
+Authorization: Bearer {{token}}
+
+### Delete a tasting
+DELETE {{host}}/api/beer-tastings/{{tastingId}}
+Authorization: Bearer {{token}}
+
+### Add a beer to a tasting
+POST {{host}}/api/beer-tastings/{{tastingId}}/beers/{{beerId}}
+Authorization: Bearer {{token}}
+
+### Add a rating and comment to a tasting
+POST {{host}}/api/beer-tastings/{{tastingId}}/rate
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "score": 5,
+  "comment": "Fantastic tasting experience!"
+}
+
 
 ### Admin Endpoints
 

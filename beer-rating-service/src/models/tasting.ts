@@ -5,6 +5,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
 
 
 export interface Reviews {
+    user: mongoose.Schema.Types.ObjectId;
     score: number; // Score how good the testing was
     comment?: string;
 }
@@ -21,11 +22,12 @@ interface ITastingModel extends PaginateModel<ITasting> { }
 
 const tastingSchema = new Schema<ITasting>(
     {
-        name: { type: String, required: true },
+        name: { type: String, required: true, unique: true, index: true },
         description: { type: String },
         beers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Beer" }],
         users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
         reviews: [{
+            user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
             score: { type: Number, required: true, min: 0, max: 5 },
             comment: { type: String },
         }],
