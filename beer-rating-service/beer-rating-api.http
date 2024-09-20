@@ -10,7 +10,7 @@
 @nameQuery=Delight
 @userId = 66cf28e28268b8904e1b9df0
 @ratingId = 66d60773156f45c743b418c7
-@tastingId = 66eb1ffc9e2255f17c502a07
+@tastingId = 66eb20009e2255f17c502a0a
 
 ### User Authentication Endpoints
 
@@ -185,6 +185,21 @@ Authorization: Bearer {{token}}
   "comment": "Fantastic tasting experience!"
 }
 
+
+### Update an existing tasting
+PUT {{host}}/api/beer-tastings/{{tastingId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Updated Tasting Name",
+  "description": "Updated description",
+  "beers": ["{{beerId}}"]
+}
+
+### Remove a beer from a tasting
+DELETE {{host}}/api/beer-tastings/{{tastingId}}/beers/{{beerId}}
+Authorization: Bearer {{token}}
 
 ### Admin Endpoints
 

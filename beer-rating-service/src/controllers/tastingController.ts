@@ -1,13 +1,18 @@
 import { Request, Response } from "express";
-import Tasting from "../models/tasting"; // Import your Tasting model
-import Beer from "../models/beer";       // Import your Beer model
+import Tasting from "../models/tasting";
+import Beer from "../models/beer";
 import mongoose from "mongoose";
 
-// Create a new tasting
+// Create a new tasting with beer validation
 export const createTasting = async (req: Request, res: Response) => {
     try {
-        // TODO: Validate that the beers exists
         const { name, description, beers } = req.body;
+
+        const existingBeers = await Beer.find({ _id: { $in: beers } });
+        if (existingBeers.length !== beers.length) {
+            return res.status(400).json({ message: "Some beers do not exist" });
+        }
+
         const newTasting = new Tasting({
             name,
             description,
@@ -103,9 +108,56 @@ export const addRating = async (req: Request, res: Response) => {
     }
 };
 
+// Update a tasting
+export const updateTasting = async (req: Request, res: Response) => {
+    const { tastingId } = req.params;
+    const { name, description, beers } = req.body;
 
+    try {
+        // Optional: Validate the beers if they are updated
+        if (beers) {
+            const existingBeers = await Beer.find({ _id: { $in: beers } });
+            if (existingBeers.length !== beers.length) {
+                return res.status(400).json({ message: "Some beers do not exist" });
+            }
+        }
 
-// TODO: add a update tasting endpoint
+        const updatedTasting = await Tasting.findByIdAndUpdate(
+            tastingId,
+            { name, description, beers },
+            { new: true, runValidators: true }
+        );
 
+        if (!updatedTasting) {
+            return res.status(404).json({ message: "Tasting not found" });
+        }
 
-// TODO: Add remove beer from tasting endpoint
+        return res.status(200).json(updatedTasting);
+    } catch (error) {
+        return res.status(500).json({ message: "Error updating tasting", error });
+    }
+};
+
+// Remove a beer from a tasting
+export const removeBeerFromTasting = async (req: Request, res: Response) => {
+    const { tastingId, beerId } = req.params;
+
+    try {
+        const tasting = await Tasting.findById(tastingId);
+        if (!tasting) return res.status(404).json({ message: "Tasting not found" });
+
+        const beerIndex = tasting.beers?.indexOf(beerId as unknown as mongoose.Schema.Types.ObjectId);
+
+        if (beerIndex !== -1 && beerIndex !== undefined) {
+            const deletedBeer = tasting.beers?.splice(beerIndex, 1);
+            console.log(`Deleted beer: ${deletedBeer}`);
+            await tasting.save();
+        } else {
+            return res.status(404).json({ message: "Beer not found in this tasting" });
+        }
+
+        return res.status(200).json(tasting);
+    } catch (error) {
+        return res.status(500).json({ message: "Error removing beer from tasting", error });
+    }
+};
