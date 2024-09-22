@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, PaginateModel } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import { BeerType } from "./beerType";
+import Tasting from "./tasting";
 
 export interface IBeer extends Document {
   name: string;
@@ -45,5 +46,20 @@ const beerSchema = new Schema<IBeer>(
 );
 
 beerSchema.plugin(mongoosePaginate);
+
+// Trigger after any beer update, specifically for averageRating changes
+beerSchema.post('save', async function (beer) {
+  if (beer.isModified('averageRating')) {
+    // Find all tastings that include this beer
+    const tastings = await Tasting.find({ beers: beer._id });
+
+    // For each tasting that includes this beer, recalculate the averageBeerRating
+    for (const tasting of tastings) {
+      await (tasting as any).recalculateAverageBeerRating();
+    }
+  }
+});
+
+
 const Beer = mongoose.model<IBeer, IBeerModel>("Beer", beerSchema);
 export default Beer;
