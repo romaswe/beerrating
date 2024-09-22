@@ -1,9 +1,11 @@
 <template>
   <h1>Bulk Rate Beers</h1>
-  <p class="warning">You need to submit page by page</p>
-  <p class="warning">
-    After you submit the page will reload and refetch the beers you have not given a rating
-  </p>
+  <div v-if="beers.docs.length >= 1">
+    <p class="warning">You need to submit page by page</p>
+    <p class="warning">
+      After you submit the page will reload and refetch the beers you have not given a rating
+    </p>
+  </div>
   <div v-if="loading">
     <LoadingComponent />
   </div>

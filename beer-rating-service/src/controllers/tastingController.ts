@@ -18,6 +18,12 @@ export const createTasting = async (req: Request, res: Response) => {
             description,
             beers,
         });
+
+        // Calculate the average rating of the beers in the tasting
+        const totalBeerRating = existingBeers.reduce((total, beer) => total + (beer.averageRating || 0), 0);
+        const averageBeerRating = totalBeerRating / existingBeers.length;
+        newTasting.averageBeerRating = averageBeerRating;
+
         await newTasting.save();
         return res.status(201).json(newTasting);
     } catch (error) {
@@ -29,7 +35,14 @@ export const createTasting = async (req: Request, res: Response) => {
 export const getTastings = async (req: Request, res: Response) => {
     try {
         const { page = 1, limit = 10 } = req.query;
-        const tastings = await Tasting.paginate({}, { page: Number(page), limit: Number(limit) });
+        const nameQuery = req.query.q as string;
+        // Build the filter query
+        const filter: any = {};
+        if (nameQuery) {
+            const regex = new RegExp(nameQuery, "i"); // i for case insensitive
+            filter.name = { $regex: regex };
+        }
+        const tastings = await Tasting.paginate(filter, { page: Number(page), limit: Number(limit) });
         return res.status(200).json(tastings);
     } catch (error) {
         return res.status(500).json({ message: "Error fetching tastings", error });
@@ -67,6 +80,12 @@ export const addBeerToTasting = async (req: Request, res: Response) => {
         // Add beer to tasting if not already there
         if (!tasting.beers?.includes(beer.id)) {
             tasting.beers?.push(beer.id);
+
+            // Recalculate the average beer rating
+            const allBeers = await Beer.find({ _id: { $in: tasting.beers } });
+            const totalBeerRating = allBeers.reduce((total, beer) => total + (beer.averageRating || 0), 0);
+            tasting.averageBeerRating = totalBeerRating / allBeers.length;
+
             await tasting.save();
         }
 
@@ -97,10 +116,6 @@ export const addRating = async (req: Request, res: Response) => {
         // Add new rating with correct field name 'user' as per schema
         tasting.reviews?.push({ score, comment, user: userId });
 
-        // Calculate the new average rating
-        const totalScore = tasting.reviews?.reduce((total, review) => total + review.score, 0) || 0;
-        tasting.avrageRating = totalScore / (tasting.reviews?.length ? tasting.reviews?.length : 0);
-
         await tasting.save();
         return res.status(201).json(tasting);
     } catch (error) {
@@ -120,19 +135,22 @@ export const updateTasting = async (req: Request, res: Response) => {
             if (existingBeers.length !== beers.length) {
                 return res.status(400).json({ message: "Some beers do not exist" });
             }
+
+            const totalBeerRating = existingBeers.reduce((total, beer) => total + (beer.averageRating || 0), 0);
+            const averageBeerRating = totalBeerRating / existingBeers.length;
+
+            const updatedTasting = await Tasting.findByIdAndUpdate(
+                tastingId,
+                { name, description, beers, averageBeerRating },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedTasting) {
+                return res.status(404).json({ message: "Tasting not found" });
+            }
+
+            return res.status(200).json(updatedTasting);
         }
-
-        const updatedTasting = await Tasting.findByIdAndUpdate(
-            tastingId,
-            { name, description, beers },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedTasting) {
-            return res.status(404).json({ message: "Tasting not found" });
-        }
-
-        return res.status(200).json(updatedTasting);
     } catch (error) {
         return res.status(500).json({ message: "Error updating tasting", error });
     }
@@ -149,8 +167,13 @@ export const removeBeerFromTasting = async (req: Request, res: Response) => {
         const beerIndex = tasting.beers?.indexOf(beerId as unknown as mongoose.Schema.Types.ObjectId);
 
         if (beerIndex !== -1 && beerIndex !== undefined) {
-            const deletedBeer = tasting.beers?.splice(beerIndex, 1);
-            console.log(`Deleted beer: ${deletedBeer}`);
+            tasting.beers?.splice(beerIndex, 1);
+
+            // Recalculate the average beer rating after removing the beer
+            const allBeers = await Beer.find({ _id: { $in: tasting.beers } });
+            const totalBeerRating = allBeers.reduce((total, beer) => total + (beer.averageRating || 0), 0);
+            tasting.averageBeerRating = allBeers.length > 0 ? totalBeerRating / allBeers.length : 0;
+
             await tasting.save();
         } else {
             return res.status(404).json({ message: "Beer not found in this tasting" });

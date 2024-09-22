@@ -3,7 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import BeerView from '@/views/BeerView.vue'
 import LoginView from '@/views/LoginView.vue' // Import LoginView
 import ProfileView from '@/views/ProfileView.vue'
-
+import TastingView from '@/views/TastingView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +31,11 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView
+    },
+    {
+      path: '/tasting',
+      name: 'tasting',
+      component: TastingView
     },
     {
       path: '/login',
