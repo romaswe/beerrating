@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Beer from "../models/beer";
 import Rating from "../models/rating";
 import { isValidObjectId } from "mongoose";
+import Tasting from "../models/tasting";
 
 // Add a new rating to a beer by a user
 export const addRating = async (req: Request, res: Response) => {
@@ -167,6 +168,11 @@ export const updateRating = async (req: Request, res: Response) => {
     // Update the beer's average rating
     beer.averageRating = averageRating;
     await beer.save();
+
+    const tastings = await Tasting.find({ beers: beer._id });
+    for (const tasting of tastings) {
+      await (tasting as any).recalculateAverageBeerRating();
+    }
 
     res.status(200).json(rating);
   } catch (error) {
