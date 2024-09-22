@@ -3,7 +3,13 @@
     <h1>Tasting List</h1>
     <template v-if="addNewTasting">
       <!-- Use TastingForm for adding new tastings -->
-      <!-- <TastingForm @submit="handleFormSubmit" @cancel="toggleAddTastingMode" /> -->
+      <TastingForm
+        @submit="handleFormSubmit"
+        @cancel="toggleAddTastingMode"
+        @deleteAction="handleFormSubmit"
+        :tasting="selectedTasting !== null ? selectedTasting : undefined"
+        :isEdit="selectedTasting !== null"
+      />
     </template>
     <template v-else>
       <div class="filter-bar">
@@ -29,7 +35,12 @@
       </div>
       <div v-else>
         <div class="tasting-cards">
-          <TastingCard v-for="tasting in tastings.docs" :key="tasting._id" :tasting="tasting" />
+          <TastingCard
+            v-for="tasting in tastings.docs"
+            :key="tasting._id"
+            :tasting="tasting"
+            @open-modal="editTasting(tasting)"
+          />
         </div>
         <!-- Pagination Controls -->
         <div class="pagination-controls">
@@ -51,26 +62,25 @@ import { defineComponent, ref, onMounted } from 'vue'
 import TastingCard from '@/components/TastingCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
-//import TastingForm from '@/components/TastingForm.vue'
+import TastingForm from '@/components/TastingForm.vue'
 import { Myconsts } from '@/const'
-import type { TastingModel } from '@/models/tastings'
+import type { Tasting, TastingModel } from '@/models/tastings'
 
 export default defineComponent({
   name: 'TastingView',
   components: {
     TastingCard,
     ErrorComponent,
-    LoadingComponent
-    // TastingForm
+    LoadingComponent,
+    TastingForm
   },
   setup() {
     const tastings = ref<TastingModel>({} as TastingModel)
     const loading = ref(true)
     const error = ref<string | null>(null)
     const nameQuery = ref('')
-    const showModal = ref(false)
     const addNewTasting = ref(false)
-
+    const selectedTasting = ref<Tasting | null>(null)
     const token = localStorage.getItem(Myconsts.tokenName)
 
     const fetchTastings = async (page: number = 1) => {
@@ -95,7 +105,6 @@ export default defineComponent({
         tastings.value = data
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
-        console.log(error.value)
       } finally {
         loading.value = false
       }
@@ -108,7 +117,16 @@ export default defineComponent({
     }
 
     const toggleAddTastingMode = () => {
+      if (addNewTasting.value) {
+        selectedTasting.value = null
+      }
       addNewTasting.value = !addNewTasting.value
+    }
+
+    const editTasting = (tasting: Tasting) => {
+      console.log('editTasting', tasting)
+      selectedTasting.value = tasting
+      addNewTasting.value = true
     }
 
     const handleFormSubmit = async () => {
@@ -125,10 +143,11 @@ export default defineComponent({
       fetchTastings,
       goToPage,
       nameQuery,
-      showModal,
       addNewTasting,
       toggleAddTastingMode,
-      handleFormSubmit
+      handleFormSubmit,
+      editTasting,
+      selectedTasting
     }
   }
 })

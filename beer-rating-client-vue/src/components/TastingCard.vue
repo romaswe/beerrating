@@ -1,12 +1,11 @@
 <template>
   <div class="tasting-card" @click="openModal">
     <h2>{{ tasting.name }}</h2>
-    <p><strong>Description:</strong> {{ tasting.description }}</p>
-    <p>
-      <strong>Beers:</strong> {{ tasting.beers.length }} <strong>Number of users:</strong>
-      {{ tasting.users.length }}
+    <p v-if="tasting.description"><strong>Description:</strong> {{ tasting.description }}</p>
+    <p v-if="tasting.beers?.length"><strong>Beers:</strong> {{ tasting.beers?.length }}</p>
+    <p v-if="tasting.averageBeerRating">
+      <strong>Average Beer Rating:</strong> {{ tasting.averageBeerRating }}
     </p>
-    <p><strong>Average Beer Rating:</strong> {{ tasting.averageBeerRating }}</p>
   </div>
 </template>
 

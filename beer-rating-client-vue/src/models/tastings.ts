@@ -12,16 +12,16 @@ export interface TastingModel {
 }
 
 export interface Tasting {
-    _id: string;
+    _id?: string;
     name: string;
     description: string;
-    beers: string[];
-    users: any[];
-    reviews: Review[];
-    createdAt: Date;
-    updatedAt: Date;
-    __v: number;
-    averageBeerRating: number;
+    beers?: string[];
+    users?: any[];
+    reviews?: Review[];
+    createdAt?: Date;
+    updatedAt?: Date;
+    __v?: number;
+    averageBeerRating?: number;
 }
 
 export interface Review {

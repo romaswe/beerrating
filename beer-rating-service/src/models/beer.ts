@@ -60,6 +60,5 @@ beerSchema.post('save', async function (beer) {
   }
 });
 
-
 const Beer = mongoose.model<IBeer, IBeerModel>("Beer", beerSchema);
 export default Beer;
