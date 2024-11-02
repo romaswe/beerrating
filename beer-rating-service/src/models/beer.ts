@@ -11,6 +11,31 @@ export interface IBeer extends Document {
   averageRating?: number;
   reviews?: mongoose.Schema.Types.ObjectId[];
   tasting?: mongoose.Schema.Types.ObjectId[];
+  matchedSites?: MatchedBeerSites;
+}
+
+export interface MatchedBeerSites {
+  untappd?: MatchedUntappd;
+  systembolaget?: MatchedSystembolaget;
+  ratebeer?: MatchedRatebeer;
+}
+
+export interface MatchedSystembolaget {
+  url: string;
+  articleNumber: number;
+  // In the feature fetch information from the site and store it in the database
+}
+
+export interface MatchedUntappd {
+  url: string;
+  id: number;
+  // In the feature fetch information from the site and store it in the database
+}
+
+export interface MatchedRatebeer {
+  url: string;
+  id: number;
+  // In the feature fetch information from the site and store it in the database
 }
 
 interface IBeerModel extends PaginateModel<IBeer> { }
@@ -41,6 +66,22 @@ const beerSchema = new Schema<IBeer>(
     averageRating: { type: Number, default: 0, index: true }, // This will be computed from ratings
     tasting: [{ type: Schema.Types.ObjectId, ref: 'Tasting' }],
     reviews: [{ type: Schema.Types.ObjectId, ref: 'Rating' }],
+    matchedSites: {
+      type: {
+        untappd: {
+          url: String,
+          articleNumber: Number
+        },
+        systembolaget: {
+          url: String,
+          articleNumber: Number
+        },
+        ratebeer: {
+          url: String,
+          id: Number
+        }
+      }
+    }
   },
   { timestamps: true }
 );
