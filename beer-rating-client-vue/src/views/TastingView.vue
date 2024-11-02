@@ -100,7 +100,6 @@ export default defineComponent({
           throw new Error(`Error fetching tastings: ${response.statusText}`)
         }
         const data = await response.json()
-        console.log(data)
 
         tastings.value = data
       } catch (err) {
@@ -124,7 +123,6 @@ export default defineComponent({
     }
 
     const editTasting = (tasting: Tasting) => {
-      console.log('editTasting', tasting)
       selectedTasting.value = tasting
       addNewTasting.value = true
     }

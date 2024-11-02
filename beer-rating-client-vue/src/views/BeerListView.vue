@@ -3,12 +3,14 @@ import type { BeerSheet } from '@/models/Beer'
 import { defineComponent, ref, onMounted } from 'vue'
 import ErrorComponent from '@/components/ErrorComponent.vue' // Import the ErrorComponent
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import BeerSubNavbar from '@/components/BeerSubNavbar.vue'
 
 export default defineComponent({
   name: 'BeerList',
   components: {
     ErrorComponent,
-    LoadingComponent
+    LoadingComponent,
+    BeerSubNavbar
   },
   setup() {
     const beers = ref<BeerSheet>({
@@ -56,6 +58,8 @@ export default defineComponent({
 
 <template>
   <div class="beer-sheets">
+    <!-- Navigation Bar -->
+    <BeerSubNavbar />
     <div class="beer-list">
       <h1>Beer List</h1>
       <div v-if="loading">
@@ -75,16 +79,28 @@ export default defineComponent({
                 Top beer: {{ styleStats[1].topBeer?.name }} ({{ styleStats[1].topBeer?.rating }})
               </h3>
               <div class="button-group-top">
-                <a :href="`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(styleStats[1].topBeer?.name)}`"
-                  class="button button-systembolaget" target="_blank" rel="noopener noreferrer">
+                <a
+                  :href="`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(styleStats[1].topBeer?.name)}`"
+                  class="button button-systembolaget"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Systembolaget
                 </a>
-                <a :href="`https://untappd.com/search?q=${encodeURIComponent(styleStats[1].topBeer?.name)}`"
-                  class="button button-untappd" target="_blank" rel="noopener noreferrer">
+                <a
+                  :href="`https://untappd.com/search?q=${encodeURIComponent(styleStats[1].topBeer?.name)}`"
+                  class="button button-untappd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Untappd
                 </a>
-                <a :href="`https://www.ratebeer.com/search?beername=${encodeURIComponent(styleStats[1].topBeer?.name)}&tab=beer`"
-                  class="button button-ratebeer" target="_blank" rel="noopener noreferrer">
+                <a
+                  :href="`https://www.ratebeer.com/search?beername=${encodeURIComponent(styleStats[1].topBeer?.name)}&tab=beer`"
+                  class="button button-ratebeer"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Ratebeer
                 </a>
               </div>
@@ -105,16 +121,28 @@ export default defineComponent({
               <td>
                 <span>{{ data[0] }}</span>
                 <div class="button-group">
-                  <a :href="`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(data[0])}`"
-                    class="button button-systembolaget" target="_blank" rel="noopener noreferrer">
+                  <a
+                    :href="`https://www.systembolaget.se/sortiment/?q=${encodeURIComponent(data[0])}`"
+                    class="button button-systembolaget"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Systembolaget
                   </a>
-                  <a :href="`https://untappd.com/search?q=${encodeURIComponent(data[0])}`" class="button button-untappd"
-                    target="_blank" rel="noopener noreferrer">
+                  <a
+                    :href="`https://untappd.com/search?q=${encodeURIComponent(data[0])}`"
+                    class="button button-untappd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Untappd
                   </a>
-                  <a :href="`https://www.ratebeer.com/search?beername=${encodeURIComponent(data[0])}&tab=beer`"
-                    class="button button-ratebeer" target="_blank" rel="noopener noreferrer">
+                  <a
+                    :href="`https://www.ratebeer.com/search?beername=${encodeURIComponent(data[0])}&tab=beer`"
+                    class="button button-ratebeer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Ratebeer
                   </a>
                 </div>

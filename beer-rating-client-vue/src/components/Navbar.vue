@@ -12,12 +12,11 @@
 
         <div class="navbar-links">
           <RouterLink class="nav-link" to="/">Home</RouterLink>
-          <RouterLink class="nav-link" to="/beer-list">Legacy List</RouterLink>
           <RouterLink class="nav-link" to="/beers">Beers</RouterLink>
           <!-- Show more links if the user is logged in -->
           <template v-if="isLoggedIn">
-            <RouterLink class="nav-link" to="/profile">Profile</RouterLink>
             <RouterLink class="nav-link" to="/tasting">Tasting</RouterLink>
+            <RouterLink class="nav-link" to="/profile">Profile</RouterLink>
             <!-- Example: Show Admin only if the role is 'admin' -->
             <RouterLink class="nav-link" v-if="userRole === 'admin'" to="/admin">Admin</RouterLink>
             <!-- Add more links based on the user role here -->

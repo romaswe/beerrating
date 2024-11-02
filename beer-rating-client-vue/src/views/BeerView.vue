@@ -1,5 +1,8 @@
 <template>
   <div class="beer-list">
+    <!-- Navigation Bar -->
+    <BeerSubNavbar />
+
     <h1>Beer List</h1>
     <template v-if="addNewBeer">
       <!-- Use BeerForm for adding new beers -->
@@ -121,6 +124,7 @@ import BeerModal from '@/components/BeerModal.vue'
 import BeerForm from '@/components/BeerForm.vue'
 import DoubleSlider from '@/components/DoubleSlider.vue'
 import BrewerySelect from '@/components/BrewerySelect.vue'
+import BeerSubNavbar from '@/components/BeerSubNavbar.vue'
 import type { Beer, Review } from '@/models/Beer'
 import { Myconsts } from '@/const'
 
@@ -133,7 +137,8 @@ export default defineComponent({
     BeerModal,
     BeerForm,
     DoubleSlider,
-    BrewerySelect
+    BrewerySelect,
+    BeerSubNavbar
   },
   setup() {
     const beers = ref<Beer[]>([])
