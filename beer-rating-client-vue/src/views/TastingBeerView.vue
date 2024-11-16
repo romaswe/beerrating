@@ -11,7 +11,7 @@
         @delete-action="handleFormSubmit"
         :beerStyles="beerStyles"
         :beer="selectedBeer"
-        :isEdit="selectedBeer !== null"
+        :isEdit="selectedBeer != undefined"
       />
     </template>
     <template v-else>
@@ -86,7 +86,7 @@ export default defineComponent({
     const isLoggedIn = ref(false)
     const addNewBeer = ref(false)
     const beerStyles = ref([])
-    const selectedBeer = ref<TastingBeer>({} as TastingBeer)
+    const selectedBeer = ref<TastingBeer | undefined>(undefined)
 
     const token = localStorage.getItem(Myconsts.tokenName)
     isLoggedIn.value = !!token
@@ -145,7 +145,7 @@ export default defineComponent({
 
     const toggleAddBeerMode = () => {
       if (addNewBeer.value) {
-        selectedBeer.value = {} as TastingBeer
+        selectedBeer.value = undefined
       }
       addNewBeer.value = !addNewBeer.value
     }
