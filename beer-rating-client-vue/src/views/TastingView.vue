@@ -1,6 +1,8 @@
 <template>
+  <!-- Navigation Bar -->
+  <TastingSubNavbar />
   <div class="tasting-list">
-    <h1>Tasting List</h1>
+    <h1>Tasting List (WIP)</h1>
     <template v-if="addNewTasting">
       <!-- Use TastingForm for adding new tastings -->
       <TastingForm
@@ -63,6 +65,7 @@ import TastingCard from '@/components/TastingCard.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import TastingForm from '@/components/TastingForm.vue'
+import TastingSubNavbar from '@/components/TastingSubNavbar.vue'
 import { Myconsts } from '@/const'
 import type { Tasting, TastingModel } from '@/models/tastings'
 
@@ -72,7 +75,8 @@ export default defineComponent({
     TastingCard,
     ErrorComponent,
     LoadingComponent,
-    TastingForm
+    TastingForm,
+    TastingSubNavbar
   },
   setup() {
     const tastings = ref<TastingModel>({} as TastingModel)

@@ -13,6 +13,7 @@ import adminRoutes from "./routes/adminRoutes";
 import { seedBeerTypes } from "./models/beerType";
 import beerTypeRoutes from "./routes/beerTypeRoutes";
 import beerTastingRoutes from "./routes/beerTastingRoutes";
+import tastingBeerRoutes from "./routes/tastingBeerRoutes";
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use("/api/sheets", sheetRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/beer-types", beerTypeRoutes);
 app.use("/api/beer-tastings", beerTastingRoutes);
+app.use("/api/tasting-beers", tastingBeerRoutes);
 app.use("/api/stats", statsRoutes)
 
 app.get('/echo', function (req, res) {

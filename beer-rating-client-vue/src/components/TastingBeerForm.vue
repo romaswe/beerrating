@@ -20,13 +20,14 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="brewery">Brewery</label>
-        <input type="text" id="brewery" v-model="form.brewery" />
+        <label for="link">Link</label>
+        <input type="url" id="link" v-model="form.link" />
       </div>
       <div class="form-group">
-        <label for="abv">ABV (%)</label>
-        <input type="number" id="abv" v-model="form.abv" required step="0.1" min="0" max="100" />
+        <label for="comment">Comment</label>
+        <input type="text" id="comment" v-model="form.comment" />
       </div>
+
       <div class="button-group">
         <button type="submit" class="submit-button">
           {{ isEdit ? 'Update Beer' : 'Add Beer' }}
@@ -47,16 +48,16 @@
 
 <script lang="ts">
 import { defineComponent, ref, type PropType, watch, toRefs } from 'vue'
-import { type Beer } from '@/models/Beer'
 import { Myconsts } from '@/const'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import type { TastingBeer } from '@/models/TastingBeer'
 
 export default defineComponent({
-  name: 'BeerForm',
+  name: 'TastingBeerForm',
   props: {
     beer: {
-      type: Object as PropType<Beer>,
+      type: Object as PropType<TastingBeer>,
       required: false
     },
     beerStyles: {
@@ -78,15 +79,14 @@ export default defineComponent({
     const error = ref<string | null>(null)
     const isLoading = ref(false)
     const { beer, isEdit } = toRefs(props)
-    const form = ref<Partial<Beer>>(
+    const form = ref<Partial<TastingBeer>>(
       isEdit.value && beer.value
         ? { ...beer.value }
         : {
             name: '',
             type: [] as string[],
-            brewery: '',
-            abv: undefined,
-            averageRating: undefined
+            link: '',
+            comment: ''
           }
     )
     const role = localStorage.getItem(Myconsts.roleName)
@@ -104,9 +104,9 @@ export default defineComponent({
         let response
         // Trim whitespaces from form values before submission
         form.value.name = form.value.name?.trim() || ''
-        form.value.brewery = form.value.brewery?.trim() || ''
+        form.value.comment = form.value.comment?.trim() || ''
         if (isEdit.value && beer.value?._id) {
-          response = await fetch(`/api/beers/${beer.value._id}`, {
+          response = await fetch(`/api/tasting-beers/${beer.value._id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export default defineComponent({
             body: JSON.stringify(form.value)
           })
         } else {
-          response = await fetch(`/api/beers`, {
+          response = await fetch(`/api/tasting-beers`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export default defineComponent({
           throw new Error('User is not authenticated')
         }
         if (beer.value?._id) {
-          let response = await fetch(`/api/beers/${beer.value._id}`, {
+          let response = await fetch(`/api/tasting-beers/${beer.value._id}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -188,9 +188,8 @@ export default defineComponent({
         form.value = {
           name: '',
           type: [] as string[],
-          brewery: '',
-          abv: undefined,
-          averageRating: undefined
+          link: '',
+          comment: ''
         }
       }
     })

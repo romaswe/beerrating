@@ -239,3 +239,26 @@ GET {{host}}/api/beer-types
 ### Get user stats
 GET {{host}}/api/stats/user-stats
 Authorization: Bearer {{token}}
+
+
+### Beers to request to have on a tasting
+
+### Get beers
+GET {{host}}/api/tasting-beers
+Authorization: Bearer {{token}}
+
+### Add beer
+post {{host}}/api/tasting-beers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "beers2",
+  "type": "Stout",
+  "link": "hej",
+  "comment": "test"
+}
+
+### Delete beer
+DELETE {{host}}/api/tasting-beers/673104e3a7e25b7cc38750c4
+Authorization: Bearer {{token}}

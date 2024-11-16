@@ -15,7 +15,8 @@ const defaultBeerTypes = [
     { name: 'APA' },
     { name: 'Cider' },
     { name: 'Festbier' },
-    { name: 'Other' }
+    { name: 'Other' },
+    { name: 'Unknown' }
 ];
 
 export const seedBeerTypes = async () => {
