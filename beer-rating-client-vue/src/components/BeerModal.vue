@@ -5,7 +5,7 @@
     </div>
     <div v-else class="modal-content">
       <button
-        v-if="!isEditing && !isAddingRating && isLoggedIn && beerStyles"
+        v-if="!isEditing && !isAddingRating && isAdmin && beerStyles"
         @click="toggleEditMode"
         class="edit-button"
       >
@@ -131,7 +131,10 @@ export default defineComponent({
     const isAddingRating = ref(false)
     const isLoggedIn = ref(false)
     const userRating = ref<Review[] | null>(null)
+    const isAdmin = ref(false)
     const token = localStorage.getItem(Myconsts.tokenName)
+    const role = localStorage.getItem(Myconsts.roleName)
+    isAdmin.value = role === 'admin'
 
     isLoggedIn.value = !!token
 
@@ -227,7 +230,8 @@ export default defineComponent({
       formattedTypes,
       loading,
       error,
-      fetchUserRating
+      fetchUserRating,
+      isAdmin
     }
   }
 })

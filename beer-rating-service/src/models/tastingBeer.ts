@@ -17,6 +17,7 @@ const tastingBeerSchema = new Schema<ITastingBeer>(
         type: {
             type: [String],
             required: true,
+            unique: true,
             validate: {
                 validator: async function (value: string[]): Promise<boolean> {
                     const validTypes = await BeerType.find({ name: { $in: value } }).select('name').exec();
