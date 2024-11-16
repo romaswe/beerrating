@@ -26,17 +26,43 @@ export const getTastingBeers = async (req: Request, res: Response) => {
         const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page if not specified
 
         const nameQuery = req.query.q as string;
+        // Get the 'styles' query parameter and convert it into an array
+        const stylesQuery = req.query.styles as string; // Expecting a comma-separated list of styles
+        const styles = stylesQuery ? stylesQuery.split(",") : [];
+
+
+        // Fetch the valid beer types from the BeerType model
+        const validBeerTypes = await BeerType.find({ name: { $in: styles } }).select('name').exec();
+        // Extract only the names from the validBeerTypes array
+        const validTypes = validBeerTypes.map(beerType => beerType.name);
+
+
+        // Get the 'sortOrder' query parameter, or default to sorting by average rating in descending order
+        // Sort by ABV in ascending order: ?sortField=abv&sortOrder=1
+        // Sort by beer name in descending order: ?sortField=name&sortOrder=-1
+        const sortField = req.query.sortField as string || 'averageRating';
+        const sortOrder = parseInt(req.query.sortOrder as string) || -1;
+
+
         const filter: any = {};
         if (nameQuery) {
             const regex = new RegExp(nameQuery, "i"); // i for case insensitive
             filter.name = { $regex: regex };
         }
 
+        if (validTypes.length > 0) {
+            filter.type = { $in: validTypes }; // Filter by beer styles if provided
+        }
+
         // Fetch all valid beer types to return in the response
         const allValidBeerTypes = await BeerType.find().select('name').sort({ name: 1 }).lean();
         const allValidTypes = allValidBeerTypes.map(beerType => beerType.name);
 
-        const tastingBeers = await TastingBeer.paginate(filter, { page, limit });
+        const tastingBeers = await TastingBeer.paginate(filter, {
+            page,
+            limit,
+            sort: { [sortField]: sortOrder }, // Dynamic sorting based on the provided field and order 
+        });
         res.status(200).json({ ...tastingBeers, allValidTypes });
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });

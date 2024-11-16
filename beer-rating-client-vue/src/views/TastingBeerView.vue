@@ -23,6 +23,26 @@
           <input type="text" v-model="nameQuery" placeholder="Search by name" class="name-input" />
         </div>
 
+        <div v-if="isLoggedIn" class="filter-row">
+          <label v-for="style in beerStyles" :key="style" class="checkbox-label">
+            <input type="checkbox" :value="style" v-model="selectedStyles" />
+            {{ style }}
+          </label>
+        </div>
+        <h3>Sort By</h3>
+        <div class="filter-row sort-select-wrapper">
+          <select v-model="selectedSortField" class="sort-select">
+            <option value="name">Name</option>
+            <option value="type">Beer Style</option>
+            <option value="createdAt">Created At</option>
+          </select>
+
+          <select v-model="selectedSortOrder" class="sort-select">
+            <option value="1">Ascending</option>
+            <option value="-1">Descending</option>
+          </select>
+        </div>
+
         <!-- Apply Filters and Add Beer Buttons -->
         <div class="filter-row buttons-row">
           <button class="btn-secondary" @click="applyFilters">Apply Filters/Search</button>
@@ -87,6 +107,9 @@ export default defineComponent({
     const addNewBeer = ref(false)
     const beerStyles = ref([])
     const selectedBeer = ref<TastingBeer | undefined>(undefined)
+    const selectedStyles = ref([])
+    const selectedSortField = ref('createdAt') // Default sort field
+    const selectedSortOrder = ref('-1') // Default sort order (Descending)
 
     const token = localStorage.getItem(Myconsts.tokenName)
     isLoggedIn.value = !!token
@@ -100,9 +123,13 @@ export default defineComponent({
         // Sort by beer name in descending order: ?sortField=name&sortOrder=-1
         // posible fields name, abv, type(style), brewery, averageRating
         const nameQueryParam = nameQuery.value ? `q=${encodeURIComponent(nameQuery.value)}` : ''
+        const stylesQuery = selectedStyles.value ? `styles=${selectedStyles.value.join(',')}` : ''
+
+        const sortFieldParam = `sortField=${selectedSortField.value}`
+        const sortOrderParam = `sortOrder=${selectedSortOrder.value}`
 
         const limit = 35
-        const url = `/api/tasting-beers?${nameQueryParam}&page=${page.value}&limit=${limit}&cache-buster=${new Date().getTime()}`
+        const url = `/api/tasting-beers?${sortFieldParam}&${sortOrderParam}${nameQueryParam}&${stylesQuery}&page=${page.value}&limit=${limit}&cache-buster=${new Date().getTime()}`
         const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -180,7 +207,10 @@ export default defineComponent({
       handleFormSubmit,
       beerStyles,
       selectedBeer,
-      openModal
+      openModal,
+      selectedStyles,
+      selectedSortField,
+      selectedSortOrder
     }
   }
 })
