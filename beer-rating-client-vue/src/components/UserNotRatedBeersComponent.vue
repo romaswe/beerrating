@@ -142,8 +142,15 @@ export default defineComponent({
             hasChanges.value = false
             emit('changePage')
           } else {
-            const errorData = await response.json()
-            error.value = errorData.message
+            if (response.status === 401) {
+              console.log('Unauthorized')
+              localStorage.removeItem(Myconsts.tokenName)
+              localStorage.removeItem(Myconsts.roleName)
+              localStorage.removeItem(Myconsts.userName)
+            } else {
+              const errorData = await response.json()
+              error.value = errorData.message
+            }
           }
         } catch (err) {
           console.error('Error submitting ratings:', err)

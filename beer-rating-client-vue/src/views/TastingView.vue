@@ -101,7 +101,14 @@ export default defineComponent({
           }
         })
         if (!response.ok) {
-          throw new Error(`Error fetching tastings: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error fetching tastings: ${response.statusText}`)
+          }
         }
         const data = await response.json()
 

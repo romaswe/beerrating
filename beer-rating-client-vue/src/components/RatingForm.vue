@@ -116,8 +116,15 @@ export default defineComponent({
         }
 
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || 'Failed to submit rating')
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to submit rating')
+          }
         }
 
         const data = await response.json()

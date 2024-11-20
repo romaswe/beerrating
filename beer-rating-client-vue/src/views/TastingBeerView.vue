@@ -118,7 +118,6 @@ export default defineComponent({
       loading.value = true
       error.value = null
       try {
-        // TODO: add option to change sort order and sort field
         // Sort by ABV in ascending order: ?sortField=abv&sortOrder=1
         // Sort by beer name in descending order: ?sortField=name&sortOrder=-1
         // posible fields name, abv, type(style), brewery, averageRating
@@ -136,7 +135,15 @@ export default defineComponent({
           }
         })
         if (!response.ok) {
-          throw new Error(`Error fetching beers: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+            isLoggedIn.value = false
+          } else {
+            throw new Error(`Error fetching beers: ${response.statusText}`)
+          }
         }
         const data = await response.json()
 

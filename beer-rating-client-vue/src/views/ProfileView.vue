@@ -96,7 +96,14 @@ export default defineComponent({
           }
         })
         if (!response.ok) {
-          throw new Error(`Error fetching beers: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error fetching beers: ${response.statusText}`)
+          }
         }
         const data = await response.json()
         userStats.value = data
@@ -109,7 +116,6 @@ export default defineComponent({
     }
 
     const fetchUserRatedBeers = async (page = 1, limit = 26) => {
-      // TODO: Handle pagination
       loading.value = true
       error.value = null
       try {
@@ -120,7 +126,14 @@ export default defineComponent({
           }
         })
         if (!response.ok) {
-          throw new Error(`Error fetching beers: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error fetching beers: ${response.statusText}`)
+          }
         }
         const data = await response.json()
         userRatedBeers.value = data
@@ -142,7 +155,14 @@ export default defineComponent({
           }
         })
         if (!response.ok) {
-          throw new Error(`Error fetching beers: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error fetching beers: ${response.statusText}`)
+          }
         }
         const data = await response.json()
         userNotRatedBeers.value = data

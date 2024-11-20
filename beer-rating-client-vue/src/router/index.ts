@@ -5,6 +5,7 @@ import LoginView from '@/views/LoginView.vue' // Import LoginView
 import ProfileView from '@/views/ProfileView.vue'
 import TastingView from '@/views/TastingView.vue'
 import TastingBeerView from '@/views/TastingBeerView.vue'
+import { Myconsts } from '@/const'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -50,5 +51,26 @@ const router = createRouter({
     }
   ]
 })
+
+router.beforeEach(async (to, from) => {
+  const validLogin = (localStorage.getItem(Myconsts.tokenName) && localStorage.getItem(Myconsts.roleName) && localStorage.getItem(Myconsts.userName))
+  if (!validLogin && blockRoute(to.name?.toString() || '')) {
+    // redirect the user to the login page
+    return { name: 'login' }
+  }
+})
+
+function blockRoute(routeName: string): boolean {
+  switch (routeName) {
+    case 'login':
+    case 'home':
+    case 'beers':
+    case 'beer-list':
+      return false
+
+    default:
+      return true
+  }
+}
 
 export default router

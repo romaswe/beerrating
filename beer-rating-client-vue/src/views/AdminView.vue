@@ -124,7 +124,14 @@ export default defineComponent({
         })
 
         if (!response.ok) {
-          throw new Error(`Error fetching users: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error fetching users: ${response.statusText}`)
+          }
         }
 
         const data = await response.json()
@@ -152,7 +159,14 @@ export default defineComponent({
         })
 
         if (!response.ok) {
-          throw new Error(`Error updating user role: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error updating user role: ${response.statusText}`)
+          }
         }
 
         fetchUsers()
@@ -176,7 +190,14 @@ export default defineComponent({
         })
 
         if (!response.ok) {
-          throw new Error(`Error fetching beer types: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error fetching beer types: ${response.statusText}`)
+          }
         }
         const data = await response.json()
         beerTypes.value = data.docs
@@ -207,7 +228,14 @@ export default defineComponent({
         })
 
         if (!response.ok) {
-          throw new Error(`Error adding beer type: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error adding beer type: ${response.statusText}`)
+          }
         }
 
         await fetchBeerTypes() // Refresh the list after adding
@@ -232,7 +260,14 @@ export default defineComponent({
         })
 
         if (!response.ok) {
-          throw new Error(`Error deleting beer type: ${response.statusText}`)
+          if (response.status === 401) {
+            console.log('Unauthorized')
+            localStorage.removeItem(Myconsts.tokenName)
+            localStorage.removeItem(Myconsts.roleName)
+            localStorage.removeItem(Myconsts.userName)
+          } else {
+            throw new Error(`Error deleting beer type: ${response.statusText}`)
+          }
         }
 
         await fetchBeerTypes() // Refresh the list after deletion

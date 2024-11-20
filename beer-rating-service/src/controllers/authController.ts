@@ -13,7 +13,8 @@ const getJwtSecret = (): string => {
 
 // Function to generate a JWT token
 const generateToken = (id: string): string => {
-  return jwt.sign({ id }, getJwtSecret(), { expiresIn: "30d" });
+  const expiresIn = process.env.JWT_EXPIRES_IN ?? "30d";
+  return jwt.sign({ id }, getJwtSecret(), { expiresIn: expiresIn });
 };
 
 // Register a new user
