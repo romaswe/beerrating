@@ -11,8 +11,9 @@
     <div v-for="style in stats.topBeerTypes" :key="style.beerType" class="style-item">
       <span class="style-label">Style:</span> {{ style.beerType }}
       <span class="style-label">Count:</span> {{ style.userCount }}
-      <span class="style-label">Your Average Rating:</span> {{ style.averageRating }}
-      <span class="style-label">Global Average Rating:</span> {{ style.totalAverageRating }}
+      <span class="style-label">Your Average Rating:</span> {{ style.averageRating }} (out of 5)
+      <span class="style-label">Global Average Rating:</span> {{ style.totalAverageRating }} (out of
+      5)
     </div>
   </div>
   <h2>Your top ten rated beers</h2>
