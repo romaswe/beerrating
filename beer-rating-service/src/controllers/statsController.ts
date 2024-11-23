@@ -47,12 +47,23 @@ export const getUserStats = async (req: Request, res: Response) => {
         const totalBeersRated = await Rating.countDocuments({ user: user._id });
 
         // Calculate the average rating given by the user
+        // This is done by grouping all user ratings and calculating the average score
+        // The result is an array with one element, which is an object with the averageRating field
+        // We then extract the averageRating field from this object, or use 0 if it does not exist
         const averageRating = (await Rating.aggregate([
-            { $match: { user: user._id } },
-            { $group: { _id: null, averageRating: { $avg: "$score" } } },
+            { $match: { user: user._id } }, // Filter ratings by user
+            { $group: { _id: null, averageRating: { $avg: "$score" } } }, // Group and calculate average score
         ]))?.[0]?.averageRating || 0;
 
-        // Fetch the top 10 beer types the user has rated, along with count and average score
+        // Calculate the average rating given by all users
+        // This is done by grouping all user ratings and calculating the average score
+        // The result is an array with one element, which is an object with the averageRating field
+        // We then extract the averageRating field from this object, or use 0 if it does not exist
+        const averageRatingAllUsers = (await Rating.aggregate([
+            { $group: { _id: null, averageRating: { $avg: "$score" } } }, // Group and calculate average score
+        ]))?.[0]?.averageRating || 0;
+
+        // Fetch all beer types the user has rated, along with count and average score
         const topBeerTypes = await Rating.aggregate([
             { $match: { user: user._id } }, // Filter ratings by user
             {
@@ -81,6 +92,7 @@ export const getUserStats = async (req: Request, res: Response) => {
             username: user.username,
             totalBeersRated,
             averageRating: Math.round(averageRating * 100) / 100,
+            averageRatingAllUsers: Math.round(averageRatingAllUsers * 100) / 100,
             topTenBeers: topTenBeers.map(beer => beer.beer),
             topBeerTypes: topBeerTypes.map(type => ({
                 beerType: type._id,

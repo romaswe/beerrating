@@ -5,6 +5,7 @@ export interface Stats {
     username: string;
     totalBeersRated: number;
     averageRating: number;
+    averageRatingAllUsers: number;
     topTenBeers: Beer[];
     topBeerTypes: TopBeerType[];
 }

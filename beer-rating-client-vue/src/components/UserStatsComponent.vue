@@ -2,7 +2,10 @@
   <h1>User stats for {{ stats.username }}</h1>
   <p>You have been a member for {{ stats.daysMember }} days</p>
   <p>You have rated a total of {{ stats.totalBeersRated }} beers</p>
-  <p>Your total average rating is {{ stats.averageRating }}</p>
+  <p>
+    Your total average rating is {{ stats.averageRating }} (Global average rating is
+    {{ stats.averageRatingAllUsers }}) out of 5
+  </p>
   <h2>Your beer styles</h2>
   <div class="top-beer-styles">
     <div v-for="style in stats.topBeerTypes" :key="style.beerType" class="style-item">
