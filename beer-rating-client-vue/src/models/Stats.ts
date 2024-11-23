@@ -12,7 +12,9 @@ export interface Stats {
 
 export interface TopBeerType {
     beerType: string;
-    count: number;
+    userCount: number;
+    totalCount: number;
     averageRating: number;
+    totalAverageRating: number;
 }
 

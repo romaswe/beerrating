@@ -65,7 +65,6 @@ export const getUserStats = async (req: Request, res: Response) => {
 
         // Fetch all beer types the user has rated, along with count and average score
         const topBeerTypes = await Rating.aggregate([
-            { $match: { user: user._id } }, // Filter ratings by user
             {
                 $lookup: {
                     from: "beers", // Collection name of beers
@@ -76,15 +75,105 @@ export const getUserStats = async (req: Request, res: Response) => {
             },
             { $unwind: "$beerInfo" }, // Flatten the beer info array
             { $unwind: "$beerInfo.type" }, // Flatten the beer type array
+
+            // Stage 1: Group by beer type for the specific user
             {
-                $group: {
-                    _id: "$beerInfo.type", // Group by beer type
-                    count: { $sum: 1 }, // Count occurrences of each type
-                    averageRating: { $avg: "$score" }, // Calculate average score for each type
+                $facet: {
+                    userRatings: [
+                        { $match: { user: user._id } }, // Filter ratings by user
+                        {
+                            $group: {
+                                _id: "$beerInfo.type", // Group by beer type
+                                count: { $sum: 1 }, // Count occurrences of each type
+                                averageRating: { $avg: "$score" }, // Calculate average score for user
+                            },
+                        },
+                    ],
+
+                    totalRatings: [
+                        {
+                            $group: {
+                                _id: "$beerInfo.type", // Group by beer type
+                                count: { $sum: 1 }, // Count occurrences of each type
+                                averageRating: { $avg: "$score" }, // Calculate average score across all users
+                            },
+                        },
+                    ],
                 },
             },
-            { $sort: { count: -1 } }, // Sort by count in descending order
+
+            // Match totalRatings to userRatings by beer type
+            {
+                $project: {
+                    userRatings: 1,
+                    filteredTotalRatings: {
+                        $filter: {
+                            input: "$totalRatings",
+                            as: "totalResult",
+                            cond: {
+                                $in: ["$$totalResult._id", { $map: { input: "$userRatings", as: "userResult", in: "$$userResult._id" } }],
+                            },
+                        },
+                    },
+                },
+            },
+
+            // Combine filtered totalRatings with userRatings
+            {
+                $project: {
+                    combinedResults: {
+                        $map: {
+                            input: "$userRatings",
+                            as: "userResult",
+                            in: {
+                                type: "$$userResult._id",
+                                userCount: "$$userResult.count",
+                                userAverageRating: "$$userResult.averageRating",
+                                totalCount: {
+                                    $ifNull: [
+                                        {
+                                            $arrayElemAt: [
+                                                {
+                                                    $filter: {
+                                                        input: "$filteredTotalRatings",
+                                                        as: "totalResult",
+                                                        cond: { $eq: ["$$totalResult._id", "$$userResult._id"] },
+                                                    },
+                                                },
+                                                0,
+                                            ],
+                                        },
+                                        { count: 0, averageRating: 0 }, // Default value if no match
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+
+            // Format the final combined results
+            {
+                $project: {
+                    combinedResults: {
+                        $map: {
+                            input: "$combinedResults",
+                            as: "result",
+                            in: {
+                                type: "$$result.type",
+                                userCount: "$$result.userCount",
+                                userAverageRating: "$$result.userAverageRating",
+                                totalCount: "$$result.totalCount.count",
+                                totalAverageRating: "$$result.totalCount.averageRating",
+                            },
+                        },
+                    },
+                },
+            },
         ]);
+
+        console.log(topBeerTypes);
+
 
         // Prepare the stats to return
         const stats = {
@@ -94,11 +183,15 @@ export const getUserStats = async (req: Request, res: Response) => {
             averageRating: Math.round(averageRating * 100) / 100,
             averageRatingAllUsers: Math.round(averageRatingAllUsers * 100) / 100,
             topTenBeers: topTenBeers.map(beer => beer.beer),
-            topBeerTypes: topBeerTypes.map(type => ({
-                beerType: type._id,
-                count: type.count,
-                averageRating: Math.round(type.averageRating * 100) / 100, // Round to 2 decimal places
-            })),
+            topBeerTypes: topBeerTypes[0]?.combinedResults?.length
+                ? topBeerTypes[0].combinedResults.map((type: { type: any; userCount: any; totalCount: any; userAverageRating: any; totalAverageRating: any; }) => ({
+                    beerType: type.type,
+                    userCount: type.userCount,
+                    totalCount: type.totalCount || 0, // Default to 0 if null
+                    averageRating: Math.round((type.userAverageRating || 0) * 100) / 100, // Handle null with default
+                    totalAverageRating: Math.round((type.totalAverageRating || 0) * 100) / 100, // Handle null with default
+                }))
+                : [],
         };
 
         res.status(201).json(stats);
