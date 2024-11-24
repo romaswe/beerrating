@@ -275,7 +275,7 @@ export const getUnratedBeers = async (req: Request, res: Response) => {
       {
         page,
         limit,
-        sort: { name: -1 }, // Sort by name in descending order
+        sort: { createdAt: -1 }, // Sort by creation date in descending order
         populate: [
           { path: 'tasting', model: 'Tasting' },
           {
@@ -290,7 +290,6 @@ export const getUnratedBeers = async (req: Request, res: Response) => {
         ],
       },
     );
-
     // Return the list of unrated beers
     return res.status(200).json(unratedBeers);
   } catch (error) {
