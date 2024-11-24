@@ -63,7 +63,6 @@ export const getUserStats = async (req: Request, res: Response) => {
             { $group: { _id: null, averageRating: { $avg: "$score" } } }, // Group and calculate average score
         ]))?.[0]?.averageRating || 0;
 
-        // Fetch all beer types the user has rated, along with count and average score
         const topBeerTypes = await Rating.aggregate([
             {
                 $lookup: {
@@ -75,7 +74,6 @@ export const getUserStats = async (req: Request, res: Response) => {
             },
             { $unwind: "$beerInfo" }, // Flatten the beer info array
             { $unwind: "$beerInfo.type" }, // Flatten the beer type array
-
             // Stage 1: Group by beer type for the specific user
             {
                 $facet: {
@@ -101,7 +99,6 @@ export const getUserStats = async (req: Request, res: Response) => {
                     ],
                 },
             },
-
             // Match totalRatings to userRatings by beer type
             {
                 $project: {
@@ -117,7 +114,6 @@ export const getUserStats = async (req: Request, res: Response) => {
                     },
                 },
             },
-
             // Combine filtered totalRatings with userRatings
             {
                 $project: {
@@ -151,7 +147,6 @@ export const getUserStats = async (req: Request, res: Response) => {
                     },
                 },
             },
-
             // Format the final combined results
             {
                 $project: {
@@ -170,9 +165,21 @@ export const getUserStats = async (req: Request, res: Response) => {
                     },
                 },
             },
+            // Flatten and sort combined results
+            { $unwind: "$combinedResults" }, // Flatten the combinedResults array
+            {
+                $sort: {
+                    "combinedResults.userCount": -1, // Primary sort by userCount (descending)
+                    "combinedResults.userAverageRating": -1, // Secondary sort by userAverageRating (descending)
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    combinedResults: { $push: "$combinedResults" }, // Rebuild the array after sorting
+                },
+            },
         ]);
-
-        console.log(topBeerTypes);
 
 
         // Prepare the stats to return
