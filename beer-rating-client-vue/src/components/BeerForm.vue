@@ -31,10 +31,10 @@
       <h3>WIP</h3>
       <div class="form-group">
         <label for="systembolaget-link">Systembolaget Link</label>
-        <input type="url" id="systembolaget-link" v-model="form.matchedSites.systembolaget.url" />
+        <input type="url" id="systembolaget-link" v-model="form.matchedSites!.systembolaget!.url" />
 
         <label for="systembolaget-id">Systembolaget Number</label>
-        <input type="text" id="systembolaget-id" v-model="form.matchedSites.systembolaget.id" />
+        <input type="text" id="systembolaget-id" v-model="form.matchedSites!.systembolaget!.id" />
       </div>
 
       <div class="button-group">
@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, type PropType, watch, toRefs } from 'vue'
+import { defineComponent, ref, type PropType, watch } from 'vue'
 import { type Beer } from '@/models/Beer'
 import { Myconsts } from '@/const'
 import ErrorComponent from '@/components/ErrorComponent.vue'
