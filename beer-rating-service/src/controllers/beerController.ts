@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Beer from "../models/beer";
+import Beer, { IBeer } from "../models/beer";
 import Rating from "../models/rating";
 import { MongoError } from "mongodb";
 import { BeerType } from "../models/beerType";
@@ -122,20 +122,28 @@ export const getBeerById = async (req: Request, res: Response) => {
 
 // Add a new beer
 export const createBeer = async (req: Request, res: Response) => {
-  const { name, type, brewery, abv } = req.body;
-
+  //const { name, type, brewery, abv } = req.body;
+  const body = req.body as IBeer;
   try {
-    // Convert all provided types to BeerStyle enums
-    //const types: BeerStyle[] = type.map((style: string) => convertToBeerStyleEnum(style)).filter((style: null) => style !== null) as BeerStyle[];
-
     // Validate if all provided types are valid BeerStyles
-    if (!type.length) {
+    if (!body.type.length) {
       return res.status(400).json({
         message: `Invalid beer styles provided.`
       });
     }
 
-    const beer = new Beer({ name, type: type, brewery, abv });
+    const beer = new Beer(
+      {
+        name: body.name,
+        type: body.type,
+        brewery: body.brewery,
+        abv: body.abv,
+        matchedSites: {
+          untappd: { url: body.matchedSites?.untappd?.url, articleNumber: body.matchedSites?.untappd?.id },
+          systembolaget: { url: body.matchedSites?.systembolaget?.url, articleNumber: body.matchedSites?.systembolaget?.id },
+          ratebeer: { url: body.matchedSites?.ratebeer?.url, id: body.matchedSites?.ratebeer?.id }
+        }
+      });
     const savedBeer = await beer.save();
     res.status(201).json(savedBeer);
   } catch (error) {

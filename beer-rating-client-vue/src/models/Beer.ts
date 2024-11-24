@@ -48,6 +48,31 @@ export interface Beer {
   reviews?: Review[];
   tasting?: any[];
   brewery?: string;
+  matchedSites?: MatchedBeerSites;
+}
+
+export interface MatchedBeerSites {
+  untappd?: MatchedUntappd;
+  systembolaget?: MatchedSystembolaget;
+  ratebeer?: MatchedRatebeer;
+}
+
+export interface MatchedSystembolaget {
+  url?: string;
+  id?: string;
+  // In the feature fetch information from the site and store it in the database
+}
+
+export interface MatchedUntappd {
+  url?: string;
+  id?: string;
+  // In the feature fetch information from the site and store it in the database
+}
+
+export interface MatchedRatebeer {
+  url?: string;
+  id?: string;
+  // In the feature fetch information from the site and store it in the database
 }
 
 export interface Review {

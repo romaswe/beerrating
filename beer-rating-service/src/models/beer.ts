@@ -22,7 +22,7 @@ export interface MatchedBeerSites {
 
 export interface MatchedSystembolaget {
   url: string;
-  articleNumber: number;
+  id: number;
   // In the feature fetch information from the site and store it in the database
 }
 
@@ -69,22 +69,31 @@ const beerSchema = new Schema<IBeer>(
     matchedSites: {
       type: {
         untappd: {
-          url: String,
-          articleNumber: Number
+          url: { type: String, validate: { validator: isValidUrl, message: 'Invalid URL for untappd' } },
+          id: String
         },
         systembolaget: {
-          url: String,
-          articleNumber: Number
+          url: { type: String, validate: { validator: isValidUrl, message: 'Invalid URL for systembolaget' } },
+          id: String
         },
         ratebeer: {
-          url: String,
-          id: Number
+          url: { type: String, validate: { validator: isValidUrl, message: 'Invalid URL for ratebeer' } },
+          id: String
         }
       }
     }
   },
   { timestamps: true }
 );
+
+function isValidUrl(value: string): boolean {
+  try {
+    new URL(value); // Uses the native URL constructor to validate
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 beerSchema.plugin(mongoosePaginate);
 

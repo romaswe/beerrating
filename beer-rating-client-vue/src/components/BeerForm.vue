@@ -27,6 +27,16 @@
         <label for="abv">ABV (%)</label>
         <input type="number" id="abv" v-model="form.abv" required step="0.1" min="0" max="100" />
       </div>
+      <!-- Optional: Links to Systembolaget, Untapped, and Ratebeer -->
+      <h3>WIP</h3>
+      <div class="form-group">
+        <label for="systembolaget-link">Systembolaget Link</label>
+        <input type="url" id="systembolaget-link" v-model="form.matchedSites.systembolaget.url" />
+
+        <label for="systembolaget-id">Systembolaget Number</label>
+        <input type="text" id="systembolaget-id" v-model="form.matchedSites.systembolaget.id" />
+      </div>
+
       <div class="button-group">
         <button type="submit" class="submit-button">
           {{ isEdit ? 'Update Beer' : 'Add Beer' }}
@@ -77,20 +87,44 @@ export default defineComponent({
     const isAdmin = ref(false)
     const error = ref<string | null>(null)
     const isLoading = ref(false)
-    const { beer, isEdit } = toRefs(props)
-    const form = ref<Partial<Beer>>(
-      isEdit.value && beer.value
-        ? { ...beer.value }
-        : {
-            name: '',
-            type: [] as string[],
-            brewery: '',
-            abv: undefined,
-            averageRating: undefined
-          }
-    )
+    const form = ref<Partial<Beer>>({
+      name: '',
+      type: [] as string[],
+      brewery: '',
+      abv: undefined,
+      matchedSites: {
+        systembolaget: { url: '', id: '' },
+        untappd: { url: '', id: '' },
+        ratebeer: { url: '', id: '' }
+      }
+    })
+
     const role = localStorage.getItem(Myconsts.roleName)
     isAdmin.value = role === 'admin'
+
+    const initializeForm = () => {
+      if (props.isEdit && props.beer) {
+        form.value = {
+          name: props.beer.name || '',
+          type: [...(props.beer.type || [])],
+          brewery: props.beer.brewery || '',
+          abv: props.beer.abv || undefined,
+          matchedSites: {
+            systembolaget: props.beer.matchedSites?.systembolaget || { url: '', id: '' },
+            untappd: props.beer.matchedSites?.untappd || { url: '', id: '' },
+            ratebeer: props.beer.matchedSites?.ratebeer || { url: '', id: '' }
+          }
+        }
+      }
+    }
+
+    watch(
+      () => props.beer,
+      () => {
+        initializeForm()
+      },
+      { immediate: true }
+    )
 
     const handleSubmit = async () => {
       error.value = null
@@ -102,11 +136,11 @@ export default defineComponent({
         }
 
         let response
-        // Trim whitespaces from form values before submission
         form.value.name = form.value.name?.trim() || ''
         form.value.brewery = form.value.brewery?.trim() || ''
-        if (isEdit.value && beer.value?._id) {
-          response = await fetch(`/api/beers/${beer.value._id}`, {
+        //TODO: check urls and se if we can parse id if its not enterd
+        if (props.isEdit && props.beer?._id) {
+          response = await fetch(`/api/beers/${props.beer._id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -126,17 +160,8 @@ export default defineComponent({
         }
 
         if (!response.ok) {
-          if (response.status === 401) {
-            console.log('Unauthorized')
-            localStorage.removeItem(Myconsts.tokenName)
-            localStorage.removeItem(Myconsts.roleName)
-            localStorage.removeItem(Myconsts.userName)
-          } else {
-            const errorData = await response.json()
-            throw new Error(
-              `${errorData.message}\n ${errorData.error ?? ''}` || 'Failed to submit form'
-            )
-          }
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Failed to submit form')
         }
 
         const data = await response.json()
@@ -161,8 +186,8 @@ export default defineComponent({
         if (!token) {
           throw new Error('User is not authenticated')
         }
-        if (beer.value?._id) {
-          let response = await fetch(`/api/beers/${beer.value._id}`, {
+        if (props.beer?._id) {
+          const response = await fetch(`/api/beers/${props.beer._id}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -171,43 +196,19 @@ export default defineComponent({
           })
 
           if (!response.ok) {
-            if (response.status === 401) {
-              console.log('Unauthorized')
-              localStorage.removeItem(Myconsts.tokenName)
-              localStorage.removeItem(Myconsts.roleName)
-              localStorage.removeItem(Myconsts.userName)
-            } else {
-              const errorData = await response.json()
-              throw new Error(
-                `${errorData.message}\n ${errorData.error ?? ''}` || 'Failed to submit form'
-              )
-            }
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to delete beer')
           }
 
-          const data = await response.json()
-          emit('deleteAction', data)
+          emit('deleteAction', props.beer._id)
         }
       } catch (err) {
-        console.error('Failed to submit form:', error)
+        console.error('Failed to delete beer:', error)
         error.value = err instanceof Error ? err.message : 'An unknown error occurred.'
       } finally {
         isLoading.value = false
       }
     }
-
-    watch(isEdit, (newVal) => {
-      if (newVal && beer.value) {
-        form.value = { ...beer.value }
-      } else {
-        form.value = {
-          name: '',
-          type: [] as string[],
-          brewery: '',
-          abv: undefined,
-          averageRating: undefined
-        }
-      }
-    })
 
     return {
       form,
@@ -221,7 +222,6 @@ export default defineComponent({
   }
 })
 </script>
-
 <style scoped>
 .form-container {
   max-width: 600px;

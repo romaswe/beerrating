@@ -3,7 +3,7 @@
 @username = john_admin
 @password = SecurePass123!
 @token = {{postLogin.response.body.token}}
-@beerId = 66df2b2e8f0ef61efac6c187
+@beerId = 67434209ed87e36991b03635
 @page=1
 @limit=20
 @styles=Lager,IPA,Belgian Ale
@@ -44,8 +44,13 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Guinness22",
-  "type": ["Stout", "Lager"]
+  "name": "matchedSites",
+  "type": ["Stout", "Lager"],
+  "matchedSites": {
+    "systembolaget": {
+      "url": "https://www.systembolaget.se/produkt/vin/expedition-221211/"
+    }
+  }
 }
 
 ### Get all beers with pagination
