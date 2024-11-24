@@ -4,6 +4,7 @@ import Rating from "../models/rating";
 
 export const getUserStats = async (req: Request, res: Response) => {
     const userId = req.user?.id;
+
     try {
         const user = await User.findById(userId);
 
@@ -23,19 +24,16 @@ export const getUserStats = async (req: Request, res: Response) => {
             .limit(10)
             .populate([
                 {
-                    path: 'beer', // Populate beer details
+                    path: "beer", // Populate beer details
                     populate: [
+                        { path: "tasting", model: "Tasting" },
                         {
-                            path: 'tasting', // Populate tasting field within beer
-                            model: 'Tasting',
-                        },
-                        {
-                            path: 'reviews', // Populate reviews field within beer
-                            model: 'Rating',
+                            path: "reviews",
+                            model: "Rating",
                             populate: {
-                                path: 'user', // Populate user field within reviews
-                                model: 'User',
-                                select: 'username role', // Specify fields to return
+                                path: "user",
+                                model: "User",
+                                select: "username role",
                                 match: { deletedAt: null, _id: { $ne: null } }, // Exclude deleted users
                             },
                         },
@@ -47,87 +45,51 @@ export const getUserStats = async (req: Request, res: Response) => {
         const totalBeersRated = await Rating.countDocuments({ user: user._id });
 
         // Calculate the average rating given by the user
-        // This is done by grouping all user ratings and calculating the average score
-        // The result is an array with one element, which is an object with the averageRating field
-        // We then extract the averageRating field from this object, or use 0 if it does not exist
         const averageRating = (await Rating.aggregate([
-            { $match: { user: user._id } }, // Filter ratings by user
-            { $group: { _id: null, averageRating: { $avg: "$score" } } }, // Group and calculate average score
+            { $match: { user: user._id } },
+            { $group: { _id: null, averageRating: { $avg: "$score" } } },
         ]))?.[0]?.averageRating || 0;
 
         // Calculate the average rating given by all users
-        // This is done by grouping all user ratings and calculating the average score
-        // The result is an array with one element, which is an object with the averageRating field
-        // We then extract the averageRating field from this object, or use 0 if it does not exist
         const averageRatingAllUsers = (await Rating.aggregate([
-            { $group: { _id: null, averageRating: { $avg: "$score" } } }, // Group and calculate average score
+            { $group: { _id: null, averageRating: { $avg: "$score" } } },
         ]))?.[0]?.averageRating || 0;
 
+        // Fetch the top beer styles rated by the user and calculate stats
         const topBeerTypes = await Rating.aggregate([
             {
                 $lookup: {
-                    from: "beers", // Collection name of beers
+                    from: "beers", // Collection name for beers
                     localField: "beer",
                     foreignField: "_id",
                     as: "beerInfo",
                 },
             },
-            { $unwind: "$beerInfo" }, // Flatten the beer info array
+            { $unwind: "$beerInfo" }, // Flatten the beerInfo array
             { $unwind: "$beerInfo.type" }, // Flatten the beer type array
             {
                 $facet: {
-                    // User-specific ratings grouped by beer type
                     userRatings: [
-                        { $match: { user: user._id } }, // Filter ratings by user
+                        { $match: { user: user._id } },
                         {
                             $group: {
-                                _id: "$beerInfo.type", // Group by beer type
-                                count: { $sum: 1 }, // Count occurrences of each type
-                                averageRating: { $avg: "$score" }, // Calculate average score for user
+                                _id: "$beerInfo.type",
+                                count: { $sum: 1 },
+                                averageRating: { $avg: "$score" },
                             },
                         },
                     ],
-
-                    // Total ratings grouped by beer type
                     totalRatings: [
                         {
                             $group: {
-                                _id: "$beerInfo.type", // Group by beer type
-                                count: { $sum: 1 }, // Count occurrences of each type
-                                averageRating: { $avg: "$score" }, // Calculate average score across all users
-                            },
-                        },
-                    ],
-
-                    // Total beers grouped by beer type (include all beers, rated or not)
-                    totalBeers: [
-                        {
-                            $lookup: {
-                                from: "beers",
-                                pipeline: [
-                                    { $unwind: "$type" }, // Flatten type array
-                                    {
-                                        $group: {
-                                            _id: "$type", // Group by beer type
-                                            totalCount: { $sum: 1 }, // Count all beers in each type
-                                        },
-                                    },
-                                    {
-                                        $project: {
-                                            _id: 0, // Exclude _id from the result
-                                            type: "$_id", // Rename _id to type for matching later
-                                            totalCount: 1, // Include totalCount
-                                        },
-                                    },
-                                ],
-                                as: "totalBeers",
+                                _id: "$beerInfo.type",
+                                count: { $sum: 1 },
+                                averageRating: { $avg: "$score" },
                             },
                         },
                     ],
                 },
             },
-
-            // Combine all facets into a unified result
             {
                 $project: {
                     userRatings: 1,
@@ -136,15 +98,21 @@ export const getUserStats = async (req: Request, res: Response) => {
                             input: "$totalRatings",
                             as: "totalResult",
                             cond: {
-                                $in: ["$$totalResult._id", { $map: { input: "$userRatings", as: "userResult", in: "$$userResult._id" } }],
+                                $in: [
+                                    "$$totalResult._id",
+                                    {
+                                        $map: {
+                                            input: "$userRatings",
+                                            as: "userResult",
+                                            in: "$$userResult._id",
+                                        },
+                                    },
+                                ],
                             },
                         },
                     },
-                    totalBeers: { $arrayElemAt: ["$totalBeers.totalBeers", 0] }, // Extract totalBeers array
                 },
             },
-
-            // Merge userRatings, totalRatings, and totalBeers
             {
                 $project: {
                     combinedResults: {
@@ -161,32 +129,17 @@ export const getUserStats = async (req: Request, res: Response) => {
                                             $arrayElemAt: [
                                                 {
                                                     $filter: {
-                                                        input: "$totalBeers",
-                                                        as: "beerResult",
-                                                        cond: { $eq: ["$$beerResult.type", "$$userResult._id"] },
-                                                    },
-                                                },
-                                                0,
-                                            ],
-                                        },
-                                        { totalCount: 0 }, // Default to 0 if no match
-                                    ],
-                                },
-                                totalAverageRating: {
-                                    $ifNull: [
-                                        {
-                                            $arrayElemAt: [
-                                                {
-                                                    $filter: {
                                                         input: "$filteredTotalRatings",
                                                         as: "totalResult",
-                                                        cond: { $eq: ["$$totalResult._id", "$$userResult._id"] },
+                                                        cond: {
+                                                            $eq: ["$$totalResult._id", "$$userResult._id"],
+                                                        },
                                                     },
                                                 },
                                                 0,
                                             ],
                                         },
-                                        { averageRating: 0 }, // Default to 0 if no match
+                                        { count: 0, averageRating: 0 },
                                     ],
                                 },
                             },
@@ -194,24 +147,39 @@ export const getUserStats = async (req: Request, res: Response) => {
                     },
                 },
             },
-
-            // Flatten and sort combined results
-            { $unwind: "$combinedResults" }, // Flatten the combinedResults array
+            {
+                $project: {
+                    combinedResults: {
+                        $map: {
+                            input: "$combinedResults",
+                            as: "result",
+                            in: {
+                                type: "$$result.type",
+                                userCount: "$$result.userCount",
+                                userAverageRating: "$$result.userAverageRating",
+                                totalCount: "$$result.totalCount.count",
+                                totalAverageRating: {
+                                    $ifNull: ["$$result.totalCount.averageRating", 0],
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            { $unwind: "$combinedResults" },
             {
                 $sort: {
-                    "combinedResults.userCount": -1, // Primary sort by userCount (descending)
-                    "combinedResults.userAverageRating": -1, // Secondary sort by userAverageRating (descending)
+                    "combinedResults.userCount": -1,
+                    "combinedResults.userAverageRating": -1,
                 },
             },
             {
                 $group: {
                     _id: null,
-                    combinedResults: { $push: "$combinedResults" }, // Rebuild the array after sorting
+                    combinedResults: { $push: "$combinedResults" },
                 },
             },
         ]);
-
-
 
         // Prepare the stats to return
         const stats = {
@@ -220,14 +188,14 @@ export const getUserStats = async (req: Request, res: Response) => {
             totalBeersRated,
             averageRating: Math.round(averageRating * 100) / 100,
             averageRatingAllUsers: Math.round(averageRatingAllUsers * 100) / 100,
-            topTenBeers: topTenBeers.map(beer => beer.beer),
+            topTenBeers: topTenBeers.map((beer) => beer.beer),
             topBeerTypes: topBeerTypes[0]?.combinedResults?.length
-                ? topBeerTypes[0].combinedResults.map((type: { type: any; userCount: any; totalCount: any; userAverageRating: any; totalAverageRating: any; }) => ({
+                ? topBeerTypes[0].combinedResults.map((type: { type: any; userCount: any; totalCount: any; userAverageRating: any; totalAverageRating: any }) => ({
                     beerType: type.type,
                     userCount: type.userCount,
-                    totalCount: type.totalCount.totalCount || 0, // Default to 0 if null
-                    averageRating: Math.round((type.userAverageRating || 0) * 100) / 100, // Handle null with default
-                    totalAverageRating: Math.round((type.totalAverageRating || 0) * 100) / 100, // Handle null with default
+                    totalCount: type.totalCount || 0,
+                    averageRating: Math.round((type.userAverageRating || 0) * 100) / 100,
+                    totalAverageRating: Math.round((type.totalAverageRating || 0) * 100) / 100,
                 }))
                 : [],
         };
@@ -237,8 +205,3 @@ export const getUserStats = async (req: Request, res: Response) => {
         res.status(500).json({ message: (error as Error).message });
     }
 };
-
-
-
-
-
