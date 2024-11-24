@@ -103,13 +103,20 @@ export const getUserStats = async (req: Request, res: Response) => {
                     totalBeers: [
                         {
                             $lookup: {
-                                from: "beers", // Use beers as the source
+                                from: "beers",
                                 pipeline: [
                                     { $unwind: "$type" }, // Flatten type array
                                     {
                                         $group: {
                                             _id: "$type", // Group by beer type
                                             totalCount: { $sum: 1 }, // Count all beers in each type
+                                        },
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 0, // Exclude _id from the result
+                                            type: "$_id", // Rename _id to type for matching later
+                                            totalCount: 1, // Include totalCount
                                         },
                                     },
                                 ],
@@ -156,7 +163,7 @@ export const getUserStats = async (req: Request, res: Response) => {
                                                     $filter: {
                                                         input: "$totalBeers",
                                                         as: "beerResult",
-                                                        cond: { $eq: ["$$beerResult._id", "$$userResult._id"] },
+                                                        cond: { $eq: ["$$beerResult.type", "$$userResult._id"] },
                                                     },
                                                 },
                                                 0,
@@ -218,7 +225,7 @@ export const getUserStats = async (req: Request, res: Response) => {
                 ? topBeerTypes[0].combinedResults.map((type: { type: any; userCount: any; totalCount: any; userAverageRating: any; totalAverageRating: any; }) => ({
                     beerType: type.type,
                     userCount: type.userCount,
-                    totalCount: type.totalCount || 0, // Default to 0 if null
+                    totalCount: type.totalCount.totalCount || 0, // Default to 0 if null
                     averageRating: Math.round((type.userAverageRating || 0) * 100) / 100, // Handle null with default
                     totalAverageRating: Math.round((type.totalAverageRating || 0) * 100) / 100, // Handle null with default
                 }))
