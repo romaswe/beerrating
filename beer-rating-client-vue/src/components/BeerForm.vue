@@ -27,15 +27,6 @@
         <label for="abv">ABV (%)</label>
         <input type="number" id="abv" v-model="form.abv" required step="0.1" min="0" max="100" />
       </div>
-      <!-- Optional: Links to Systembolaget, Untapped, and Ratebeer -->
-      <h3>WIP</h3>
-      <div class="form-group">
-        <label for="systembolaget-link">Systembolaget Link</label>
-        <input type="url" id="systembolaget-link" v-model="form.matchedSites!.systembolaget!.url" />
-
-        <label for="systembolaget-id">Systembolaget Number</label>
-        <input type="text" id="systembolaget-id" v-model="form.matchedSites!.systembolaget!.id" />
-      </div>
 
       <div class="button-group">
         <button type="submit" class="submit-button">
@@ -93,9 +84,9 @@ export default defineComponent({
       brewery: '',
       abv: undefined,
       matchedSites: {
-        systembolaget: { url: '', id: '' },
-        untappd: { url: '', id: '' },
-        ratebeer: { url: '', id: '' }
+        systembolaget: { url: undefined, id: undefined },
+        untappd: { url: undefined, id: undefined },
+        ratebeer: { url: undefined, id: undefined }
       }
     })
 
@@ -110,9 +101,12 @@ export default defineComponent({
           brewery: props.beer.brewery || '',
           abv: props.beer.abv || undefined,
           matchedSites: {
-            systembolaget: props.beer.matchedSites?.systembolaget || { url: '', id: '' },
-            untappd: props.beer.matchedSites?.untappd || { url: '', id: '' },
-            ratebeer: props.beer.matchedSites?.ratebeer || { url: '', id: '' }
+            systembolaget: props.beer.matchedSites?.systembolaget || {
+              url: undefined,
+              id: undefined
+            },
+            untappd: props.beer.matchedSites?.untappd || { url: undefined, id: undefined },
+            ratebeer: props.beer.matchedSites?.ratebeer || { url: undefined, id: undefined }
           }
         }
       }
